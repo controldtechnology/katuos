@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=Katu OS
+Description=Tema de inicialização do Katu OS
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/katu
+ScriptFile=/usr/share/plymouth/themes/katu/katu.script

@@ -1,0 +1,30 @@
+#!/bin/bash
+# Hook: Configurar SDDM com tema Katu
+
+set -Eeuo pipefail
+
+echo ">>> [Katu Hook] Configurando SDDM..."
+
+mkdir -p /etc/sddm.conf.d
+
+cat > /etc/sddm.conf.d/katu.conf << 'EOF'
+[Theme]
+Current=katu
+
+[General]
+HaltCommand=/usr/bin/systemctl poweroff
+RebootCommand=/usr/bin/systemctl reboot
+Numlock=none
+
+[Autologin]
+User=
+Session=
+
+[X11]
+ServerArguments=-nolisten tcp -dpi 96
+EOF
+
+# Habilitar SDDM como display manager
+systemctl enable sddm 2>/dev/null || true
+
+echo ">>> [Katu Hook] SDDM configurado."

@@ -1,0 +1,58 @@
+# Katu OS GRUB Theme
+# Baseado em identidade visual Amazônia/Natureza brasileira
+
+# === Fundo ===
+desktop-image: "background.png"
+desktop-color: "#1a1a1a"
+
+# === Título ===
+title-text: "Katu OS"
+title-font: "Noto Sans Bold 20"
+title-color: "#f8f9fa"
+
+# === Fonte padrão ===
++ label {
+    font: "Noto Sans Regular 14"
+    color: "#f8f9fa"
+}
+
+# === Caixa do menu ===
++ boot_menu {
+    left = 25%
+    width = 50%
+    top = 20%
+    height = 50%
+
+    item_font = "Noto Sans Regular 14"
+    item_color = "#cccccc"
+    selected_item_color = "#f8f9fa"
+    item_height = 36
+    item_padding = 12
+    item_spacing = 4
+
+    selected_item_pixmap_style = "select_bkg_*.png"
+
+    scrollbar = false
+    scrollbar_width = 4
+    scrollbar_thumb = "scrollbar_thumb.png"
+    scrollbar_frame = "scrollbar_frame.png"
+}
+
+# === Terminal ===
++ terminal_box {
+    left = 5%
+    width = 90%
+    top = 72%
+    height = 20%
+}
+
+# === Versão no rodapé ===
++ label {
+    left = 5%
+    top = 94%
+    width = 90%
+    align = "left"
+    text = "Katu OS 1.0"
+    font = "Noto Sans Regular 11"
+    color = "#555555"
+}

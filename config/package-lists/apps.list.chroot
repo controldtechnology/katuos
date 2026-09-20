@@ -1,0 +1,54 @@
+# Aplicativos padrão Katu OS
+
+# Navegador
+firefox-esr
+firefox-esr-l10n-pt-br
+
+# Escritório
+libreoffice
+libreoffice-l10n-pt-br
+libreoffice-help-pt-br
+libreoffice-kde5
+
+# Leitura de PDF
+okular
+
+# Imagens
+gwenview
+
+# Vídeo/Áudio
+vlc
+vlc-l10n
+
+# Compactação
+ark
+
+# Fontes
+fonts-noto
+fonts-noto-cjk
+fonts-noto-color-emoji
+
+# Terminal já incluído via kde.list (konsole)
+
+# Utilitários
+htop
+p7zip-full
+gzip
+zip
+unzip
+wget
+curl
+
+# Integração GTK
+qt5ct
+qt6ct
+kde-config-gtk-style
+
+# Impressão
+cups
+system-config-printer
+printer-driver-gutenprint
+
+# Acessibilidade
+orca
+kmag

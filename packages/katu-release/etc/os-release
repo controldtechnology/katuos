@@ -1,0 +1,11 @@
+NAME="Katu OS"
+PRETTY_NAME="Katu OS 1.0"
+VERSION="1.0"
+VERSION_ID="1.0"
+ID=katu
+ID_LIKE=debian
+HOME_URL="https://katuos.org"
+SUPPORT_URL="https://katuos.org/suporte"
+BUG_REPORT_URL="https://github.com/katuos/katuos/issues"
+VERSION_CODENAME=stable
+LOGO=katu-logo

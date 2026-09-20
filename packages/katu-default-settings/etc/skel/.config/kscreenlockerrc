@@ -1,0 +1,9 @@
+[Daemon]
+Autolock=true
+LockGrace=5
+LockOnResume=true
+Timeout=10
+
+[Greeter]
+Theme=org.katuos.desktop
+WallpaperPlugin=org.kde.image

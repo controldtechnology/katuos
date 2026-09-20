@@ -1,0 +1,41 @@
+#!/bin/bash
+# Hook: Configurar Firefox ESR com configurações Katu
+
+set -Eeuo pipefail
+
+echo ">>> [Katu Hook] Configurando Firefox..."
+
+FIREFOX_DIST_DIR="/usr/lib/firefox-esr/distribution"
+mkdir -p "${FIREFOX_DIST_DIR}"
+
+# Configuração de distribuição Firefox
+cat > "${FIREFOX_DIST_DIR}/distribution.ini" << 'EOF'
+[Global]
+id=katuos
+version=1.0
+about=Katu OS Firefox
+
+[Preferences]
+app.distributor=katuos
+app.distributor.channel=katuos-1.0
+EOF
+
+# Políticas (sem telemetria extra, sem adware)
+mkdir -p /usr/lib/firefox-esr/distribution/policies
+cat > /usr/lib/firefox-esr/distribution/policies.json << 'EOF'
+{
+  "policies": {
+    "DisableTelemetry": false,
+    "DisableFirefoxStudies": true,
+    "DisablePocket": false,
+    "NewTabPage": true,
+    "Homepage": {
+      "URL": "about:home",
+      "Locked": false,
+      "StartPage": "homepage"
+    }
+  }
+}
+EOF
+
+echo ">>> [Katu Hook] Firefox configurado."

@@ -1,0 +1,41 @@
+# Pacotes próprios Katu OS
+# Estes pacotes são construídos a partir de packages/ e incluídos no build
+
+katu-branding
+katu-default-settings
+katu-welcome
+katu-release
+
+# Instalador
+calamares
+calamares-settings-debian
+
+# Flatpak
+flatpak
+plasma-discover-backend-flatpak
+
+# NetworkManager
+network-manager
+network-manager-gnome
+network-manager-pptp
+network-manager-vpnc
+network-manager-openvpn
+
+# Suporte Bluetooth
+bluetooth
+bluez
+blueman
+
+# Suporte Android
+libmtp-runtime
+gvfs-backends
+
+# Sistema
+sudo
+bash-completion
+apt-transport-https
+ca-certificates
+gnupg
+lsb-release
+dbus-user-session
+policykit-1

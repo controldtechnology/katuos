@@ -1,0 +1,63 @@
+// Katu OS Plymouth Theme Script
+// Animação de boot minimalista com logo Katu
+
+// Configuração
+Window.SetBackgroundTopColor(0.102, 0.102, 0.102);    // #1a1a1a topo
+Window.SetBackgroundBottomColor(0.063, 0.110, 0.063); // #102010 base verde escura
+
+// Logo principal
+logo.image = Image("logo.png");
+logo.sprite = Sprite();
+logo.sprite.SetImage(logo.image);
+logo.x = Window.GetX() + Window.GetWidth()  / 2 - logo.image.GetWidth()  / 2;
+logo.y = Window.GetY() + Window.GetHeight() / 2 - logo.image.GetHeight() / 2 - 30;
+logo.sprite.SetX(logo.x);
+logo.sprite.SetY(logo.y);
+logo.sprite.SetZ(10);
+
+// Indicador de progresso (barra fina)
+progress_box.image = Image.Scale(
+    Image("progress-box.png"),
+    300, 4
+);
+progress_box.sprite = Sprite();
+progress_box.sprite.SetImage(progress_box.image);
+progress_box.x = Window.GetX() + Window.GetWidth()  / 2 - 150;
+progress_box.y = logo.y + logo.image.GetHeight() + 40;
+progress_box.sprite.SetX(progress_box.x);
+progress_box.sprite.SetY(progress_box.y);
+progress_box.sprite.SetZ(10);
+
+// Barra de progresso animada
+progress_bar.image = Image.Scale(
+    Image("progress-bar.png"),
+    1, 4
+);
+progress_bar.sprite = Sprite();
+progress_bar.sprite.SetImage(progress_bar.image);
+progress_bar.sprite.SetX(progress_box.x);
+progress_bar.sprite.SetY(progress_box.y);
+progress_bar.sprite.SetZ(11);
+progress_bar.width = 0;
+
+// Função de progresso
+fun progress_callback(duration, progress) {
+    new_width = Math.Int(progress * 300);
+    if (new_width > progress_bar.width) {
+        progress_bar.width = new_width;
+        progress_bar.image = Image.Scale(
+            Image("progress-bar.png"),
+            new_width, 4
+        );
+        progress_bar.sprite.SetImage(progress_bar.image);
+    }
+}
+
+Plymouth.SetBootProgressFunction(progress_callback);
+
+// Mensagem de status (tela de login iminente)
+fun message_callback(text) {
+    // Silencioso — não exibir texto técnico
+}
+
+Plymouth.SetMessageFunction(message_callback);

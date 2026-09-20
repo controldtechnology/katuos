@@ -1,0 +1,40 @@
+# Firmware — suporte amplo a hardware
+
+# Firmware geral
+firmware-linux
+firmware-linux-free
+firmware-linux-nonfree
+
+# Wi-Fi
+firmware-iwlwifi
+firmware-realtek
+firmware-atheros
+firmware-brcm80211
+firmware-ralink
+firmware-mediatek
+
+# Bluetooth
+firmware-qualcomm-soc1
+
+# Áudio (Intel)
+firmware-sof-signed
+
+# GPU AMD/ATI
+firmware-amd-graphics
+
+# GPU NVIDIA (Nouveau)
+# Driver proprietário NVIDIA via katu-welcome (não incluído por padrão)
+
+# USB/HID
+firmware-misc-nonfree
+
+# Rede
+firmware-bnx2
+firmware-bnx2x
+firmware-libertas
+firmware-netxen
+firmware-qlogic
+firmware-ti-connectivity
+
+# Multimidia
+firmware-samsung

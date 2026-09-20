@@ -1,0 +1,21 @@
+# Localização — Português Brasil e multilíngue
+
+# Locale
+locales
+locales-all
+
+# Suporte pt_BR
+language-pack-pt
+task-portuguese-brazilian
+
+# Input method
+# ibus (se necessário futuramente)
+
+# Fontes com acentos
+fonts-dejavu
+fonts-dejavu-core
+fonts-dejavu-extra
+fonts-liberation
+fonts-liberation2
+fonts-noto
+fonts-noto-color-emoji

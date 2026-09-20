@@ -1,0 +1,25 @@
+#!/bin/bash
+# Hook: Configurar locale pt_BR
+
+set -Eeuo pipefail
+
+echo ">>> [Katu Hook] Configurando locale pt_BR..."
+
+# Gerar locale
+sed -i 's/# pt_BR.UTF-8 UTF-8/pt_BR.UTF-8 UTF-8/' /etc/locale.gen
+locale-gen
+
+# Definir locale padrão
+cat > /etc/locale.conf << 'EOF'
+LANG=pt_BR.UTF-8
+LANGUAGE=pt_BR:pt:en
+LC_ALL=pt_BR.UTF-8
+EOF
+
+# XDG locale
+mkdir -p /etc/skel/.config
+cat > /etc/skel/.config/user-dirs.locale << 'EOF'
+pt_BR
+EOF
+
+echo ">>> [Katu Hook] Locale pt_BR configurado."

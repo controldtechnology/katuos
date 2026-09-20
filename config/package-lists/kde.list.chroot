@@ -1,0 +1,25 @@
+# KDE Plasma — pacotes principais
+plasma-desktop
+plasma-workspace
+plasma-nm
+plasma-pa
+plasma-systemmonitor
+plasma-disks
+plasma-browser-integration
+kwin-x11
+kwin-wayland
+kde-spectacle
+dolphin
+konsole
+kate
+krunner
+kscreen
+powerdevil
+bluedevil
+kdeconnect
+kde-config-gtk-style
+kde-config-sddm
+breeze
+breeze-gtk-theme
+sddm
+sddm-theme-breeze

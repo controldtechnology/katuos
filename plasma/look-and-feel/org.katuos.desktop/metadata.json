@@ -1,0 +1,17 @@
+{
+    "KPackageStructure": "Plasma/LookAndFeel",
+    "KPlugin": {
+        "Authors": [
+            {
+                "Email": "hello@katuos.org",
+                "Name": "Katu OS Team"
+            }
+        ],
+        "Description": "Tema padrão do Katu OS — Livre. Brasileiro. Para todos.",
+        "Id": "org.katuos.desktop",
+        "License": "MIT",
+        "Name": "Katu OS",
+        "Version": "1.0",
+        "Website": "https://katuos.org"
+    }
+}

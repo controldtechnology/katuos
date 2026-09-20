@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Name=Instalar Katu OS
+Name[en]=Install Katu OS
+GenericName=Instalador do sistema
+Comment=Instalar o Katu OS no seu computador
+Exec=pkexec calamares
+Icon=katu-installer
+Terminal=false
+Categories=System;
+Keywords=instalar;install;katu;setup;
+NoDisplay=false
+OnlyShowIn=KDE;

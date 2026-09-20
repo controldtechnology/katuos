@@ -1,0 +1,22 @@
+#!/bin/bash
+# Hook: Configurar teclado ABNT2 como padrão
+
+set -Eeuo pipefail
+
+echo ">>> [Katu Hook] Configurando teclado..."
+
+# Configuração do teclado para console
+cat > /etc/default/keyboard << 'EOF'
+XKBMODEL="abnt2"
+XKBLAYOUT="br"
+XKBVARIANT=""
+XKBOPTIONS=""
+BACKSPACE="guess"
+EOF
+
+# Aplicar configuração
+if command -v setupcon &>/dev/null; then
+    setupcon --force --save-only || true
+fi
+
+echo ">>> [Katu Hook] Teclado ABNT2 configurado."

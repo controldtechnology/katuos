@@ -1,0 +1,51 @@
+# Build artifacts
+build/
+output/*.iso
+output/*.img
+logs/
+*.log
+
+# live-build cache and chroot
+cache/
+chroot/
+binary/
+.build/
+
+# Debian package build artifacts
+packages/**/debian/
+packages/**/*.deb
+packages/**/*.buildinfo
+packages/**/*.changes
+
+# Large binary files tracked separately
+base/*.iso
+base/*.img
+
+# OS artifacts
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor artifacts
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# Temp files
+*.tmp
+*.bak
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Keep output dir but ignore contents
+output/*
+!output/.gitkeep
+
+# Keep logs dir
+logs/*
+!logs/.gitkeep

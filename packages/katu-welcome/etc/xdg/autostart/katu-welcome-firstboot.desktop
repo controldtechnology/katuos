@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Katu Welcome (First Boot)
+Exec=katu-welcome
+Hidden=false
+NoDisplay=true
+X-GNOME-Autostart-enabled=true
+X-KDE-autostart-condition=katu-welcome:General:FirstBoot:true
+Comment=Katu OS first boot welcome screen

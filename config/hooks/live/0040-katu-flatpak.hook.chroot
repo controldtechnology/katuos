@@ -1,0 +1,17 @@
+#!/bin/bash
+# Hook: Configurar Flatpak (sem adicionar Flathub automaticamente)
+# O usuário escolhe no Katu Welcome se deseja habilitar o Flathub
+
+set -Eeuo pipefail
+
+echo ">>> [Katu Hook] Configurando Flatpak..."
+
+if command -v flatpak &>/dev/null; then
+    # Flatpak instalado — não adicionamos Flathub automaticamente
+    # O Katu Welcome oferece essa opção ao usuário
+    echo ">>> Flatpak disponível. Flathub será configurado opcionalmente via Katu Welcome."
+else
+    echo ">>> Flatpak não instalado, pulando configuração."
+fi
+
+echo ">>> [Katu Hook] Flatpak configurado."

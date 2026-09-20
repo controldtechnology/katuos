@@ -1,0 +1,15 @@
+[Desktop Entry]
+Type=Application
+Name=Bem-vindo ao Katu OS
+Name[en]=Welcome to Katu OS
+Name[es]=Bienvenido a Katu OS
+GenericName=Aplicativo de boas-vindas
+GenericName[en]=Welcome Application
+Comment=Configure seu novo Katu OS
+Comment[en]=Configure your new Katu OS
+Exec=katu-welcome
+Icon=katu-welcome
+Terminal=false
+Categories=System;Settings;
+Keywords=katu;boas-vindas;configuração;bem-vindo;
+StartupNotify=true

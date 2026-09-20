@@ -1,0 +1,19 @@
+#!/bin/bash
+# Hook: Configurar sudo
+
+set -Eeuo pipefail
+
+echo ">>> [Katu Hook] Configurando sudo..."
+
+# Garantir que o grupo sudo existe
+groupadd sudo 2>/dev/null || true
+
+# Configuração padrão do sudo para o grupo sudo
+cat > /etc/sudoers.d/katu-sudo << 'EOF'
+# Katu OS sudo configuration
+%sudo ALL=(ALL:ALL) ALL
+EOF
+
+chmod 440 /etc/sudoers.d/katu-sudo
+
+echo ">>> [Katu Hook] sudo configurado."

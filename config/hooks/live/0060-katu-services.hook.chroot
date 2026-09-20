@@ -1,0 +1,37 @@
+#!/bin/bash
+# Hook: Configurar serviços — habilitar necessários, desabilitar desnecessários
+
+set -Eeuo pipefail
+
+echo ">>> [Katu Hook] Configurando serviços..."
+
+# Habilitar serviços necessários
+ENABLE_SERVICES=(
+    NetworkManager
+    bluetooth
+    cups
+    sddm
+)
+
+for svc in "${ENABLE_SERVICES[@]}"; do
+    if systemctl list-unit-files "${svc}.service" &>/dev/null; then
+        systemctl enable "${svc}" 2>/dev/null || true
+        echo "  [+] Habilitado: ${svc}"
+    fi
+done
+
+# Desabilitar serviços desnecessários para desktop
+DISABLE_SERVICES=(
+    apt-daily.timer
+    apt-daily-upgrade.timer
+    man-db.timer
+)
+
+for svc in "${DISABLE_SERVICES[@]}"; do
+    if systemctl list-unit-files "${svc}" &>/dev/null; then
+        systemctl disable "${svc}" 2>/dev/null || true
+        echo "  [-] Desabilitado: ${svc}"
+    fi
+done
+
+echo ">>> [Katu Hook] Serviços configurados."

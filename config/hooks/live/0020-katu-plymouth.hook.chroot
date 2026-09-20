@@ -1,0 +1,25 @@
+#!/bin/bash
+# Hook: Configurar Plymouth com tema Katu
+
+set -Eeuo pipefail
+
+echo ">>> [Katu Hook] Configurando Plymouth..."
+
+# Verificar se plymouth está instalado
+if ! command -v plymouth-set-default-theme &>/dev/null; then
+    apt-get install -y plymouth plymouth-themes 2>/dev/null || true
+fi
+
+# Definir tema katu
+if plymouth-set-default-theme katu 2>/dev/null; then
+    echo ">>> Tema Plymouth 'katu' ativado."
+else
+    # Fallback para tema disponível
+    plymouth-set-default-theme spinner 2>/dev/null || true
+    echo ">>> Tema Plymouth 'katu' não encontrado, usando 'spinner'."
+fi
+
+# Atualizar initramfs
+update-initramfs -u 2>/dev/null || true
+
+echo ">>> [Katu Hook] Plymouth configurado."

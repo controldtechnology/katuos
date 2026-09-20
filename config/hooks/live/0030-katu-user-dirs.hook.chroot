@@ -1,0 +1,31 @@
+#!/bin/bash
+# Hook: Configurar diretórios do usuário em português
+
+set -Eeuo pipefail
+
+echo ">>> [Katu Hook] Configurando diretórios do usuário..."
+
+# Configurar xdg-user-dirs em português
+cat > /etc/skel/.config/user-dirs.dirs << 'EOF'
+XDG_DESKTOP_DIR="$HOME/Área de Trabalho"
+XDG_DOWNLOAD_DIR="$HOME/Downloads"
+XDG_TEMPLATES_DIR="$HOME/Modelos"
+XDG_PUBLICSHARE_DIR="$HOME/Público"
+XDG_DOCUMENTS_DIR="$HOME/Documentos"
+XDG_MUSIC_DIR="$HOME/Música"
+XDG_PICTURES_DIR="$HOME/Imagens"
+XDG_VIDEOS_DIR="$HOME/Vídeos"
+EOF
+
+# Criar diretórios para o usuário live
+if [ -d /home/katu ]; then
+    mkdir -p "/home/katu/Área de Trabalho"
+    mkdir -p "/home/katu/Downloads"
+    mkdir -p "/home/katu/Documentos"
+    mkdir -p "/home/katu/Imagens"
+    mkdir -p "/home/katu/Vídeos"
+    mkdir -p "/home/katu/Música"
+    chown -R katu:katu /home/katu/ 2>/dev/null || true
+fi
+
+echo ">>> [Katu Hook] Diretórios configurados."
