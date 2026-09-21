@@ -1,8 +1,8 @@
 # Katu OS — Calamares branding
+# Paleta Amazônia Dark: #0d1117 / #00c853 / #ffab00
 
 componentName: katu
 
-# === Strings de apresentação ===
 strings:
     productName:         "Katu OS"
     version:             "1.0"
@@ -10,24 +10,22 @@ strings:
     versionedName:       "Katu OS 1.0"
     shortProductName:    "Katu OS"
     bootloaderEntryName: "Katu OS"
-    productUrl:          "https://katuos.org"
-    supportUrl:          "https://katuos.org/suporte"
-    knownIssuesUrl:      "https://katuos.org/problemas-conhecidos"
-    releaseNotesUrl:     "https://katuos.org/notas-de-versao/1.0"
+    productUrl:          "https://katuos.com.br"
+    supportUrl:          "https://katuos.com.br/suporte"
+    knownIssuesUrl:      "https://katuos.com.br/problemas-conhecidos"
+    releaseNotesUrl:     "https://katuos.com.br/notas/1.0"
 
-# === Imagens ===
 images:
     productLogo:         "logo.png"
-    productIcon:         "logo.png"
-    productWelcome:     "welcome.png"
+    productIcon:         "icon.png"
+    productWelcome:      "welcome.png"
 
-# === Slides durante instalação ===
 slideshow:             "show.qml"
 slideshowAPI:          2
 
-# === Cores ===
 style:
-    sidebarBackground:  "#1a1a1a"
-    sidebarText:        "#f8f9fa"
-    sidebarTextSelect:  "#f8f9fa"
-    sidebarTextHighlight: "#2ecc71"
+    sidebarBackground:       "#0d1117"
+    sidebarText:             "#8b949e"
+    sidebarTextSelect:       "#e6edf3"
+    sidebarTextHighlight:    "#00c853"
+    sidebarSelectionColor:   "#161b22"

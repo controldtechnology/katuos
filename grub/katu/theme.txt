@@ -1,58 +1,79 @@
-# Katu OS GRUB Theme
-# Baseado em identidade visual Amazônia/Natureza brasileira
+# Katu OS GRUB Theme — Amazônia Dark
+# Identidade visual: preto profundo + verde vivo + âmbar
 
 # === Fundo ===
 desktop-image: "background.png"
-desktop-color: "#1a1a1a"
+desktop-color: "#0d1117"
 
 # === Título ===
-title-text: "Katu OS"
-title-font: "Noto Sans Bold 20"
-title-color: "#f8f9fa"
+title-text: ""
 
-# === Fonte padrão ===
+# === Label de boas-vindas ===
 + label {
-    font: "Noto Sans Regular 14"
-    color: "#f8f9fa"
+    top = 8%
+    left = 0
+    width = 100%
+    align = "center"
+    text = "Katu OS"
+    font = "Noto Sans Bold 28"
+    color = "#e6edf3"
+}
+
++ label {
+    top = 13%
+    left = 0
+    width = 100%
+    align = "center"
+    text = "Livre. Brasileiro. Para todos."
+    font = "Noto Sans Regular 13"
+    color = "#8b949e"
+}
+
+# === Separador accent ===
++ label {
+    top = 17%
+    left = 30%
+    width = 40%
+    align = "center"
+    text = "────────────────────────────────"
+    font = "Noto Sans Regular 10"
+    color = "#00c853"
 }
 
 # === Caixa do menu ===
 + boot_menu {
-    left = 25%
-    width = 50%
+    left = 20%
+    width = 60%
     top = 20%
-    height = 50%
+    height = 52%
 
-    item_font = "Noto Sans Regular 14"
-    item_color = "#cccccc"
-    selected_item_color = "#f8f9fa"
-    item_height = 36
-    item_padding = 12
-    item_spacing = 4
-
+    item_font = "Noto Sans Regular 15"
+    item_color = "#8b949e"
+    selected_item_color = "#e6edf3"
     selected_item_pixmap_style = "select_bkg_*.png"
+    item_height = 40
+    item_padding = 16
+    item_spacing = 2
 
     scrollbar = false
-    scrollbar_width = 4
-    scrollbar_thumb = "scrollbar_thumb.png"
-    scrollbar_frame = "scrollbar_frame.png"
 }
 
 # === Terminal ===
 + terminal_box {
     left = 5%
     width = 90%
-    top = 72%
-    height = 20%
+    top = 74%
+    height = 16%
+    terminal_font = "Noto Sans Regular 12"
 }
 
-# === Versão no rodapé ===
+# === Rodapé ===
 + label {
-    left = 5%
-    top = 94%
-    width = 90%
-    align = "left"
-    text = "Katu OS 1.0"
+    left = 0
+    top = 92%
+    width = 100%
+    align = "center"
+    text = "Katu OS 1.0 — baseado em Debian 13 Trixie"
     font = "Noto Sans Regular 11"
-    color = "#555555"
+    color = "#30363d"
 }

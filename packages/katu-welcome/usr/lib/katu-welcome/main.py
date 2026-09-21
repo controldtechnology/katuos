@@ -31,131 +31,143 @@ except ImportError:
         print("Erro: PyQt5 ou PySide6 não encontrado.")
         sys.exit(1)
 
-KATU_VERSION = "1.0"
-KATU_GREEN = "#1a5c2a"
-KATU_EMERALD = "#2ecc71"
-KATU_GOLD = "#f39c12"
-KATU_DARK = "#1a1a1a"
-KATU_WHITE = "#f8f9fa"
+# === Paleta Amazônia Dark ===
+KATU_VERSION       = "1.0"
+KATU_BG            = "#0d1117"
+KATU_BG_ALT        = "#161b22"
+KATU_BG_CARD       = "#1c2128"
+KATU_BORDER        = "#30363d"
+KATU_BORDER_HOVER  = "#484f58"
+KATU_ACCENT        = "#00c853"
+KATU_ACCENT_HOVER  = "#00e676"
+KATU_ACCENT_PRESSED= "#00a040"
+KATU_AMBER         = "#ffab00"
+KATU_TEXT          = "#e6edf3"
+KATU_TEXT_MUTED    = "#8b949e"
+KATU_NEGATIVE      = "#f85149"
+KATU_LINK          = "#58a6ff"
 
 STYLESHEET = f"""
 QMainWindow {{
-    background-color: {KATU_DARK};
+    background-color: {KATU_BG};
 }}
 QWidget {{
-    background-color: {KATU_DARK};
-    color: {KATU_WHITE};
+    background-color: {KATU_BG};
+    color: {KATU_TEXT};
     font-family: 'Noto Sans', 'Liberation Sans', sans-serif;
 }}
+QScrollArea, QScrollArea > QWidget > QWidget {{
+    background-color: transparent;
+    border: none;
+}}
 QLabel#titulo {{
-    font-size: 28px;
+    font-size: 26px;
     font-weight: bold;
-    color: {KATU_WHITE};
+    color: {KATU_TEXT};
+    letter-spacing: -0.5px;
 }}
 QLabel#subtitulo {{
-    font-size: 14px;
-    color: {KATU_EMERALD};
-    font-style: italic;
+    font-size: 13px;
+    color: {KATU_ACCENT};
+    letter-spacing: 0.3px;
 }}
 QLabel#versao {{
     font-size: 11px;
-    color: #888888;
+    color: {KATU_TEXT_MUTED};
 }}
-QPushButton.card {{
-    background-color: #2a2a2a;
-    border: 1px solid #3a3a3a;
-    border-radius: 8px;
-    padding: 16px;
-    text-align: left;
-    color: {KATU_WHITE};
-    font-size: 13px;
-    min-height: 70px;
-    min-width: 200px;
-}}
-QPushButton.card:hover {{
-    background-color: #333333;
-    border: 1px solid {KATU_EMERALD};
-}}
-QPushButton.card:pressed {{
-    background-color: {KATU_GREEN};
+QFrame#separator {{
+    background-color: {KATU_BORDER};
+    max-height: 1px;
 }}
 QPushButton#btn-fechar {{
     background-color: transparent;
-    border: 1px solid #555555;
+    border: 1px solid {KATU_BORDER};
     border-radius: 6px;
     padding: 8px 20px;
-    color: #aaaaaa;
+    color: {KATU_TEXT_MUTED};
     font-size: 12px;
 }}
 QPushButton#btn-fechar:hover {{
-    border-color: {KATU_EMERALD};
-    color: {KATU_WHITE};
+    border-color: {KATU_ACCENT};
+    color: {KATU_TEXT};
+    background-color: {KATU_BG_ALT};
 }}
 QCheckBox {{
     font-size: 12px;
-    color: #aaaaaa;
+    color: {KATU_TEXT_MUTED};
     spacing: 8px;
 }}
 QCheckBox::indicator {{
     width: 16px;
     height: 16px;
-    border-radius: 3px;
-    border: 1px solid #555555;
-    background: #2a2a2a;
+    border-radius: 4px;
+    border: 1px solid {KATU_BORDER};
+    background: {KATU_BG_ALT};
 }}
 QCheckBox::indicator:checked {{
-    background-color: {KATU_EMERALD};
-    border-color: {KATU_EMERALD};
+    background-color: {KATU_ACCENT};
+    border-color: {KATU_ACCENT};
+}}
+QCheckBox::indicator:hover {{
+    border-color: {KATU_ACCENT};
 }}
 """
 
 CARDS = [
     {
         "titulo": "Atualizar sistema",
-        "descricao": "Instalar atualizações disponíveis",
+        "descricao": "Instalar todas as atualizações disponíveis",
         "icone": "system-software-update",
+        "cor_accent": KATU_ACCENT,
         "acao": "update",
     },
     {
         "titulo": "Instalar aplicativos",
-        "descricao": "Abrir a loja de aplicativos",
+        "descricao": "Abrir a loja de aplicativos Discover",
         "icone": "plasmadiscover",
+        "cor_accent": KATU_LINK,
         "acao": "discover",
     },
     {
         "titulo": "Habilitar Flathub",
-        "descricao": "Mais aplicativos via Flatpak",
+        "descricao": "Adicionar repositório com mais de 2.000 apps",
         "icone": "flatpak",
+        "cor_accent": KATU_AMBER,
         "acao": "flathub",
     },
     {
         "titulo": "Drivers de hardware",
-        "descricao": "Verificar drivers necessários",
+        "descricao": "Verificar e instalar drivers necessários",
         "icone": "preferences-devices",
+        "cor_accent": KATU_ACCENT,
         "acao": "drivers",
     },
     {
         "titulo": "Configurar aparência",
-        "descricao": "Personalizar o visual do sistema",
+        "descricao": "Personalizar cores, tema e wallpaper",
         "icone": "preferences-desktop-theme",
+        "cor_accent": KATU_AMBER,
         "acao": "aparencia",
     },
     {
-        "titulo": "Configurações",
-        "descricao": "Configurações do sistema",
+        "titulo": "Configurações do sistema",
+        "descricao": "Ajustar som, rede, usuários e mais",
         "icone": "systemsettings",
+        "cor_accent": KATU_LINK,
         "acao": "configuracoes",
     },
     {
         "titulo": "Documentação",
-        "descricao": "Guias e tutoriais Katu OS",
+        "descricao": "Guias, tutoriais e suporte Katu OS",
         "icone": "help-contents",
+        "cor_accent": KATU_TEXT_MUTED,
         "acao": "docs",
     },
     {
         "titulo": "Sobre o Katu OS",
-        "descricao": "Versão, licença e créditos",
+        "descricao": "Versão, licença, créditos e sistema",
         "icone": "help-about",
+        "cor_accent": KATU_TEXT_MUTED,
         "acao": "sobre",
     },
 ]
@@ -189,7 +201,7 @@ class AcaoThread(QThread):
             elif self.acao == "configuracoes":
                 subprocess.Popen(['systemsettings'])
             elif self.acao == "docs":
-                subprocess.Popen(['xdg-open', 'https://katuos.org/docs'])
+                subprocess.Popen(['xdg-open', 'https://katuos.com.br/docs'])
             elif self.acao == "sobre":
                 subprocess.Popen(['systemsettings', 'kcm_about-distro'])
             self.concluido.emit(self.acao, True)
@@ -198,19 +210,49 @@ class AcaoThread(QThread):
             self.concluido.emit(self.acao, False)
 
 
+class CardButton(QPushButton):
+    def __init__(self, titulo, descricao, cor_accent, parent=None):
+        super().__init__(parent)
+        self._cor_accent = cor_accent
+        self._normal_style = (
+            f"QPushButton {{ background-color: {KATU_BG_CARD}; "
+            f"border: 1px solid {KATU_BORDER}; border-radius: 10px; "
+            f"padding: 16px; text-align: left; color: {KATU_TEXT}; "
+            f"min-height: 76px; }}"
+            f"QPushButton:hover {{ background-color: {KATU_BG_ALT}; "
+            f"border-color: {cor_accent}; }}"
+            f"QPushButton:pressed {{ background-color: {KATU_BG}; }}"
+        )
+        self.setStyleSheet(self._normal_style)
+
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(4, 2, 4, 2)
+        layout.setSpacing(4)
+
+        lbl_titulo = QLabel(f"<b>{titulo}</b>")
+        lbl_titulo.setStyleSheet(f"color: {KATU_TEXT}; font-size: 13px; background: transparent;")
+
+        lbl_desc = QLabel(descricao)
+        lbl_desc.setStyleSheet(f"color: {KATU_TEXT_MUTED}; font-size: 11px; background: transparent;")
+        lbl_desc.setWordWrap(True)
+
+        layout.addWidget(lbl_titulo)
+        layout.addWidget(lbl_desc)
+
+
 class KatuWelcomeWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Bem-vindo ao Katu OS")
-        self.setMinimumSize(700, 560)
-        self.resize(800, 600)
+        self.setMinimumSize(720, 580)
+        self.resize(820, 620)
         self.setStyleSheet(STYLESHEET)
 
         widget_central = QWidget()
         self.setCentralWidget(widget_central)
         layout_principal = QVBoxLayout(widget_central)
         layout_principal.setContentsMargins(40, 32, 40, 24)
-        layout_principal.setSpacing(24)
+        layout_principal.setSpacing(20)
 
         # Cabeçalho
         cabecalho = QWidget()
@@ -220,57 +262,37 @@ class KatuWelcomeWindow(QMainWindow):
 
         titulo = QLabel("Bem-vindo ao Katu OS")
         titulo.setObjectName("titulo")
-        titulo.setAlignment(Qt.AlignLeft)
 
         subtitulo = QLabel("Livre. Brasileiro. Para todos.")
         subtitulo.setObjectName("subtitulo")
 
-        versao = QLabel(f"Versão {KATU_VERSION} · Baseado em Debian")
+        versao = QLabel(f"Versão {KATU_VERSION} · Baseado em Debian 13 Trixie · KDE Plasma")
         versao.setObjectName("versao")
 
         layout_cabecalho.addWidget(titulo)
         layout_cabecalho.addWidget(subtitulo)
         layout_cabecalho.addWidget(versao)
 
+        # Separador
+        sep = QFrame()
+        sep.setObjectName("separator")
+        sep.setFrameShape(QFrame.HLine)
+
         # Grade de cards
         area_scroll = QScrollArea()
         area_scroll.setWidgetResizable(True)
         area_scroll.setFrameShape(QFrame.NoFrame)
-        area_scroll.setStyleSheet("QScrollArea { border: none; background: transparent; }")
 
         widget_grade = QWidget()
         grade = QGridLayout(widget_grade)
-        grade.setSpacing(12)
+        grade.setSpacing(10)
         grade.setContentsMargins(0, 0, 0, 0)
 
         for i, card in enumerate(CARDS):
-            btn = QPushButton()
-            btn.setProperty("class", "card")
-            btn.setStyleSheet(
-                f"QPushButton {{ background-color: #2a2a2a; border: 1px solid #3a3a3a; "
-                f"border-radius: 8px; padding: 16px; text-align: left; "
-                f"color: {KATU_WHITE}; font-size: 13px; min-height: 70px; }} "
-                f"QPushButton:hover {{ background-color: #333333; border-color: {KATU_EMERALD}; }} "
-                f"QPushButton:pressed {{ background-color: {KATU_GREEN}; }}"
-            )
-
-            layout_card = QVBoxLayout(btn)
-            layout_card.setContentsMargins(8, 8, 8, 8)
-
-            lbl_titulo = QLabel(f"<b>{card['titulo']}</b>")
-            lbl_titulo.setStyleSheet(f"color: {KATU_WHITE}; font-size: 13px;")
-            lbl_desc = QLabel(card['descricao'])
-            lbl_desc.setStyleSheet("color: #aaaaaa; font-size: 11px;")
-
-            layout_card.addWidget(lbl_titulo)
-            layout_card.addWidget(lbl_desc)
-
+            btn = CardButton(card['titulo'], card['descricao'], card['cor_accent'])
             acao = card['acao']
             btn.clicked.connect(lambda checked, a=acao: self._executar_acao(a))
-
-            linha = i // 2
-            coluna = i % 2
-            grade.addWidget(btn, linha, coluna)
+            grade.addWidget(btn, i // 2, i % 2)
 
         area_scroll.setWidget(widget_grade)
 
@@ -279,7 +301,7 @@ class KatuWelcomeWindow(QMainWindow):
         layout_rodape = QHBoxLayout(rodape)
         layout_rodape.setContentsMargins(0, 0, 0, 0)
 
-        self.chk_abrir = QCheckBox("Abrir automaticamente ao iniciar sessão")
+        self.chk_abrir = QCheckBox("Abrir automaticamente no início da sessão")
         self.chk_abrir.setChecked(self._obter_autostart())
         self.chk_abrir.stateChanged.connect(self._toggle_autostart)
 
@@ -292,6 +314,7 @@ class KatuWelcomeWindow(QMainWindow):
         layout_rodape.addWidget(btn_fechar)
 
         layout_principal.addWidget(cabecalho)
+        layout_principal.addWidget(sep)
         layout_principal.addWidget(area_scroll, 1)
         layout_principal.addWidget(rodape)
 
@@ -300,13 +323,11 @@ class KatuWelcomeWindow(QMainWindow):
         self.thread.start()
 
     def _obter_autostart(self):
-        autostart = os.path.expanduser(
-            '~/.config/autostart/katu-welcome.desktop'
-        )
+        autostart = os.path.expanduser('~/.config/autostart/katu-welcome.desktop')
         return os.path.exists(autostart)
 
     def _toggle_autostart(self, estado):
-        autostart_dir = os.path.expanduser('~/.config/autostart')
+        autostart_dir  = os.path.expanduser('~/.config/autostart')
         autostart_file = os.path.join(autostart_dir, 'katu-welcome.desktop')
 
         if estado:

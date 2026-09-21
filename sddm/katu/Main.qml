@@ -1,4 +1,4 @@
-// Katu OS SDDM Theme
+// Katu OS SDDM Theme — Amazônia Dark
 // Livre. Brasileiro. Para todos.
 
 import QtQuick 2.15
@@ -10,13 +10,11 @@ Rectangle {
     id: root
     width: 1920
     height: 1080
-    color: "#1a1a1a"
+    color: "#0d1117"
 
-    // Propriedades injetadas pelo SDDM
     property int sessionIndex: sessionModel.lastIndex
-    property bool isLive: false
 
-    // Fundo — wallpaper Katu
+    // Fundo — wallpaper Katu Amazônia
     Image {
         id: background
         anchors.fill: parent
@@ -26,36 +24,46 @@ Rectangle {
         cache: false
     }
 
-    // Overlay escuro sobre wallpaper
+    // Overlay escuro — mantém legibilidade
     Rectangle {
         anchors.fill: parent
-        color: "#000000"
-        opacity: 0.55
+        color: "#0d1117"
+        opacity: 0.72
     }
 
-    // Marca d'água Katu (canto inferior esquerdo)
+    // Linha accent verde no topo
+    Rectangle {
+        anchors { top: parent.top; left: parent.left; right: parent.right }
+        height: 2
+        color: "#00c853"
+        opacity: 0.8
+    }
+
+    // Logo + tagline (canto inferior esquerdo)
     Column {
         anchors {
             left: parent.left
             bottom: parent.bottom
-            margins: 40
+            margins: 48
         }
-        spacing: 4
+        spacing: 6
 
         Image {
             id: logoKatu
-            source: "logo.svg"
-            width: 120
-            height: 48
+            source: "logo.png"
+            width: 110
+            height: 44
             fillMode: Image.PreserveAspectFit
             smooth: true
+            opacity: 0.90
         }
 
         Text {
             text: "Livre. Brasileiro. Para todos."
             font.pixelSize: 11
-            color: "#88ffffff"
+            color: "#8b949e"
             font.family: "Noto Sans"
+            font.letterSpacing: 0.5
         }
     }
 
@@ -64,13 +72,26 @@ Rectangle {
         anchors {
             right: parent.right
             top: parent.top
-            margins: 40
+            topMargin: 48
+            rightMargin: 48
         }
         spacing: 2
 
         Clock {
             id: clock
             anchors.horizontalCenter: parent.horizontalCenter
+            timeFont.pixelSize: 42
+            timeFont.family: "Noto Sans"
+            timeFont.weight: Font.Light
+            color: "#e6edf3"
+        }
+
+        Text {
+            anchors.horizontalCenter: parent.horizontalCenter
+            text: Qt.formatDate(new Date(), "dddd, d 'de' MMMM")
+            font.pixelSize: 13
+            color: "#8b949e"
+            font.family: "Noto Sans"
         }
     }
 
@@ -78,37 +99,46 @@ Rectangle {
     Rectangle {
         id: loginPanel
         anchors.centerIn: parent
-        width: 380
-        height: 440
-        color: "#cc1a1a1a"
-        radius: 16
-        border.color: "#2a2a2a"
+        width: 360
+        height: 420
+        color: "#0d1117"
+        radius: 12
+        border.color: "#30363d"
         border.width: 1
 
-        layer.enabled: true
-        layer.effect: null
+        // Linha accent no topo do painel
+        Rectangle {
+            anchors { top: parent.top; left: parent.left; right: parent.right }
+            height: 2
+            radius: 12
+            color: "#00c853"
+        }
 
         Column {
             anchors {
                 fill: parent
                 margins: 36
+                topMargin: 40
             }
-            spacing: 20
+            spacing: 18
 
-            // Avatar/ícone do usuário
-            Image {
+            // Avatar
+            Rectangle {
                 anchors.horizontalCenter: parent.horizontalCenter
-                source: userModel.currentUser.icon || "user.svg"
-                width: 72
-                height: 72
-                fillMode: Image.PreserveAspectCrop
+                width: 68
+                height: 68
+                radius: 34
+                color: "#161b22"
+                border.color: "#00c853"
+                border.width: 2
 
-                Rectangle {
-                    anchors.fill: parent
-                    radius: width / 2
-                    color: "transparent"
-                    border.color: "#2ecc71"
-                    border.width: 2
+                Text {
+                    anchors.centerIn: parent
+                    text: (userModel.currentUser.realName || userModel.currentUser.name || "U").substring(0, 1).toUpperCase()
+                    font.pixelSize: 28
+                    font.family: "Noto Sans"
+                    font.weight: Font.Medium
+                    color: "#00c853"
                 }
             }
 
@@ -116,8 +146,8 @@ Rectangle {
             Text {
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: userModel.currentUser.realName || userModel.currentUser.name || "Usuário"
-                color: "#f8f9fa"
-                font.pixelSize: 16
+                color: "#e6edf3"
+                font.pixelSize: 15
                 font.weight: Font.Medium
                 font.family: "Noto Sans"
             }
@@ -128,32 +158,27 @@ Rectangle {
                 width: parent.width
                 height: 44
                 echoMode: TextInput.Password
-                placeholderText: "Senha"
+                placeholderText: "Digite sua senha"
                 focus: true
                 font.pixelSize: 14
                 font.family: "Noto Sans"
 
                 background: Rectangle {
-                    color: "#2a2a2a"
+                    color: "#161b22"
                     radius: 8
-                    border.color: passwordField.activeFocus ? "#2ecc71" : "#3a3a3a"
-                    border.width: 1
+                    border.color: passwordField.activeFocus ? "#00c853" : "#30363d"
+                    border.width: passwordField.activeFocus ? 2 : 1
+                    Behavior on border.color { ColorAnimation { duration: 150 } }
                 }
 
-                color: "#f8f9fa"
+                color: "#e6edf3"
                 leftPadding: 16
                 rightPadding: 16
 
                 Keys.onReturnPressed: sddm.login(
-                    userModel.currentUser.name,
-                    passwordField.text,
-                    sessionIndex
-                )
+                    userModel.currentUser.name, passwordField.text, sessionIndex)
                 Keys.onEnterPressed: sddm.login(
-                    userModel.currentUser.name,
-                    passwordField.text,
-                    sessionIndex
-                )
+                    userModel.currentUser.name, passwordField.text, sessionIndex)
             }
 
             // Botão entrar
@@ -166,24 +191,21 @@ Rectangle {
                 font.weight: Font.Medium
 
                 background: Rectangle {
-                    color: parent.pressed ? "#1a5c2a" : (parent.hovered ? "#27ae60" : "#2ecc71")
+                    color: parent.pressed ? "#00a040" : (parent.hovered ? "#00e676" : "#00c853")
                     radius: 8
-                    Behavior on color { ColorAnimation { duration: 150 } }
+                    Behavior on color { ColorAnimation { duration: 120 } }
                 }
 
                 contentItem: Text {
                     text: parent.text
-                    color: "#ffffff"
+                    color: "#0d1117"
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
                     font: parent.font
                 }
 
                 onClicked: sddm.login(
-                    userModel.currentUser.name,
-                    passwordField.text,
-                    sessionIndex
-                )
+                    userModel.currentUser.name, passwordField.text, sessionIndex)
             }
 
             // Mensagem de erro
@@ -191,7 +213,7 @@ Rectangle {
                 id: errorMessage
                 width: parent.width
                 text: ""
-                color: "#e74c3c"
+                color: "#f85149"
                 font.pixelSize: 12
                 font.family: "Noto Sans"
                 wrapMode: Text.WordWrap
@@ -201,20 +223,19 @@ Rectangle {
         }
     }
 
-    // Ações de sistema (canto inferior direito)
+    // Barra inferior — sessão + ações de sistema
     Row {
         anchors {
             right: parent.right
             bottom: parent.bottom
             margins: 30
         }
-        spacing: 12
+        spacing: 8
 
-        // Sessão
         ComboBox {
             id: sessionCombo
-            width: 130
-            height: 36
+            width: 140
+            height: 34
             model: sessionModel
             currentIndex: sessionIndex
             textRole: "name"
@@ -223,65 +244,77 @@ Rectangle {
             onCurrentIndexChanged: sessionIndex = currentIndex
 
             background: Rectangle {
-                color: "#2a2a2a"
+                color: "#161b22"
                 radius: 6
-                border.color: "#3a3a3a"
+                border.color: "#30363d"
+                border.width: 1
             }
             contentItem: Text {
                 leftPadding: 10
                 text: parent.displayText
-                color: "#f8f9fa"
+                color: "#8b949e"
                 font: parent.font
                 verticalAlignment: Text.AlignVCenter
             }
         }
 
         // Reiniciar
-        Button {
-            width: 36
-            height: 36
-            text: "↺"
-            font.pixelSize: 18
-            onClicked: sddm.reboot()
-            background: Rectangle {
-                color: parent.hovered ? "#333333" : "#2a2a2a"
-                radius: 6
+        Rectangle {
+            width: 34; height: 34
+            radius: 6
+            color: rebootArea.containsMouse ? "#161b22" : "transparent"
+            border.color: "#30363d"
+            border.width: 1
+            Behavior on color { ColorAnimation { duration: 120 } }
+
+            Text {
+                anchors.centerIn: parent
+                text: "↺"
+                font.pixelSize: 18
+                color: rebootArea.containsMouse ? "#e6edf3" : "#8b949e"
             }
-            contentItem: Text {
-                text: parent.text
-                color: "#aaaaaa"
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-                font: parent.font
+
+            MouseArea {
+                id: rebootArea
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: sddm.reboot()
             }
-            ToolTip.visible: hovered
+
+            ToolTip.visible: rebootArea.containsMouse
             ToolTip.text: "Reiniciar"
         }
 
         // Desligar
-        Button {
-            width: 36
-            height: 36
-            text: "⏻"
-            font.pixelSize: 16
-            onClicked: sddm.powerOff()
-            background: Rectangle {
-                color: parent.hovered ? "#333333" : "#2a2a2a"
-                radius: 6
+        Rectangle {
+            width: 34; height: 34
+            radius: 6
+            color: powerArea.containsMouse ? "#1c0a0a" : "transparent"
+            border.color: powerArea.containsMouse ? "#f85149" : "#30363d"
+            border.width: 1
+            Behavior on color { ColorAnimation { duration: 120 } }
+
+            Text {
+                anchors.centerIn: parent
+                text: "⏻"
+                font.pixelSize: 16
+                color: powerArea.containsMouse ? "#f85149" : "#8b949e"
             }
-            contentItem: Text {
-                text: parent.text
-                color: "#aaaaaa"
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-                font: parent.font
+
+            MouseArea {
+                id: powerArea
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: sddm.powerOff()
             }
-            ToolTip.visible: hovered
+
+            ToolTip.visible: powerArea.containsMouse
             ToolTip.text: "Desligar"
         }
     }
 
-    // Conexões com SDDM
     Connections {
         target: sddm
         function onLoginFailed() {

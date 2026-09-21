@@ -8,15 +8,22 @@ O Katu OS representa a biodiversidade, inovação e cultura brasileira.
 - **Missão**: Linux acessível, bonito e funcional para o Brasil
 - **Personalidade**: Moderno, acolhedor, verde amazônico
 
-## Paleta de Cores
+## Paleta de Cores — Amazônia Dark
 
-| Nome | Hex | Uso |
-|------|-----|-----|
-| Katu Escuro | `#1a1a1a` | Background principal |
-| Katu Esmeralda | `#2ecc71` | Accent principal (seleção, foco, botões) |
-| Katu Ouro | `#f39c12` | Accent secundário (destaques, avisos) |
-| Katu Claro | `#ecf0f1` | Texto em fundo escuro |
-| Katu Verde Escuro | `#102018` | Background Plymouth |
+| Nome | Hex | RGB | Uso |
+|------|-----|-----|-----|
+| Katu Preto | `#0d1117` | 13, 17, 23 | Background principal |
+| Katu Fundo Alt | `#161b22` | 22, 27, 34 | Painéis, sidebar |
+| Katu Card | `#1c2128` | 28, 33, 40 | Cards, campos de entrada |
+| Katu Borda | `#30363d` | 48, 54, 61 | Bordas, separadores |
+| **Katu Verde** | `#00c853` | 0, 200, 83 | **Accent principal** |
+| Katu Verde Hover | `#00e676` | 0, 230, 118 | Hover do accent |
+| Katu Verde Pressed | `#00a040` | 0, 160, 64 | Pressed/active |
+| **Katu Âmbar** | `#ffab00` | 255, 171, 0 | **Accent secundário** |
+| Katu Texto | `#e6edf3` | 230, 237, 243 | Texto principal |
+| Katu Texto Muted | `#8b949e` | 139, 148, 158 | Texto secundário |
+| Katu Negativo | `#f85149` | 248, 81, 73 | Erros, desligar |
+| Katu Link | `#58a6ff` | 88, 166, 255 | Links |
 
 ## Tipografia
 
@@ -46,14 +53,15 @@ O logo do Katu OS consiste em:
 
 ## Temas
 
-### KatuDark (padrão)
-- Background: `#1a1a1a`
-- Accent: `#2ecc71` (esmeralda)
+### KatuDark — Amazônia (padrão)
+- Background: `#0d1117` (preto profundo)
+- Accent: `#00c853` (verde vivo)
+- Secundário: `#ffab00` (âmbar)
 - Arquivo: `plasma/colors/KatuDark.colors`
 
-### KatuLight
-- Background: `#ffffff` / `#f0f0f0`
-- Accent: `#2ecc71` (esmeralda — mesma)
+### KatuLight — Amazônia
+- Background: `#f0f4f8` (branco suave)
+- Accent: `#00c853` (verde vivo — mesma identidade)
 - Arquivo: `plasma/colors/KatuLight.colors`
 
 O usuário pode alternar entre os temas via **Configurações do Sistema → Esquema de Cores**.
