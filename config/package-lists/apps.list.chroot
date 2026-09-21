@@ -14,7 +14,7 @@ libreoffice-math
 libreoffice-base
 libreoffice-l10n-pt-br
 libreoffice-help-pt-br
-libreoffice-kde5
+libreoffice-kf5
 libreoffice-java-common
 # Fontes para compatibilidade com Word/Excel
 fonts-liberation

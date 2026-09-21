@@ -13,9 +13,6 @@ firmware-brcm80211
 firmware-ralink
 firmware-mediatek
 
-# Bluetooth
-firmware-qualcomm-soc1
-
 # Áudio (Intel)
 firmware-sof-signed
 

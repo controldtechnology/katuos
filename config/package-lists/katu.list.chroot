@@ -46,10 +46,9 @@ kdeconnect
 
 # Informações do sistema KDE (§62)
 plasma-systemmonitor
-kcm-about-distro
 
 # Informações do sistema no terminal
-fastfetch | neofetch
+fastfetch
 
 # Sistema
 sudo
@@ -59,4 +58,4 @@ ca-certificates
 gnupg
 lsb-release
 dbus-user-session
-policykit-1
+polkit

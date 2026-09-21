@@ -4,10 +4,6 @@
 locales
 locales-all
 
-# Suporte pt_BR
-language-pack-pt
-task-portuguese-brazilian
-
 # Input method
 # ibus (se necessário futuramente)
 
