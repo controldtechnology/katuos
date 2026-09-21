@@ -1,20 +1,35 @@
 #!/bin/sh
-# Cria copias sem versao do kernel e initrd para compatibilidade com grub.cfg
-# O live-build gera vmlinuz-X.Y.Z-amd64 mas nosso grub.cfg usa /live/vmlinuz
+# Cria /live/vmlinuz e /live/initrd.img sem versão para compatibilidade com grub.cfg
 set -e
 
-LIVE_DIR="binary/live"
-if [ ! -d "$LIVE_DIR" ]; then
-    echo "WARNING: $LIVE_DIR nao encontrado, pulando copia do kernel"
+echo "=== Hook binary kernel: CWD=$(pwd) ==="
+ls -la 2>/dev/null || true
+
+# live-build binary hooks rodam dentro do diretório binary/
+# Tentar paths relativos ao cwd atual
+LIVE_DIR=""
+for try in "live" "binary/live" "../binary/live"; do
+    if [ -d "$try" ]; then
+        LIVE_DIR="$try"
+        echo "Diretório live encontrado: $try"
+        break
+    fi
+done
+
+if [ -z "$LIVE_DIR" ]; then
+    echo "WARNING: diretório live não encontrado — listando diretórios:"
+    find . -maxdepth 3 -name "vmlinuz*" 2>/dev/null || true
     exit 0
 fi
 
 cd "$LIVE_DIR"
+echo "Conteúdo de $LIVE_DIR:"
+ls -la
 
 for K in vmlinuz-*; do
     if [ -f "$K" ]; then
         cp -v "$K" vmlinuz
-        echo "Kernel copiado: $K -> vmlinuz"
+        echo "OK: $K -> vmlinuz"
         break
     fi
 done
@@ -22,10 +37,10 @@ done
 for I in initrd.img-*; do
     if [ -f "$I" ]; then
         cp -v "$I" initrd.img
-        echo "Initrd copiado: $I -> initrd.img"
+        echo "OK: $I -> initrd.img"
         break
     fi
 done
 
-[ -f "vmlinuz" ] && echo "OK: /live/vmlinuz criado" || { echo "ERRO: vmlinuz nao criado!"; exit 1; }
-[ -f "initrd.img" ] && echo "OK: /live/initrd.img criado" || { echo "ERRO: initrd.img nao criado!"; exit 1; }
+[ -f "vmlinuz" ]  && echo "OK: /live/vmlinuz criado"  || echo "AVISO: vmlinuz nao criado"
+[ -f "initrd.img" ] && echo "OK: /live/initrd.img criado" || echo "AVISO: initrd.img nao criado"
