@@ -1,0 +1,19 @@
+#!/bin/bash
+# Hook: Configurar firewall UFW (§39)
+
+set -Eeuo pipefail
+
+echo ">>> [Katu Hook] Configurando UFW..."
+
+# Habilitar UFW com política padrão
+ufw default deny incoming
+ufw default allow outgoing
+ufw allow ssh || true
+
+# Habilitar mas não ativar por padrão no live — ativado após instalação
+ufw --force enable || true
+
+# Configurar para iniciar no boot do sistema instalado
+systemctl enable ufw || true
+
+echo ">>> [Katu Hook] UFW configurado (allow outgoing / deny incoming)."

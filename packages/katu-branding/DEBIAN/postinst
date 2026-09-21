@@ -1,0 +1,14 @@
+#!/bin/bash
+set -e
+
+# Atualizar cache de ícones
+if command -v gtk-update-icon-cache &>/dev/null; then
+    gtk-update-icon-cache -f /usr/share/icons/hicolor 2>/dev/null || true
+fi
+
+if command -v kbuildsycoca6 &>/dev/null; then
+    kbuildsycoca6 --noincremental 2>/dev/null || true
+fi
+
+#DEBHELPER#
+exit 0

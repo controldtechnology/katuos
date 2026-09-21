@@ -1,0 +1,10 @@
+#!/bin/bash
+set -e
+
+# Link os-release para LSB compatibility
+if [ -f /etc/os-release ]; then
+    ln -sf /etc/os-release /usr/lib/os-release 2>/dev/null || true
+fi
+
+#DEBHELPER#
+exit 0

@@ -11,8 +11,8 @@ chroot/
 binary/
 .build/
 
-# Debian package build artifacts
-packages/**/debian/
+# Debian package build artifacts (lowercase debian/ = debhelper source dir)
+# UPPERCASE DEBIAN/ = package control dir — deve ser versionado
 packages/**/*.deb
 packages/**/*.buildinfo
 packages/**/*.changes

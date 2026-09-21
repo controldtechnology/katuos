@@ -17,6 +17,8 @@ Calamares.Slideshow {
         "slide-06.png"
     ]
 
+    property color katuGreen: "#2ecc71"
+
     Rectangle {
         anchors.fill: parent
         color: "#1a1a1a"

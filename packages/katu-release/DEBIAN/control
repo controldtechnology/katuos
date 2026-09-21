@@ -1,0 +1,11 @@
+Package: katu-release
+Version: 1.0
+Architecture: all
+Maintainer: Katu OS Team <hello@katuos.org>
+Depends: lsb-release
+Replaces: base-files
+Priority: required
+Section: misc
+Description: Katu OS release information
+ This package provides the Katu OS release identification files,
+ including /etc/os-release and /etc/katu-release.

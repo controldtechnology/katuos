@@ -1,0 +1,8 @@
+#!/bin/bash
+set -e
+
+# Aplicar configurações padrão para novos usuários via /etc/skel
+# (os arquivos já estão em /etc/skel pelo pacote)
+
+#DEBHELPER#
+exit 0

@@ -30,6 +30,17 @@ blueman
 libmtp-runtime
 gvfs-backends
 
+# Firewall (§39)
+ufw
+gufw
+
+# KDE Connect (§45)
+kdeconnect
+
+# Informações do sistema KDE (§62)
+plasma-systemmonitor
+kcm-about-distro
+
 # Sistema
 sudo
 bash-completion

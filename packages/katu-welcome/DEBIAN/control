@@ -1,0 +1,12 @@
+Package: katu-welcome
+Version: 1.0
+Architecture: all
+Maintainer: Katu OS Team <hello@katuos.org>
+Depends: python3 (>= 3.10), python3-pyqt5 | python3-pyside6, katu-release
+Priority: optional
+Section: misc
+Description: Katu OS welcome application
+ Welcome application that opens on first login.
+ Guides new users through post-install steps such as
+ updates, driver installation, app store setup,
+ and system configuration.

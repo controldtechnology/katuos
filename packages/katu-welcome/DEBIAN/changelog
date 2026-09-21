@@ -1,0 +1,5 @@
+katu-welcome (1.0-1) stable; urgency=low
+
+  * Initial release: aplicativo de boas-vindas PyQt5 com 8 cartões de ação.
+
+ -- Katu OS Project <controld.technology@gmail.com>  Sat, 20 Sep 2026 00:00:00 -0300

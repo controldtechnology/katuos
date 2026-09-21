@@ -1,0 +1,11 @@
+Package: katu-default-settings
+Version: 1.0
+Architecture: all
+Maintainer: Katu OS Team <hello@katuos.org>
+Depends: katu-branding, plasma-desktop, sddm
+Priority: optional
+Section: misc
+Description: Katu OS default desktop configuration
+ This package provides default KDE Plasma settings for Katu OS:
+ panel layout, color schemes, application defaults,
+ and system configuration tuned for the Katu OS experience.

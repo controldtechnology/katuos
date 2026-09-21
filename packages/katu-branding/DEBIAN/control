@@ -1,0 +1,11 @@
+Package: katu-branding
+Version: 1.0
+Architecture: all
+Maintainer: Katu OS Team <hello@katuos.org>
+Depends: katu-release, plasma-desktop
+Recommends: katu-default-settings
+Priority: optional
+Section: misc
+Description: Katu OS visual branding
+ This package provides the visual identity for Katu OS:
+ logos, wallpapers, splash screens and brand assets.

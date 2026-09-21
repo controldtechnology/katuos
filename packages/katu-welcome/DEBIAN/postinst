@@ -1,0 +1,14 @@
+#!/bin/bash
+set -e
+
+# Tornar executável
+chmod +x /usr/bin/katu-welcome
+chmod +x /usr/lib/katu-welcome/main.py
+
+# Atualizar banco de dados de aplicativos
+if command -v update-desktop-database &>/dev/null; then
+    update-desktop-database -q /usr/share/applications 2>/dev/null || true
+fi
+
+#DEBHELPER#
+exit 0
