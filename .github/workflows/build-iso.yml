@@ -168,8 +168,7 @@ jobs:
             --iso-preparer "Katu OS Team" \
             --iso-publisher "katuos.com.br" \
             --iso-volume "KATU_OS_1.0" \
-            --hostname katu \
-            --username katu \
+            --bootappend-live "boot=live components username=katu hostname=katu" \
             --compression xz \
             --verbose
           echo "lb config OK"
