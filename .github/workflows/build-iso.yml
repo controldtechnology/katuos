@@ -50,9 +50,10 @@ jobs:
             debootstrap squashfs-tools xorriso isolinux \
             syslinux-common syslinux-efi dpkg-dev apt-utils rsync \
             gzip xz-utils wget curl ca-certificates gnupg dos2unix \
-            python3-pyqt5 python3-pip debian-archive-keyring
+            python3-pyqt5 python3-pip
 
-          # Instalar live-build do Debian Trixie (versao compativel com todas as opcoes)
+          # Instalar live-build e debian-archive-keyring do Debian Trixie
+          # (Ubuntu 2021 keyring nao tem a chave Trixie 762F67A0B2C39DE4)
           sudo tee /etc/apt/sources.list.d/debian-trixie-lb.list > /dev/null << 'EOF'
           deb [trusted=yes] http://deb.debian.org/debian trixie main
           EOF
@@ -64,9 +65,13 @@ jobs:
           Package: live-build
           Pin: release n=trixie
           Pin-Priority: 900
+
+          Package: debian-archive-keyring
+          Pin: release n=trixie
+          Pin-Priority: 900
           EOF
           sudo apt-get update -qq
-          sudo apt-get install -y live-build
+          sudo apt-get install -y live-build debian-archive-keyring
           sudo rm -f /etc/apt/sources.list.d/debian-trixie-lb.list \
                      /etc/apt/preferences.d/debian-trixie-lb
           sudo apt-get update -qq
