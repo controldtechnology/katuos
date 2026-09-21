@@ -1,9 +1,9 @@
-{
+﻿{
     "KPackageStructure": "Plasma/LookAndFeel",
     "KPlugin": {
         "Authors": [
             {
-                "Email": "controld.technology@gmail.com",
+                "Email": "katuos@gmail.com",
                 "Name": "Katu OS Team"
             }
         ],

@@ -1,7 +1,7 @@
-Package: katu-xampp
+﻿Package: katu-xampp
 Version: 1.0-1
 Architecture: all
-Maintainer: Katu OS Team <controld.technology@gmail.com>
+Maintainer: Katu OS Team <katuos@gmail.com>
 Depends: python3, python3-pyqt5 | python3-pyside6, apache2, php, php-mysql, php-curl, php-gd, php-mbstring, php-xml, php-zip, mariadb-server, phpmyadmin, libapache2-mod-php
 Recommends: composer, nodejs, npm
 Description: Katu XAMPP — Painel de Controle LAMP

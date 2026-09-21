@@ -1,7 +1,7 @@
-Package: katu-release
+﻿Package: katu-release
 Version: 1.0
 Architecture: all
-Maintainer: Katu OS Team <controld.technology@gmail.com>
+Maintainer: Katu OS Team <katuos@gmail.com>
 Depends: lsb-release
 Replaces: base-files
 Priority: required

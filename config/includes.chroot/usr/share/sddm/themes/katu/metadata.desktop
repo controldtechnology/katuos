@@ -1,8 +1,8 @@
-[SddmGreeterTheme]
+﻿[SddmGreeterTheme]
 Name=Katu OS
 Description=Tema oficial do Katu OS para SDDM
 Author=Katu OS Team
-Email=controld.technology@gmail.com
+Email=katuos@gmail.com
 License=MIT
 Type=sddm-theme
 Version=1.0

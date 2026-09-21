@@ -1,5 +1,5 @@
-katu-ia (1.0-1) stable; urgency=low
+﻿katu-ia (1.0-1) stable; urgency=low
 
   * Initial release: hub de IA com Claude, GPT-4, Gemini, Ollama e prompts para devs.
 
- -- Katu OS Team <controld.technology@gmail.com>  Sat, 20 Sep 2026 00:00:00 -0300
+ -- Katu OS Team <katuos@gmail.com>  Sat, 20 Sep 2026 00:00:00 -0300
