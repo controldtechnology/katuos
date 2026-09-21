@@ -1,0 +1,12 @@
+#!/bin/bash
+set -e
+
+chmod +x /usr/bin/katu-installer
+chmod +x /usr/lib/katu-installer/instalador.py
+
+if command -v update-desktop-database &>/dev/null; then
+    update-desktop-database -q /usr/share/applications 2>/dev/null || true
+fi
+
+#DEBHELPER#
+exit 0

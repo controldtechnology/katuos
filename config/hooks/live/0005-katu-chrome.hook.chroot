@@ -1,0 +1,27 @@
+#!/bin/bash
+# Hook: Instalar Google Chrome estável
+# Executado antes dos outros hooks (numeração 0005)
+
+set -Eeuo pipefail
+
+echo ">>> [Katu Hook] Instalando Google Chrome..."
+
+# Adicionar chave GPG do Google
+install -d -m 755 /usr/share/keyrings
+wget -qO- https://dl.google.com/linux/linux_signing_key.pub \
+    | gpg --dearmor > /usr/share/keyrings/google-chrome.gpg
+
+# Adicionar repositório
+echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome.gpg] \
+http://dl.google.com/linux/chrome/deb/ stable main" \
+    > /etc/apt/sources.list.d/google-chrome.list
+
+# Instalar
+apt-get update -qq
+apt-get install -y google-chrome-stable
+
+# Remover atalho de repositório que o Chrome adiciona automaticamente
+# (evitar duplicata com o que já criamos)
+rm -f /etc/apt/sources.list.d/google-chrome.list
+
+echo ">>> [Katu Hook] Google Chrome instalado."

@@ -1,26 +1,37 @@
 # Aplicativos padrão Katu OS
 
-# Navegador
+# Navegadores
 firefox-esr
 firefox-esr-l10n-pt-br
+# Google Chrome é instalado via hook 0005-katu-chrome
 
-# Escritório
-libreoffice
+# Escritório LibreOffice — Suite completa em PT-BR
+libreoffice-writer
+libreoffice-calc
+libreoffice-impress
+libreoffice-draw
+libreoffice-math
+libreoffice-base
 libreoffice-l10n-pt-br
 libreoffice-help-pt-br
 libreoffice-kde5
+libreoffice-java-common
+# Fontes para compatibilidade com Word/Excel
+fonts-liberation
+fonts-crosextra-carlito
+fonts-crosextra-caladea
 
 # Leitura de PDF
 okular
 
-# Imagens
+# Visualizador de imagens
 gwenview
 
 # Vídeo/Áudio
 vlc
 vlc-l10n
 
-# Codecs multimídia (§29)
+# Codecs multimídia
 gstreamer1.0-plugins-base
 gstreamer1.0-plugins-good
 gstreamer1.0-plugins-bad
@@ -30,26 +41,26 @@ ffmpeg
 
 # Compactação
 ark
+p7zip-full
 
 # Fontes
 fonts-noto
 fonts-noto-cjk
 fonts-noto-color-emoji
 
-# Terminal já incluído via kde.list (konsole)
+# Editor de texto simples
+kate
 
-# Utilitários
+# Utilitários de sistema
 htop
-p7zip-full
 gzip
 zip
 unzip
 wget
 curl
 
-# Integração GTK
+# Integração GTK com KDE
 qt5ct
-qt6ct
 kde-config-gtk-style
 
 # Impressão

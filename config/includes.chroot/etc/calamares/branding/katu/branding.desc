@@ -15,6 +15,22 @@ strings:
     knownIssuesUrl:      "https://katuos.com.br/problemas-conhecidos"
     releaseNotesUrl:     "https://katuos.com.br/notas/1.0"
 
+    # Textos da tela de instalação
+    welcome:
+        title:       "Bem-vindo ao Katu OS!"
+        subtitle:    "Livre. Brasileiro. Para todos."
+        description: "Vamos instalar o Katu OS no seu computador.\nO processo é simples e leva apenas alguns minutos."
+
+    install:
+        title:    "Instalando o Katu OS…"
+        subtitle: "Isso pode levar entre 10 e 30 minutos.\nNão desligue o computador."
+
+    finished:
+        title:       "Instalação concluída!"
+        restartNow:  "Reiniciar agora"
+        restartLater: "Continuar usando o sistema live"
+        description: "O Katu OS foi instalado com sucesso! Remova o pendrive e reinicie."
+
 images:
     productLogo:         "logo.png"
     productIcon:         "icon.png"

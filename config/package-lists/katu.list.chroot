@@ -9,6 +9,7 @@ katu-release
 # Instalador
 calamares
 calamares-settings-debian
+katu-installer
 
 # Flatpak
 flatpak

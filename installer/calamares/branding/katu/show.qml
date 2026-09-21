@@ -1,5 +1,6 @@
 /* Katu OS — Calamares Installation Slideshow
-   Amazônia Dark: #0d1117 / #00c853 / #ffab00  */
+   Slides informativos durante a instalação — PT-BR amigável
+   Paleta: #0d1117 / #00c853 / #ffab00                        */
 
 import QtQuick 2.15
 import QtQuick.Controls 2.15
@@ -15,14 +16,40 @@ Calamares.Slideshow {
     property color katuText:   "#e6edf3"
     property color katuMuted:  "#8b949e"
     property color katuBorder: "#30363d"
+    property color katuLink:   "#58a6ff"
 
-    property var slides: [
-        "slide-01.png",
-        "slide-02.png",
-        "slide-03.png",
-        "slide-04.png",
-        "slide-05.png",
-        "slide-06.png"
+    // Cada slide tem: imagem de fundo + título + descrição
+    property var slideData: [
+        {
+            img:   "slide-01.png",
+            titulo: "Bem-vindo ao Katu OS!",
+            desc:  "O Linux brasileiro feito para todo mundo.\nSimples, rápido e bonito — pronto para usar."
+        },
+        {
+            img:   "slide-02.png",
+            titulo: "Trabalhe com o LibreOffice",
+            desc:  "Suite de escritório completa em português.\nCompatível com Word, Excel e PowerPoint."
+        },
+        {
+            img:   "slide-03.png",
+            titulo: "Firefox e Google Chrome incluídos",
+            desc:  "Dois navegadores prontos para usar.\nNavigue com segurança e velocidade."
+        },
+        {
+            img:   "slide-04.png",
+            titulo: "Tudo em português do Brasil",
+            desc:  "Interface, teclado ABNT2 e fuso horário de São Paulo\nconfigurados automaticamente."
+        },
+        {
+            img:   "slide-05.png",
+            titulo: "Seguro e sempre atualizado",
+            desc:  "Baseado no Debian 13 — o Linux mais estável do mundo.\nAtualizações de segurança automáticas."
+        },
+        {
+            img:   "slide-06.png",
+            titulo: "Quase pronto!",
+            desc:  "O Katu OS está sendo instalado no seu computador.\nEm breve você poderá começar a usar."
+        }
     ]
 
     Rectangle {
@@ -32,65 +59,141 @@ Calamares.Slideshow {
         // Linha accent topo
         Rectangle {
             anchors { top: parent.top; left: parent.left; right: parent.right }
-            height: 2
+            height: 3
             color: katuGreen
-            z: 10
+            z: 20
         }
 
-        SwipeView {
-            id: swipeView
-            anchors.fill: parent
-            currentIndex: 0
+        // Área de imagem (metade superior)
+        Item {
+            id: areaImagem
+            anchors { top: parent.top; left: parent.left; right: parent.right }
+            height: parent.height * 0.55
 
-            Repeater {
-                model: slides
+            SwipeView {
+                id: swipeView
+                anchors.fill: parent
+                currentIndex: 0
 
-                Item {
-                    Image {
-                        anchors.fill: parent
-                        source: modelData
-                        fillMode: Image.PreserveAspectCrop
-                        asynchronous: true
-                        smooth: true
+                Repeater {
+                    model: slideData
 
-                        // Overlay suave nos slides
-                        Rectangle {
+                    Item {
+                        Image {
                             anchors.fill: parent
-                            color: "#0d1117"
-                            opacity: 0.35
+                            source: modelData.img
+                            fillMode: Image.PreserveAspectCrop
+                            asynchronous: true
+                            smooth: true
+
+                            Rectangle {
+                                anchors.fill: parent
+                                color: "#0d1117"
+                                opacity: 0.40
+                            }
                         }
                     }
                 }
             }
         }
 
-        // Indicadores de slide
-        Row {
+        // Área de texto (metade inferior)
+        Rectangle {
+            id: areaTexto
             anchors {
+                top: areaImagem.bottom
+                left: parent.left
+                right: parent.right
                 bottom: parent.bottom
-                horizontalCenter: parent.horizontalCenter
-                bottomMargin: 24
             }
-            spacing: 8
+            color: katuBg
 
-            Repeater {
-                model: slides.length
+            Column {
+                anchors {
+                    fill: parent
+                    margins: 36
+                    topMargin: 28
+                }
+                spacing: 12
 
-                Rectangle {
-                    width:  swipeView.currentIndex === index ? 28 : 8
-                    height: 4
-                    radius: 2
-                    color:  swipeView.currentIndex === index ? katuGreen : katuBorder
-                    Behavior on width { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
-                    Behavior on color { ColorAnimation { duration: 200 } }
+                // Número do slide
+                Text {
+                    text: (swipeView.currentIndex + 1) + " / " + slideData.length
+                    color: katuGreen
+                    font.pixelSize: 12
+                    font.family: "Noto Sans"
+                    font.letterSpacing: 1
+                }
+
+                // Título do slide
+                Text {
+                    id: tituloSlide
+                    width: parent.width
+                    text: slideData[swipeView.currentIndex] ? slideData[swipeView.currentIndex].titulo : ""
+                    color: katuText
+                    font.pixelSize: 22
+                    font.family: "Noto Sans"
+                    font.weight: Font.Bold
+                    wrapMode: Text.WordWrap
+
+                    Behavior on text {
+                        SequentialAnimation {
+                            NumberAnimation { target: tituloSlide; property: "opacity"; to: 0; duration: 150 }
+                            PropertyAction { }
+                            NumberAnimation { target: tituloSlide; property: "opacity"; to: 1; duration: 200 }
+                        }
+                    }
+                }
+
+                // Descrição
+                Text {
+                    id: descSlide
+                    width: parent.width
+                    text: slideData[swipeView.currentIndex] ? slideData[swipeView.currentIndex].desc : ""
+                    color: katuMuted
+                    font.pixelSize: 14
+                    font.family: "Noto Sans"
+                    lineHeight: 1.5
+                    wrapMode: Text.WordWrap
+
+                    Behavior on text {
+                        SequentialAnimation {
+                            NumberAnimation { target: descSlide; property: "opacity"; to: 0; duration: 150 }
+                            PropertyAction { }
+                            NumberAnimation { target: descSlide; property: "opacity"; to: 1; duration: 200 }
+                        }
+                    }
+                }
+            }
+
+            // Indicadores pill na base
+            Row {
+                anchors {
+                    bottom: parent.bottom
+                    horizontalCenter: parent.horizontalCenter
+                    bottomMargin: 20
+                }
+                spacing: 8
+
+                Repeater {
+                    model: slideData.length
+
+                    Rectangle {
+                        width:  swipeView.currentIndex === index ? 32 : 8
+                        height: 4
+                        radius: 2
+                        color:  swipeView.currentIndex === index ? katuGreen : katuBorder
+                        Behavior on width { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
+                        Behavior on color { ColorAnimation { duration: 200 } }
+                    }
                 }
             }
         }
     }
 
-    // Auto-avanço a cada 6 segundos
+    // Auto-avanço a cada 7 segundos
     Timer {
-        interval: 6000
+        interval: 7000
         running: true
         repeat: true
         onTriggered: {
