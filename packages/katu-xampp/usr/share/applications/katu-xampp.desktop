@@ -1,0 +1,15 @@
+[Desktop Entry]
+Name=Katu XAMPP
+Name[pt_BR]=Katu XAMPP — Painel LAMP
+GenericName=Painel de Controle LAMP
+GenericName[pt_BR]=Painel de Controle LAMP
+Comment=Apache, PHP, MariaDB e phpMyAdmin — painel visual completo
+Comment[pt_BR]=Gerencie seu servidor local: Apache, PHP 8.2, MariaDB e phpMyAdmin
+Exec=katu-xampp
+Icon=katu-xampp
+Terminal=false
+Type=Application
+Categories=Development;WebDevelopment;Network;
+Keywords=web;servidor;lamp;apache;mysql;php;desenvolvimento;dev;localhost;
+StartupNotify=true
+StartupWMClass=katu-xampp

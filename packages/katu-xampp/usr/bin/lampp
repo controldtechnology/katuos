@@ -1,0 +1,48 @@
+#!/bin/bash
+# lampp — compatibilidade com comandos XAMPP tradicionais
+# Uso: lampp start|stop|restart|status
+
+SERVICOS="apache2 mariadb"
+
+case "${1}" in
+    start)
+        echo "Iniciando LAMP stack..."
+        for s in $SERVICOS; do
+            sudo systemctl start "$s" && echo "  ✓  $s iniciado" || echo "  ✗  Erro ao iniciar $s"
+        done
+        echo "Acesse: http://localhost"
+        ;;
+    stop)
+        echo "Parando LAMP stack..."
+        for s in $SERVICOS; do
+            sudo systemctl stop "$s" && echo "  ✓  $s parado" || echo "  ✗  Erro ao parar $s"
+        done
+        ;;
+    restart)
+        "$0" stop; sleep 1; "$0" start
+        ;;
+    status)
+        echo "=== Status LAMP Stack ==="
+        for s in $SERVICOS php8.2-fpm; do
+            status=$(systemctl is-active "$s" 2>/dev/null || echo "não instalado")
+            printf "  %-20s %s\n" "$s" "$status"
+        done
+        echo ""
+        echo "Acesse: http://localhost"
+        echo "phpMyAdmin: http://localhost/phpmyadmin"
+        ;;
+    security)
+        echo "Executando mysql_secure_installation..."
+        sudo mysql_secure_installation
+        ;;
+    *)
+        echo "Uso: lampp {start|stop|restart|status|security}"
+        echo ""
+        echo "  start    — Inicia Apache + MariaDB"
+        echo "  stop     — Para todos os serviços"
+        echo "  restart  — Reinicia tudo"
+        echo "  status   — Mostra status dos serviços"
+        echo "  security — Configura segurança do MySQL"
+        exit 1
+        ;;
+esac

@@ -1,0 +1,24 @@
+#!/bin/bash
+# Hook: Instala bibliotecas Python para o Hub de IA (katu-ia)
+set -e
+
+export DEBIAN_FRONTEND=noninteractive
+
+echo "[KATU] Instalando bibliotecas Python para IA..."
+
+# Dependências Python base
+apt-get install -y python3-pip python3-requests python3-pyqt5 2>/dev/null || true
+
+# Instalar libs de IA (falha silenciosa — usuário pode instalar depois com chave API)
+pip3 install --quiet --break-system-packages \
+    anthropic \
+    openai \
+    google-generativeai \
+    2>/dev/null || \
+pip3 install --quiet \
+    anthropic \
+    openai \
+    google-generativeai \
+    2>/dev/null || true
+
+echo "[KATU] Bibliotecas de IA instaladas."

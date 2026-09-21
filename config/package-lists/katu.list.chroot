@@ -11,6 +11,12 @@ calamares
 calamares-settings-debian
 katu-installer
 
+# Hub de IA para desenvolvedores (§AI)
+katu-ia
+
+# Painel LAMP / XAMPP (§XAMPP)
+katu-xampp
+
 # Flatpak
 flatpak
 plasma-discover-backend-flatpak

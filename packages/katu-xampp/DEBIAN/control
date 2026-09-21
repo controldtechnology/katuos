@@ -1,0 +1,22 @@
+Package: katu-xampp
+Version: 1.0-1
+Architecture: all
+Maintainer: Katu OS Team <controld.technology@gmail.com>
+Depends: python3, python3-pyqt5 | python3-pyside6, apache2, php, php-mysql, php-curl, php-gd, php-mbstring, php-xml, php-zip, mariadb-server, phpmyadmin, libapache2-mod-php
+Recommends: composer, nodejs, npm
+Description: Katu XAMPP — Painel de Controle LAMP
+ Painel visual completo para desenvolvimento web local no Katu OS.
+ Gerencia Apache2, PHP 8.2, MariaDB e phpMyAdmin com interface
+ gráfica intuitiva. Inclui o comando `lampp` compatível com XAMPP
+ clássico para scripts existentes.
+ .
+ Funcionalidades:
+  - Iniciar/parar Apache, MariaDB, PHP com um clique
+  - Criar projetos web automaticamente em /var/www/html
+  - Visualização de logs em tempo real
+  - Links diretos para phpMyAdmin e localhost
+  - Comando `lampp` no terminal
+Section: devel
+Priority: optional
+Installed-Size: 512
+Homepage: https://katuos.com.br

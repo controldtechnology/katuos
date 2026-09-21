@@ -1,0 +1,25 @@
+#!/bin/bash
+set -e
+
+chmod +x /usr/bin/katu-ia
+chmod +x /usr/lib/katu-ia/katu_ia.py
+chmod +x /etc/katu/ai/shell_ia.sh
+
+# Instalar bibliotecas Python para IA
+pip3 install --quiet --break-system-packages anthropic openai google-generativeai 2>/dev/null || \
+pip3 install --quiet anthropic openai google-generativeai 2>/dev/null || true
+
+# Adicionar funções IA ao .bashrc global do skel
+SKEL_BASHRC="/etc/skel/.bashrc"
+if ! grep -q "katu/ai/shell_ia.sh" "${SKEL_BASHRC}" 2>/dev/null; then
+    echo "" >> "${SKEL_BASHRC}"
+    echo "# Katu IA — funções de IA no terminal" >> "${SKEL_BASHRC}"
+    echo "[ -f /etc/katu/ai/shell_ia.sh ] && source /etc/katu/ai/shell_ia.sh 2>/dev/null || true" >> "${SKEL_BASHRC}"
+fi
+
+if command -v update-desktop-database &>/dev/null; then
+    update-desktop-database -q /usr/share/applications 2>/dev/null || true
+fi
+
+#DEBHELPER#
+exit 0

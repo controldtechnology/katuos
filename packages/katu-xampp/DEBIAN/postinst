@@ -1,0 +1,103 @@
+#!/bin/bash
+set -e
+
+chmod +x /usr/bin/katu-xampp
+chmod +x /usr/bin/lampp
+chmod +x /usr/lib/katu-xampp/katu_xampp.py
+
+# Garantir que /var/www/html existe e é acessível
+mkdir -p /var/www/html
+chown www-data:www-data /var/www/html
+chmod 755 /var/www/html
+
+# Adicionar usuário principal ao grupo www-data para editar arquivos sem sudo
+if id "1000" &>/dev/null; then
+    USERNAME=$(getent passwd 1000 | cut -d: -f1)
+    if [ -n "$USERNAME" ]; then
+        usermod -aG www-data "$USERNAME" 2>/dev/null || true
+    fi
+fi
+
+# Habilitar mod_rewrite (necessário para Laravel, WordPress, etc.)
+a2enmod rewrite 2>/dev/null || true
+a2enmod php8.2  2>/dev/null || true
+
+# Configurar AllowOverride All para /var/www/html
+CONF="/etc/apache2/conf-available/katu-xampp.conf"
+cat > "$CONF" << 'EOF'
+<Directory /var/www/html>
+    Options Indexes FollowSymLinks
+    AllowOverride All
+    Require all granted
+</Directory>
+EOF
+a2enconf katu-xampp 2>/dev/null || true
+
+# Criar página inicial do localhost
+INDEX="/var/www/html/index.php"
+if [ ! -f "$INDEX" ]; then
+    cat > "$INDEX" << 'PHPEOF'
+<?php
+$apache_ok  = true;
+$mysql_ok   = function_exists('mysqli_connect');
+$phpmyadmin = file_exists('/usr/share/phpmyadmin');
+?>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Katu OS — Servidor Local</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: #0d1117; color: #e6edf3; font-family: 'Segoe UI', sans-serif;
+               display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+        .card { background: #1c2128; border: 1px solid #30363d; border-radius: 12px;
+                padding: 40px; max-width: 600px; width: 90%; text-align: center; }
+        h1 { color: #00c853; font-size: 2rem; margin-bottom: 8px; }
+        .sub { color: #8b949e; margin-bottom: 32px; }
+        .status { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 28px; }
+        .badge { padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; }
+        .ok  { background: #00c85322; color: #00c853; border: 1px solid #00c85355; }
+        .warn{ background: #ffab0022; color: #ffab00; border: 1px solid #ffab0055; }
+        .links { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+        a { padding: 10px 24px; background: #00c853; color: #0d1117; border-radius: 8px;
+            text-decoration: none; font-weight: bold; font-size: 0.9rem; }
+        a.sec { background: transparent; color: #e6edf3; border: 1px solid #30363d; }
+        .php-ver { color: #8b949e; font-size: 0.8rem; margin-top: 20px; }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h1>🚀 Katu XAMPP</h1>
+    <p class="sub">Seu servidor local está funcionando!</p>
+    <div class="status">
+        <span class="badge ok">✓ Apache <?= apache_get_version() ?: '—' ?></span>
+        <span class="badge <?= $mysql_ok ? 'ok' : 'warn' ?>"><?= $mysql_ok ? '✓' : '○' ?> PHP + MySQL</span>
+        <span class="badge <?= $phpmyadmin ? 'ok' : 'warn' ?>"><?= $phpmyadmin ? '✓' : '○' ?> phpMyAdmin</span>
+    </div>
+    <div class="links">
+        <a href="/phpmyadmin/">phpMyAdmin</a>
+        <a href="/katu-xampp-info.php" class="sec">PHP Info</a>
+    </div>
+    <p class="php-ver">PHP <?= PHP_VERSION ?> · <?= PHP_OS ?></p>
+</div>
+</body>
+</html>
+PHPEOF
+fi
+
+# PHP Info page
+cat > /var/www/html/katu-xampp-info.php << 'EOF'
+<?php phpinfo(); ?>
+EOF
+
+# Iniciar serviços se não estiverem rodando
+systemctl enable apache2 mariadb 2>/dev/null || true
+
+if command -v update-desktop-database &>/dev/null; then
+    update-desktop-database -q /usr/share/applications 2>/dev/null || true
+fi
+
+#DEBHELPER#
+exit 0

@@ -1,0 +1,71 @@
+#!/bin/bash
+# Hook: Instala e configura o stack LAMP (Apache2 + PHP + MariaDB + phpMyAdmin)
+set -e
+
+export DEBIAN_FRONTEND=noninteractive
+
+echo "[KATU] Instalando LAMP stack..."
+
+# Pré-configurar phpMyAdmin para evitar prompt interativo
+debconf-set-selections << 'DEBCONF'
+phpmyadmin phpmyadmin/dbconfig-install boolean true
+phpmyadmin phpmyadmin/app-password-confirm password
+phpmyadmin phpmyadmin/mysql/admin-pass password
+phpmyadmin phpmyadmin/mysql/app-pass password
+phpmyadmin phpmyadmin/reconfigure-webserver multiselect apache2
+DEBCONF
+
+apt-get install -y \
+    apache2 \
+    libapache2-mod-php \
+    php \
+    php-cli \
+    php-mysql \
+    php-curl \
+    php-gd \
+    php-mbstring \
+    php-xml \
+    php-zip \
+    php-intl \
+    php-bcmath \
+    mariadb-server \
+    mariadb-client \
+    phpmyadmin \
+    composer \
+    nodejs \
+    npm
+
+# Habilitar mod_rewrite (necessário para WordPress, Laravel, etc.)
+a2enmod rewrite 2>/dev/null || true
+a2enmod headers 2>/dev/null || true
+
+# Configuração permissiva para desenvolvimento local
+cat > /etc/apache2/conf-available/katu-xampp.conf << 'EOF'
+<Directory /var/www/html>
+    Options Indexes FollowSymLinks
+    AllowOverride All
+    Require all granted
+</Directory>
+EOF
+a2enconf katu-xampp 2>/dev/null || true
+
+# MariaDB — permitir conexão sem senha como root para desenvolvimento local
+systemctl start mariadb 2>/dev/null || true
+sleep 2
+mysql -u root << 'SQL' 2>/dev/null || true
+-- Configuração para desenvolvimento local
+ALTER USER 'root'@'localhost' IDENTIFIED BY '';
+FLUSH PRIVILEGES;
+SQL
+systemctl stop mariadb 2>/dev/null || true
+
+# Link simbólico /opt/lampp → estrutura XAMPP para compatibilidade
+mkdir -p /opt/lampp/bin /opt/lampp/htdocs /opt/lampp/logs
+ln -sf /var/www/html     /opt/lampp/htdocs/html  2>/dev/null || true
+ln -sf /var/log/apache2  /opt/lampp/logs/apache2 2>/dev/null || true
+ln -sf /etc/apache2      /opt/lampp/etc          2>/dev/null || true
+
+# Habilitar serviços no boot
+systemctl enable apache2 mariadb 2>/dev/null || true
+
+echo "[KATU] LAMP stack instalado."

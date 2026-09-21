@@ -1,0 +1,13 @@
+Package: katu-ia
+Version: 1.0
+Architecture: all
+Maintainer: Katu OS Team <controld.technology@gmail.com>
+Depends: python3 (>= 3.10), python3-pyqt5 | python3-pyside6, katu-release
+Recommends: python3-pip
+Priority: optional
+Section: misc
+Description: Katu IA — AI Hub for developers
+ Visual hub for AI-assisted development. Supports Claude (Anthropic),
+ GPT-4 (OpenAI), Gemini (Google) and Ollama (local models).
+ Includes 12 developer prompt templates and shell AI functions:
+ ai, ai-fix, ai-explain, ai-code, ai-review, ai-commit, ai-sql, ai-doc.

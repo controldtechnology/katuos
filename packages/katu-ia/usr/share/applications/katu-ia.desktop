@@ -1,0 +1,13 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Katu IA
+Name[pt_BR]=Katu IA
+Comment=Hub de Inteligência Artificial para Desenvolvedores
+Comment[pt_BR]=Chat com Claude, GPT-4, Gemini e Ollama — prompts prontos para codar
+Exec=katu-ia
+Icon=katu-logo
+Terminal=false
+Categories=Development;ArtificialIntelligence;
+Keywords=ia;ai;claude;gpt;gemini;ollama;programação;código;
+StartupNotify=true
