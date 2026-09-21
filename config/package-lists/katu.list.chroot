@@ -58,4 +58,3 @@ ca-certificates
 gnupg
 lsb-release
 dbus-user-session
-polkit
