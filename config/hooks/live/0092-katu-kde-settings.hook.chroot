@@ -91,4 +91,34 @@ dbVersion=2
 first run=false
 EOF
 
+# Wallpaper padrão via plasma-org.kde.plasma.desktop-appletsrc
+WALLPAPER="/usr/share/wallpapers/katu/contents/images/katu-amazonia-4k.png"
+cat > "${SKEL_CONFIG}/plasma-org.kde.plasma.desktop-appletsrc" << EOF
+[Containments][1][Wallpaper][org.kde.image][General]
+Image=${WALLPAPER}
+ImageDefault=${WALLPAPER}
+
+[Containments][2][Wallpaper][org.kde.image][General]
+Image=${WALLPAPER}
+ImageDefault=${WALLPAPER}
+EOF
+
+# KDE look-and-feel e cores
+cat > "${SKEL_CONFIG}/kdeglobals" << 'EOF'
+[KDE]
+LookAndFeelPackage=org.katuos.desktop
+SingleClick=false
+
+[General]
+AccentColor=0,200,83
+
+[Colors:Button]
+BackgroundNormal=30,50,30
+ForegroundNormal=248,249,250
+
+[Colors:Window]
+BackgroundNormal=20,35,20
+ForegroundNormal=248,249,250
+EOF
+
 echo ">>> [Katu Hook] Configurações KDE aplicadas."
