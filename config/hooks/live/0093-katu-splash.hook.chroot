@@ -1,0 +1,42 @@
+#!/bin/bash
+# Hook: Instalar splash screen KDE e configurar Look & Feel
+
+set -Eeuo pipefail
+
+echo ">>> [Katu Hook] Configurando splash screen KDE..."
+
+# Instalar o pacote look-and-feel se não estiver no repositório
+LOOKNFEEL_SRC="/etc/katuos-looknfeel"
+LOOKNFEEL_DEST="/usr/share/plasma/look-and-feel/org.katuos.desktop"
+
+if [ -d "${LOOKNFEEL_SRC}" ]; then
+    cp -r "${LOOKNFEEL_SRC}" "${LOOKNFEEL_DEST}"
+fi
+
+# Configurar splash screen padrão para sessão instalada
+mkdir -p /etc/skel/.config
+cat >> /etc/skel/.config/ksplashrc << 'EOF'
+[KSplash]
+Engine=KSplash
+Theme=org.katuos.desktop
+EOF
+
+# Ativar look-and-feel Katu via kde-gtk-config (skel)
+cat >> /etc/skel/.config/kdeglobals << 'EOF2'
+[KSplash]
+Theme=org.katuos.desktop
+EOF2
+
+# Garantir que o tema está disponível para o usuário live
+if [ -d "${LOOKNFEEL_DEST}" ]; then
+    echo ">>> Tema org.katuos.desktop instalado em: ${LOOKNFEEL_DEST}"
+else
+    echo ">>> Tema look-and-feel não encontrado — usando fallback breeze-dark."
+    cat >> /etc/skel/.config/ksplashrc << 'EOF3'
+[KSplash]
+Engine=KSplash
+Theme=org.kde.breeze.desktop
+EOF3
+fi
+
+echo ">>> [Katu Hook] Splash screen configurado."

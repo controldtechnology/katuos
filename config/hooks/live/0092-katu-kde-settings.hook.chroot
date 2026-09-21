@@ -1,0 +1,94 @@
+#!/bin/bash
+# Hook: Configurações KDE Plasma adicionais via kwriteconfig5
+
+set -Eeuo pipefail
+
+echo ">>> [Katu Hook] Aplicando configurações KDE adicionais..."
+
+SKEL_CONFIG="/etc/skel/.config"
+mkdir -p "${SKEL_CONFIG}"
+
+# kglobalshortcutsrc — atalhos globais PT-BR
+cat > "${SKEL_CONFIG}/kglobalshortcutsrc" << 'EOF'
+[kwin]
+Kill Window=Meta+Ctrl+Escape,Meta+Ctrl+Escape,Fechar janela forçadamente
+Switch One Desktop Down=Meta+Ctrl+Down,Meta+Ctrl+Down,Área de trabalho abaixo
+Switch One Desktop Up=Meta+Ctrl+Up,Meta+Ctrl+Up,Área de trabalho acima
+Toggle Overview=Meta+W,Meta+W,Ver todas as janelas
+Window Quick Tile Bottom=Meta+Down,Meta+Down,Encaixar janela abaixo
+Window Quick Tile Left=Meta+Left,Meta+Left,Encaixar janela à esquerda
+Window Quick Tile Right=Meta+Right,Meta+Right,Encaixar janela à direita
+Window Quick Tile Top=Meta+Up,Meta+Up,Encaixar janela acima
+Window Close=Alt+F4,Alt+F4,Fechar janela
+Window Fullscreen=Meta+F11,Meta+F11,Tela cheia
+
+[plasmashell]
+Show Dashboard=Meta+D,Meta+D,Mostrar área de trabalho
+activate task manager entry 1=Meta+1,Meta+1,Ativar entrada 1 da barra de tarefas
+activate task manager entry 2=Meta+2,Meta+2,Ativar entrada 2 da barra de tarefas
+activate task manager entry 3=Meta+3,Meta+3,Ativar entrada 3 da barra de tarefas
+EOF
+
+# Plasma notifications — PT-BR
+cat > "${SKEL_CONFIG}/plasmanotifyrc" << 'EOF'
+[Notifications]
+PopupPosition=BottomRight
+PopupTimeout=5000
+EOF
+
+# spectacle — ferramenta de captura de tela
+cat > "${SKEL_CONFIG}/spectaclerc" << 'EOF'
+[General]
+clipboardGroup=PostScreenshotCopyImage
+launchAction=UseLastUsedCapturemode
+onLaunchWithToggle=true
+rememberLastRectangular=true
+useReleaseToCapture=true
+
+[ImageSave]
+defaultSaveImageLocation=/home/$USER/Imagens
+saveImageFormat=PNG
+
+[VideoSave]
+defaultSaveVideoLocation=/home/$USER/Imagens
+EOF
+
+# krunnerrc — configuração do lançador rápido
+cat > "${SKEL_CONFIG}/krunnerrc" << 'EOF'
+[General]
+FreeFloating=false
+HistoryEnabled=true
+RetainPriorSearch=true
+
+[Plugins]
+baloosearchEnabled=true
+calculatorEnabled=true
+krunner_appstreamEnabled=true
+krunner_bookmarksrunnerEnabled=false
+krunner_recentdocumentsEnabled=true
+krunner_sessionsEnabled=true
+krunner_shellEnabled=true
+krunner_systemsettingsEnabled=true
+krunner_webshortcutsEnabled=true
+EOF
+
+# Tema de notificação do Plasma (usar padrão com accent verde)
+cat > "${SKEL_CONFIG}/plasmarc" << 'EOF'
+[Theme]
+name=default
+
+[General]
+showToolTips=true
+EOF
+
+# baloofilerc — indexação de arquivos (mais leve)
+cat > "${SKEL_CONFIG}/baloofilerc" << 'EOF'
+[Basic Settings]
+Indexing-Enabled=false
+
+[General]
+dbVersion=2
+first run=false
+EOF
+
+echo ">>> [Katu Hook] Configurações KDE aplicadas."

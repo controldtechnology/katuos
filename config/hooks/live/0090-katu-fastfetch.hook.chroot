@@ -1,0 +1,99 @@
+#!/bin/bash
+# Hook: Configurar fastfetch com branding Katu OS
+
+set -Eeuo pipefail
+
+echo ">>> [Katu Hook] Configurando fastfetch..."
+
+# Instalar fastfetch se disponível, senão usar neofetch
+if apt-get install -y fastfetch 2>/dev/null; then
+    FETCH_CMD="fastfetch"
+else
+    apt-get install -y neofetch 2>/dev/null || true
+    FETCH_CMD="neofetch"
+fi
+
+# Configuração fastfetch global
+mkdir -p /etc/fastfetch
+cat > /etc/fastfetch/config.jsonc << 'EOF'
+{
+    "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
+    "logo": {
+        "source": "katu",
+        "color": {
+            "1": "green",
+            "2": "green"
+        }
+    },
+    "display": {
+        "separator": " → ",
+        "color": "green"
+    },
+    "modules": [
+        { "type": "title", "fqdn": false },
+        "separator",
+        { "type": "os",      "key": "Sistema    " },
+        { "type": "kernel",  "key": "Kernel     " },
+        { "type": "de",      "key": "Desktop    " },
+        { "type": "wm",      "key": "WM         " },
+        { "type": "theme",   "key": "Tema       " },
+        { "type": "icons",   "key": "Ícones     " },
+        { "type": "font",    "key": "Fonte      " },
+        { "type": "shell",   "key": "Shell      " },
+        { "type": "terminal","key": "Terminal   " },
+        "separator",
+        { "type": "cpu",     "key": "CPU        " },
+        { "type": "memory",  "key": "RAM        " },
+        { "type": "disk",    "key": "Disco      ", "folders": "/" },
+        { "type": "gpu",     "key": "GPU        " },
+        { "type": "display", "key": "Tela       " },
+        "separator",
+        { "type": "colors",  "paddingLeft": 0 }
+    ]
+}
+EOF
+
+# Configuração neofetch como fallback
+mkdir -p /etc/skel/.config/neofetch
+cat > /etc/skel/.config/neofetch/config.conf << 'EOF'
+print_info() {
+    prin "$(color 2)Katu OS$(color)"
+    info underline
+    info "Sistema   " distro
+    info "Kernel    " kernel
+    info "Desktop   " de
+    info "WM        " wm
+    info "Tema      " theme
+    info "Ícones    " icons
+    info "Shell     " shell
+    info "Terminal  " term
+    info underline
+    info "CPU       " cpu
+    info "RAM       " memory
+    info "Disco     " disk
+    info underline
+    info cols
+}
+
+distro_shorthand="off"
+kernel_shorthand="on"
+uptime_shorthand="tiny"
+memory_percent="on"
+memory_unit="gib"
+cpu_brand="on"
+cpu_speed="on"
+cpu_cores="logical"
+cpu_temp="off"
+disk_show=('/')
+disk_subtitle="dir"
+bold="on"
+underline_enabled="on"
+underline_char="─"
+separator=" → "
+block_width=3
+color_blocks="on"
+block_range=(0 7)
+colors=(2 2 2 2 2 2)
+EOF
+
+echo ">>> [Katu Hook] Fastfetch/neofetch configurados com branding Katu."

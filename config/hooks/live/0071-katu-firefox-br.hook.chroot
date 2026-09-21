@@ -1,0 +1,99 @@
+#!/bin/bash
+# Hook: Configuração completa do Firefox em PT-BR
+
+set -Eeuo pipefail
+
+echo ">>> [Katu Hook] Configurando Firefox PT-BR..."
+
+DIST_DIR="/usr/lib/firefox-esr/distribution"
+mkdir -p "${DIST_DIR}"
+
+# distribution.ini — identidade da distribuição
+cat > "${DIST_DIR}/distribution.ini" << 'EOF'
+[Global]
+id=katuos
+version=1.0
+about=Katu OS — Livre. Brasileiro. Para todos.
+
+[Preferences]
+app.distributor=katuos
+app.distributor.channel=release
+EOF
+
+# policies.json — configurações enterprise
+cat > "${DIST_DIR}/policies.json" << 'EOF'
+{
+  "policies": {
+    "DisableFirefoxStudies": true,
+    "DisableTelemetry": true,
+    "DisablePocket": true,
+    "DisableFormHistory": false,
+    "OverrideFirstRunPage": "https://katuos.com.br/bem-vindo",
+    "OverridePostUpdatePage": "",
+    "Homepage": {
+      "URL": "https://katuos.com.br",
+      "Locked": false,
+      "StartPage": "homepage"
+    },
+    "SearchEngines": {
+      "Default": "Google",
+      "PreventInstalls": false
+    },
+    "DisplayBookmarksToolbar": "newtab",
+    "NoDefaultBookmarks": false,
+    "Bookmarks": [
+      {
+        "Title": "Katu OS",
+        "URL": "https://katuos.com.br",
+        "Favicon": "https://katuos.com.br/favicon.ico",
+        "Placement": "toolbar"
+      },
+      {
+        "Title": "Suporte Katu OS",
+        "URL": "https://katuos.com.br/suporte",
+        "Placement": "toolbar"
+      }
+    ],
+    "FirefoxHome": {
+      "Search": true,
+      "TopSites": true,
+      "Highlights": false,
+      "Pocket": false,
+      "Snippets": false,
+      "Locked": false
+    },
+    "UserMessaging": {
+      "WhatsNew": false,
+      "ExtensionRecommendations": false,
+      "FeatureRecommendations": false,
+      "UrlbarInterventions": true,
+      "SkipOnboarding": true
+    }
+  }
+}
+EOF
+
+# Perfil padrão com autoconfig (locale PT-BR, tema escuro)
+AUTOCONFIG_DIR="/usr/lib/firefox-esr/defaults/pref"
+mkdir -p "${AUTOCONFIG_DIR}"
+cat > "${AUTOCONFIG_DIR}/katu.js" << 'EOF'
+pref("general.config.filename", "katuos.cfg");
+pref("general.config.obscure_value", 0);
+EOF
+
+cat > "/usr/lib/firefox-esr/katuos.cfg" << 'EOF'
+// Katu OS Firefox configuration
+defaultPref("intl.locale.requested", "pt-BR");
+defaultPref("browser.startup.homepage", "https://katuos.com.br");
+defaultPref("browser.newtabpage.activity-stream.feeds.section.highlights", false);
+defaultPref("browser.newtabpage.activity-stream.feeds.snippets", false);
+defaultPref("browser.newtabpage.activity-stream.showSponsored", false);
+defaultPref("browser.newtabpage.activity-stream.showSponsoredTopSites", false);
+defaultPref("browser.toolbars.bookmarks.visibility", "newtab");
+defaultPref("layout.css.prefers-color-scheme.content-override", 0);
+defaultPref("ui.systemUsesDarkTheme", 1);
+defaultPref("browser.crashReports.unsubmittedCheck.autoSubmit2", false);
+defaultPref("datareporting.healthreport.uploadEnabled", false);
+EOF
+
+echo ">>> [Katu Hook] Firefox PT-BR configurado."

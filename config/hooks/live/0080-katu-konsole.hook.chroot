@@ -1,0 +1,107 @@
+#!/bin/bash
+# Hook: Instalar perfil e tema Konsole Amazônia Dark
+
+set -Eeuo pipefail
+
+echo ">>> [Katu Hook] Configurando Konsole..."
+
+KONSOLE_DATA="/usr/share/konsole"
+mkdir -p "${KONSOLE_DATA}"
+
+# Perfil padrão Katu OS
+cat > "${KONSOLE_DATA}/katu.profile" << 'EOF'
+[Appearance]
+ColorScheme=KatuDark
+Font=Noto Mono,11,-1,5,50,0,0,0,0,0
+
+[General]
+Command=/bin/bash
+Name=Katu OS
+Parent=FALLBACK/
+TerminalColumns=110
+TerminalRows=28
+
+[Scrolling]
+HistoryMode=2
+HistorySize=10000
+ScrollBarPosition=2
+
+[Terminal Features]
+BlinkingCursorEnabled=true
+EOF
+
+# Tema de cores Amazônia Dark para Konsole
+cat > "${KONSOLE_DATA}/KatuDark.colorscheme" << 'EOF'
+[Background]
+Color=13,17,23
+
+[BackgroundIntense]
+Color=28,33,40
+
+[Color0]
+Color=48,54,61
+
+[Color0Intense]
+Color=139,148,158
+
+[Color1]
+Color=248,81,73
+
+[Color1Intense]
+Color=255,130,122
+
+[Color2]
+Color=0,200,83
+
+[Color2Intense]
+Color=0,230,118
+
+[Color3]
+Color=255,171,0
+
+[Color3Intense]
+Color=255,214,0
+
+[Color4]
+Color=88,166,255
+
+[Color4Intense]
+Color=130,195,255
+
+[Color5]
+Color=188,140,255
+
+[Color5Intense]
+Color=220,180,255
+
+[Color6]
+Color=0,200,200
+
+[Color6Intense]
+Color=80,230,230
+
+[Color7]
+Color=230,237,243
+
+[Color7Intense]
+Color=255,255,255
+
+[Foreground]
+Color=230,237,243
+
+[ForegroundIntense]
+Color=255,255,255
+
+[General]
+Description=Katu Dark — Amazônia
+Opacity=0.95
+EOF
+
+# Configurar Konsole como app padrão de terminal no Plasma
+mkdir -p /etc/skel/.config
+cat >> /etc/skel/.config/konsolerc << 'EOF2'
+[Desktop Entry]
+DefaultProfile=katu.profile
+EOF2
+
+echo ">>> [Katu Hook] Konsole configurado com tema Amazônia Dark."

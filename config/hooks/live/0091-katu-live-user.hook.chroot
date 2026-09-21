@@ -1,0 +1,48 @@
+#!/bin/bash
+# Hook: Configurar usuário live com identidade Katu OS
+
+set -Eeuo pipefail
+
+echo ">>> [Katu Hook] Configurando usuário live..."
+
+# O live-build cria o usuário 'user' por padrão, renomear para 'katu'
+# (live-config usa o nome 'user' mas podemos configurar o nome real)
+
+# Garantir que o arquivo de configuração do live-config define o usuário correto
+mkdir -p /etc/live
+cat > /etc/live/config.conf << 'EOF'
+LIVE_USERNAME="katu"
+LIVE_USER_FULLNAME="Katu Live"
+LIVE_USER_DEFAULT_GROUPS="audio video plugdev netdev bluetooth cdrom floppy sudo disk"
+LIVE_HOSTNAME="katu"
+LIVE_LOCALES="pt_BR.UTF-8"
+LIVE_KEYBOARD_LAYOUTS="br"
+LIVE_KEYBOARD_MODEL="abnt2"
+LIVE_TIMEZONE="America/Sao_Paulo"
+EOF
+
+# Garantir que grupos corretos existem
+groupadd -f sudo 2>/dev/null || true
+groupadd -f plugdev 2>/dev/null || true
+
+# Criar arquivo de primeiro boot para katu-welcome
+touch /etc/katu-firstboot
+chmod 644 /etc/katu-firstboot
+
+# Autostart do katu-welcome na sessão live
+mkdir -p /etc/skel/.config/autostart
+cat > /etc/skel/.config/autostart/katu-welcome-firstboot.desktop << 'EOF'
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Katu Welcome
+Name[pt_BR]=Katu Welcome
+Comment=Aplicativo de boas-vindas do Katu OS
+Exec=katu-welcome
+Icon=katu-welcome
+Terminal=false
+Hidden=false
+X-GNOME-Autostart-enabled=true
+EOF
+
+echo ">>> [Katu Hook] Usuário live configurado: katu / Katu Live."

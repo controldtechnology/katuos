@@ -41,6 +41,9 @@ kdeconnect
 plasma-systemmonitor
 kcm-about-distro
 
+# Informações do sistema no terminal
+fastfetch | neofetch
+
 # Sistema
 sudo
 bash-completion

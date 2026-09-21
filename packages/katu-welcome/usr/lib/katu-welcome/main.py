@@ -326,6 +326,13 @@ class KatuWelcomeWindow(QMainWindow):
         autostart = os.path.expanduser('~/.config/autostart/katu-welcome.desktop')
         return os.path.exists(autostart)
 
+    def _remover_flag_firstboot(self):
+        try:
+            if os.path.exists('/etc/katu-firstboot'):
+                os.remove('/etc/katu-firstboot')
+        except PermissionError:
+            pass  # sem sudo não é possível — não é crítico
+
     def _toggle_autostart(self, estado):
         autostart_dir  = os.path.expanduser('~/.config/autostart')
         autostart_file = os.path.join(autostart_dir, 'katu-welcome.desktop')
@@ -354,6 +361,7 @@ def main():
     app.setOrganizationName("Katu OS")
 
     window = KatuWelcomeWindow()
+    window._remover_flag_firstboot()
     window.show()
 
     sys.exit(app.exec_() if QT_BACKEND == 'PyQt5' else app.exec())

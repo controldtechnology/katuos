@@ -1,0 +1,42 @@
+#!/bin/bash
+# Hook: Configurar aplicativos padrão do sistema
+
+set -Eeuo pipefail
+
+echo ">>> [Katu Hook] Configurando aplicativos padrão..."
+
+# /etc/mailcap — mapeamentos MIME globais
+update-alternatives --set x-www-browser /usr/bin/firefox-esr 2>/dev/null || true
+update-alternatives --set gnome-www-browser /usr/bin/firefox-esr 2>/dev/null || true
+
+# xdg-settings para todo o sistema (via script de inicialização)
+mkdir -p /etc/skel/.config
+
+# mimeapps.list global (fallback para usuários sem arquivo próprio)
+cat > /usr/share/applications/mimeapps.list << 'EOF'
+[Default Applications]
+x-scheme-handler/http=firefox-esr.desktop
+x-scheme-handler/https=firefox-esr.desktop
+x-scheme-handler/ftp=firefox-esr.desktop
+text/html=firefox-esr.desktop
+application/xhtml+xml=firefox-esr.desktop
+inode/directory=org.kde.dolphin.desktop
+application/pdf=org.kde.okular.desktop
+image/jpeg=org.kde.gwenview.desktop
+image/png=org.kde.gwenview.desktop
+image/gif=org.kde.gwenview.desktop
+image/webp=org.kde.gwenview.desktop
+video/mp4=vlc.desktop
+video/x-matroska=vlc.desktop
+audio/mpeg=vlc.desktop
+audio/ogg=vlc.desktop
+audio/flac=vlc.desktop
+application/zip=org.kde.ark.desktop
+application/x-tar=org.kde.ark.desktop
+application/vnd.oasis.opendocument.text=libreoffice-writer.desktop
+application/msword=libreoffice-writer.desktop
+application/vnd.openxmlformats-officedocument.wordprocessingml.document=libreoffice-writer.desktop
+text/plain=org.kde.kwrite.desktop
+EOF
+
+echo ">>> [Katu Hook] Aplicativos padrão configurados."
