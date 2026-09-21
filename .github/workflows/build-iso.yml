@@ -18,25 +18,19 @@ jobs:
     timeout-minutes: 150
 
     steps:
-      # ── 1. Checkout ─────────────────────────────────────────────────────
-      - name: Checkout código
+      # ── 1. Checkout ──────────────────────────────────────────────────────
+      - name: Checkout codigo
         uses: actions/checkout@v4
         with:
           fetch-depth: 1
 
-      # ── 2. Liberar espaço em disco ────────────────────────────────────
-      - name: Liberar espaço em disco
+      # ── 2. Liberar espaco em disco ────────────────────────────────────
+      - name: Liberar espaco em disco
         run: |
-          echo "=== Espaço antes ==="
+          echo "=== Espaco antes ==="
           df -h /
-          # Remover pacotes grandes pré-instalados (~15GB liberados)
-          sudo rm -rf /usr/local/lib/android
-          sudo rm -rf /usr/share/dotnet
-          sudo rm -rf /opt/ghc
-          sudo rm -rf /usr/local/share/boost
-          sudo rm -rf /usr/lib/jvm
-          sudo rm -rf /usr/share/swift
-          sudo rm -rf /usr/local/julia*
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc \
+            /usr/local/share/boost /usr/lib/jvm /usr/share/swift /usr/local/julia*
           sudo apt-get remove -y \
             '^dotnet-.*' '^llvm-.*' 'php.*' azure-cli \
             google-cloud-cli google-chrome-stable firefox \
@@ -44,92 +38,88 @@ jobs:
           sudo apt-get autoremove -y 2>/dev/null || true
           sudo apt-get clean
           sudo rm -rf /var/cache/apt/archives/*
-          echo "=== Espaço depois ==="
+          echo "=== Espaco depois ==="
           df -h /
 
-      # ── 3. Corrigir line endings (BOM + CRLF → LF) ───────────────────
-      - name: Corrigir line endings Windows → Linux
+      # ── 3. Instalar live-build do Debian (nao Ubuntu) ─────────────────
+      - name: Instalar live-build e ferramentas
         run: |
-          sudo apt-get install -y dos2unix 2>/dev/null || true
-          # Remover BOM e converter CRLF->LF em todos os arquivos de texto
+          # Dependencias base do Ubuntu
+          sudo apt-get update -qq
+          sudo apt-get install -y \
+            debootstrap squashfs-tools xorriso isolinux \
+            syslinux-common syslinux-efi dpkg-dev apt-utils rsync \
+            gzip xz-utils wget curl ca-certificates gnupg dos2unix \
+            python3-pyqt5 python3-pip
+
+          # Instalar live-build do Debian Trixie (versao compativel com todas as opcoes)
+          sudo tee /etc/apt/sources.list.d/debian-trixie-lb.list > /dev/null << 'EOF'
+          deb [trusted=yes] http://deb.debian.org/debian trixie main
+          EOF
+          sudo tee /etc/apt/preferences.d/debian-trixie-lb > /dev/null << 'EOF'
+          Package: *
+          Pin: release n=trixie
+          Pin-Priority: -10
+
+          Package: live-build
+          Pin: release n=trixie
+          Pin-Priority: 900
+          EOF
+          sudo apt-get update -qq
+          sudo apt-get install -y live-build
+          sudo rm -f /etc/apt/sources.list.d/debian-trixie-lb.list \
+                     /etc/apt/preferences.d/debian-trixie-lb
+          sudo apt-get update -qq
+          lb --version
+          echo "live-build instalado do Debian Trixie"
+
+      # ── 4. Corrigir line endings (BOM + CRLF -> LF) ──────────────────
+      - name: Corrigir line endings Windows para Linux
+        run: |
           find packages/ config/ installer/ scripts/ -type f \
-            ! -name "*.png" ! -name "*.jpg" ! -name "*.ico" ! -name "*.gif" \
-            ! -name "*.pdf" ! -name "*.iso" ! -name "*.deb" \
+            ! -name "*.png" ! -name "*.jpg" ! -name "*.ico" \
+            ! -name "*.gif" ! -name "*.pdf" ! -name "*.deb" \
             -exec dos2unix -q {} \; 2>/dev/null || true
-          # Garantir permissão de execução nos scripts
-          find packages/ -name "postinst" -o -name "preinst" -o -name "postrm" -o -name "prerm" | xargs -r chmod 755
+          find packages/ -name "postinst" -o -name "preinst" \
+            -o -name "postrm" -o -name "prerm" | xargs -r chmod 755
           find config/hooks/ -name "*.chroot" | xargs -r chmod 755
           find scripts/ -name "*.sh" | xargs -r chmod 755
           echo "Line endings corrigidos"
 
-      # ── 4. Instalar live-build e dependências ─────────────────────────
-      - name: Instalar live-build e ferramentas
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y \
-            live-build \
-            debootstrap \
-            squashfs-tools \
-            xorriso \
-            isolinux \
-            syslinux-common \
-            syslinux-efi \
-            dpkg-dev \
-            apt-utils \
-            rsync \
-            gzip \
-            xz-utils \
-            python3-pyqt5 \
-            python3-pip \
-            wget \
-            curl \
-            ca-certificates \
-            gnupg
-          lb --version
-          echo "live-build instalado com sucesso"
-
-      # ── 5. Construir pacotes .deb próprios do Katu ────────────────────
+      # ── 5. Construir pacotes .deb proprios do Katu ────────────────────
       - name: Construir pacotes Katu .deb
         run: |
           set -e
           mkdir -p build/packages output logs
 
-          # Construir cada pacote
           for pkg_dir in packages/*/; do
             pkg_name=$(basename "$pkg_dir")
             echo "=== Construindo: $pkg_name ==="
-
-            # Corrigir permissões dos scripts DEBIAN
             find "${pkg_dir}/DEBIAN" -name "postinst" -o -name "preinst" \
-                 -o -name "postrm" -o -name "prerm" 2>/dev/null | \
-                xargs -r chmod 755
-
+              -o -name "postrm" -o -name "prerm" 2>/dev/null | xargs -r chmod 755
             if sudo dpkg-deb --build "$pkg_dir" "build/packages/${pkg_name}.deb"; then
-              echo "✓ $pkg_name.deb"
+              echo "OK: $pkg_name.deb"
             else
-              echo "! Aviso: falha ao construir $pkg_name"
+              echo "AVISO: falha ao construir $pkg_name — continuando"
             fi
           done
 
-          # Criar repositório local
-          ls build/packages/*.deb 2>/dev/null && \
-            cd build/packages && \
-            sudo dpkg-scanpackages . /dev/null > Packages 2>/dev/null && \
-            gzip -k Packages && cd ../..
+          if ls build/packages/*.deb 2>/dev/null; then
+            cd build/packages
+            sudo dpkg-scanpackages . /dev/null > Packages 2>/dev/null
+            gzip -k Packages
+            cd ../..
+          fi
+          ls -lh build/packages/*.deb 2>/dev/null || echo "(nenhum pacote gerado)"
 
-          echo "=== Pacotes gerados ==="
-          ls -lh build/packages/*.deb 2>/dev/null || echo "(nenhum)"
-
-      # ── 6. Preparar configuração live-build ───────────────────────────
+      # ── 6. Preparar configuracao live-build ──────────────────────────
       - name: Preparar live-build config
         run: |
           set -e
           mkdir -p build
 
-          # Copiar config para o diretório de build
           rsync -a config/ build/config/
 
-          # Copiar temas visuais para includes.chroot
           if [ -d sddm ]; then
             mkdir -p build/config/includes.chroot/usr/share/sddm/themes
             rsync -a sddm/ build/config/includes.chroot/usr/share/sddm/themes/
@@ -151,16 +141,15 @@ jobs:
             rsync -a installer/calamares/ build/config/includes.chroot/etc/calamares/
           fi
 
-          # Repositório local dos pacotes Katu
+          # Repositorio local dos pacotes Katu
           mkdir -p build/config/archives
-          cat > build/config/archives/katu-local.list.chroot << EOF
-          deb [trusted=yes] file://$(pwd)/build/packages ./
-          EOF
+          printf 'deb [trusted=yes] file://%s/build/packages ./\n' "$(pwd)" \
+            > build/config/archives/katu-local.list.chroot
 
-          echo "Config preparada. Listando:"
+          echo "Config preparada:"
           ls build/config/
 
-      # ── 7. Executar lb config ─────────────────────────────────────────
+      # ── 7. lb config ─────────────────────────────────────────────────
       - name: lb config
         working-directory: build
         run: |
@@ -171,34 +160,34 @@ jobs:
             --mirror-chroot "http://deb.debian.org/debian/" \
             --mirror-chroot-security "http://security.debian.org/debian-security/" \
             --archive-areas "main contrib non-free non-free-firmware" \
-            --bootloaders "grub-efi,grub-pc" \
+            --binary-images iso-hybrid \
+            --bootloaders grub-efi,grub-pc \
             --debian-installer none \
             --memtest none \
             --iso-application "Katu OS" \
             --iso-preparer "Katu OS Team" \
             --iso-publisher "katuos.com.br" \
             --iso-volume "KATU_OS_1.0" \
-            --image-type iso-hybrid \
-            --hostname "katu" \
-            --username "katu" \
+            --hostname katu \
+            --username katu \
             --compression xz \
             --verbose
-          echo "lb config concluído"
+          echo "lb config OK"
 
-      # ── 8. Executar lb build ──────────────────────────────────────────
-      - name: lb build (pode demorar 45-90 minutos)
+      # ── 8. lb build (45-90 minutos) ──────────────────────────────────
+      - name: lb build
         working-directory: build
         run: |
           echo "=== Iniciando lb build: $(date) ==="
           sudo lb build 2>&1 | tee ../logs/build.log
-          echo "=== Build concluído: $(date) ==="
+          echo "=== Build concluido: $(date) ==="
 
-      # ── 9. Localizar e renomear ISO ───────────────────────────────────
+      # ── 9. Localizar ISO gerada ───────────────────────────────────────
       - name: Localizar ISO gerada
         run: |
-          ISO=$(find build/ -name "*.iso" -o -name "*.hybrid.iso" | head -1)
+          ISO=$(find build/ -name "*.iso" | head -1)
           if [ -z "$ISO" ]; then
-            echo "ERRO: ISO não encontrada!"
+            echo "ERRO: ISO nao encontrada!"
             ls -la build/
             exit 1
           fi
@@ -210,8 +199,8 @@ jobs:
           echo "ISO_PATH=output/katu-os-1.0-amd64.iso" >> $GITHUB_ENV
           echo "ISO_SIZE=$(du -sh output/katu-os-1.0-amd64.iso | cut -f1)" >> $GITHUB_ENV
 
-      # ── 10. Upload do artefato ─────────────────────────────────────────
-      - name: Upload ISO como artefato
+      # ── 10. Upload ISO como artefato ─────────────────────────────────
+      - name: Upload ISO
         uses: actions/upload-artifact@v4
         with:
           name: katu-os-1.0-amd64-iso
@@ -221,7 +210,7 @@ jobs:
           retention-days: 30
           compression-level: 0
 
-      # ── 11. Upload do log de build ────────────────────────────────────
+      # ── 11. Upload log de build (sempre) ─────────────────────────────
       - name: Upload log de build
         if: always()
         uses: actions/upload-artifact@v4
@@ -230,21 +219,21 @@ jobs:
           path: logs/build.log
           retention-days: 7
 
-      # ── 12. Criar Release no GitHub (opcional) ────────────────────────
+      # ── 12. Criar Release GitHub (opcional) ──────────────────────────
       - name: Criar Release GitHub
         if: github.event.inputs.upload_release == 'true'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v1.0.0
-          name: Katu OS 1.0 — Amazônia Dark
+          name: Katu OS 1.0 - Amazonia Dark
           body: |
-            ## Katu OS 1.0 — Lançamento Inicial
+            ## Katu OS 1.0 - Lancamento Inicial
 
-            Distribuição Linux brasileira baseada em **Debian 13 Trixie + KDE Plasma**.
+            Distribuicao Linux brasileira baseada em **Debian 13 Trixie + KDE Plasma**.
 
-            ### O que está incluído
+            ### O que esta incluido
             - Sistema base Debian 13 Trixie
-            - KDE Plasma com tema Amazônia Dark
+            - KDE Plasma com tema Amazonia Dark
             - Firefox + Google Chrome
             - LibreOffice completo em PT-BR
             - Instalador visual estilo Windows 11
@@ -253,15 +242,9 @@ jobs:
 
             ### Como instalar
             1. Baixe o arquivo `.iso`
-            2. Grave em pendrive com [Balena Etcher](https://etcher.balena.io/)
+            2. Grave em pendrive com Balena Etcher (https://etcher.balena.io/)
             3. Reinicie o computador pelo pendrive
             4. Clique em "Instalar Katu OS"
-
-            ### Verificação de integridade
-            ```
-            sha256sum katu-os-1.0-amd64.iso
-            ```
-            Compare com o arquivo `.sha256` incluído.
           files: |
             output/katu-os-1.0-amd64.iso
             output/katu-os-1.0-amd64.iso.sha256
@@ -275,12 +258,10 @@ jobs:
         if: always()
         run: |
           echo "## Resultado do Build" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
           if [ -f output/katu-os-1.0-amd64.iso ]; then
-            echo "✅ ISO gerada com sucesso!" >> $GITHUB_STEP_SUMMARY
-            echo "- **Arquivo:** katu-os-1.0-amd64.iso" >> $GITHUB_STEP_SUMMARY
-            echo "- **Tamanho:** ${{ env.ISO_SIZE }}" >> $GITHUB_STEP_SUMMARY
-            echo "- **SHA256:** $(cat output/katu-os-1.0-amd64.iso.sha256 2>/dev/null | cut -c1-12)..." >> $GITHUB_STEP_SUMMARY
+            echo "ISO gerada com sucesso!" >> $GITHUB_STEP_SUMMARY
+            echo "- Arquivo: katu-os-1.0-amd64.iso" >> $GITHUB_STEP_SUMMARY
+            echo "- Tamanho: ${{ env.ISO_SIZE }}" >> $GITHUB_STEP_SUMMARY
           else
-            echo "❌ Build falhou. Verifique o log de build." >> $GITHUB_STEP_SUMMARY
+            echo "Build falhou. Verifique o log de build." >> $GITHUB_STEP_SUMMARY
           fi
