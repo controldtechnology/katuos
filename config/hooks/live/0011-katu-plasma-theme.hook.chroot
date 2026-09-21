@@ -1,0 +1,59 @@
+#!/bin/bash
+# Hook: Aplicar tema e wallpaper padrão do Katu OS no Plasma
+
+set -Eeuo pipefail
+
+echo ">>> [Katu Hook] Configurando tema Plasma..."
+
+SKEL_CONFIG="/etc/skel/.config"
+SKEL_LOCAL="/etc/skel/.local/share"
+
+mkdir -p "${SKEL_CONFIG}/plasma-workspace/env"
+mkdir -p "${SKEL_LOCAL}/plasma/look-and-feel"
+
+# Instalar tema look-and-feel Katu
+if [ -d /usr/share/plasma/look-and-feel/org.katuos.desktop ]; then
+    echo ">>> Tema org.katuos.desktop presente."
+else
+    echo ">>> Tema não encontrado, usando breeze-dark como fallback."
+fi
+
+# Configuração padrão do Plasma via plasmarc no skel
+cat > "${SKEL_CONFIG}/plasmarc" << 'EOF'
+[Theme]
+name=default
+EOF
+
+# kdeglobals — esquema de cores e fontes
+cat > "${SKEL_CONFIG}/kdeglobals" << 'EOF'
+[General]
+ColorScheme=BreezeDark
+fixed=Noto Mono,10,-1,5,50,0,0,0,0,0
+font=Noto Sans,10,-1,5,50,0,0,0,0,0
+menuFont=Noto Sans,10,-1,5,50,0,0,0,0,0
+smallestReadableFont=Noto Sans,8,-1,5,50,0,0,0,0,0
+toolBarFont=Noto Sans,10,-1,5,50,0,0,0,0,0
+
+[Icons]
+Theme=breeze-dark
+
+[KDE]
+LookAndFeelPackage=org.kde.breezedark.desktop
+SingleClick=false
+widgetStyle=Breeze
+
+[Locale]
+Country=BR
+Language=pt_BR
+EOF
+
+# Wallpaper padrão — katu-amazonia
+WALLPAPER_PATH="/usr/share/wallpapers/katu/contents/images/katu-amazonia-4k.png"
+
+cat > "${SKEL_CONFIG}/plasma-org.kde.plasma.desktop-appletsrc" << EOF
+[Containments][1][Wallpaper][org.kde.image][General]
+Image=${WALLPAPER_PATH}
+FillMode=2
+EOF
+
+echo ">>> [Katu Hook] Tema Plasma configurado."

@@ -1,0 +1,55 @@
+{
+    "KPlugin": {
+        "Authors": [
+            {
+                "Email": "hello@katuos.org",
+                "Name": "Katu OS Team"
+            }
+        ],
+        "Description": "Coleção oficial de wallpapers do Katu OS",
+        "Id": "katu-wallpapers",
+        "License": "CC-BY-SA-4.0",
+        "Name": "Katu OS Wallpapers",
+        "Version": "1.0",
+        "Website": "https://katuos.org"
+    },
+    "wallpapers": [
+        {
+            "id": "katu-amazonia-4k",
+            "name": "Amazônia",
+            "description": "A natureza encontra a tecnologia.",
+            "file": "contents/images/katu-amazonia-4k.png",
+            "default": true
+        },
+        {
+            "id": "katu-onca-4k",
+            "name": "Onça",
+            "description": "Força brasileira. Liberdade para criar.",
+            "file": "contents/images/katu-onca-4k.png"
+        },
+        {
+            "id": "katu-dark-4k",
+            "name": "Katu OS Dark",
+            "description": "Tecnologia em equilíbrio.",
+            "file": "contents/images/katu-dark-4k.png"
+        },
+        {
+            "id": "katu-green-4k",
+            "name": "Verde Brasil",
+            "description": "Brasil no nosso DNA.",
+            "file": "contents/images/katu-green-4k.png"
+        },
+        {
+            "id": "katu-minimal-4k",
+            "name": "Minimal",
+            "description": "Livre. Brasileiro. Para todos.",
+            "file": "contents/images/katu-minimal-4k.png"
+        },
+        {
+            "id": "katu-rio-4k",
+            "name": "Rio",
+            "description": "Conectando caminhos.",
+            "file": "contents/images/katu-rio-4k.png"
+        }
+    ]
+}

@@ -1,0 +1,23 @@
+[Icon Theme]
+Name=Katu
+Name[pt_BR]=Katu
+Comment=Ícones do Katu OS
+Comment[pt_BR]=Ícones do Katu OS
+Inherits=breeze-dark,breeze,hicolor
+Directories=64x64/devices,64x64/places,32x32/devices,32x32/places
+
+[64x64/devices]
+Size=64
+Type=Fixed
+
+[64x64/places]
+Size=64
+Type=Fixed
+
+[32x32/devices]
+Size=32
+Type=Fixed
+
+[32x32/places]
+Size=32
+Type=Fixed

@@ -1,0 +1,33 @@
+# Katu OS — Calamares branding
+
+componentName: katu
+
+# === Strings de apresentação ===
+strings:
+    productName:         "Katu OS"
+    version:             "1.0"
+    shortVersion:        "1.0"
+    versionedName:       "Katu OS 1.0"
+    shortProductName:    "Katu OS"
+    bootloaderEntryName: "Katu OS"
+    productUrl:          "https://katuos.org"
+    supportUrl:          "https://katuos.org/suporte"
+    knownIssuesUrl:      "https://katuos.org/problemas-conhecidos"
+    releaseNotesUrl:     "https://katuos.org/notas-de-versao/1.0"
+
+# === Imagens ===
+images:
+    productLogo:         "logo.png"
+    productIcon:         "logo.png"
+    productWelcome:     "welcome.png"
+
+# === Slides durante instalação ===
+slideshow:             "show.qml"
+slideshowAPI:          2
+
+# === Cores ===
+style:
+    sidebarBackground:  "#1a1a1a"
+    sidebarText:        "#f8f9fa"
+    sidebarTextSelect:  "#f8f9fa"
+    sidebarTextHighlight: "#2ecc71"
