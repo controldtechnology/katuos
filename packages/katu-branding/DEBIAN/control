@@ -1,7 +1,7 @@
 Package: katu-branding
 Version: 1.0
 Architecture: all
-Maintainer: Katu OS Team <hello@katuos.org>
+Maintainer: Katu OS Team <controld.technology@gmail.com>
 Depends: katu-release, plasma-desktop
 Recommends: katu-default-settings
 Priority: optional

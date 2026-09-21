@@ -2,7 +2,7 @@
     "KPlugin": {
         "Authors": [
             {
-                "Email": "hello@katuos.org",
+                "Email": "controld.technology@gmail.com",
                 "Name": "Katu OS Team"
             }
         ],
@@ -11,7 +11,7 @@
         "License": "CC-BY-SA-4.0",
         "Name": "Katu OS Wallpapers",
         "Version": "1.0",
-        "Website": "https://katuos.org"
+        "Website": "https://katuos.com.br"
     },
     "wallpapers": [
         {
