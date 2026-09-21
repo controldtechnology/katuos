@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=Katu OS Update Center
+Name[pt_BR]=Central de Atualizações Katu OS
+Comment=Verifica atualizações do Katu OS
+Comment[pt_BR]=Verifica atualizações do Katu OS
+Exec=/usr/bin/python3 /usr/lib/katu/katu-update-check
+Icon=katu-update
+Terminal=false
+Categories=System;
+X-GNOME-Autostart-Delay=60
+X-GNOME-Autostart-enabled=true

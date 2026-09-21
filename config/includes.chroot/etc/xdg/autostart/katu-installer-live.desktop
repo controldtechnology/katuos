@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Name=Instalar Katu OS
+Name[pt_BR]=Instalar Katu OS
+Comment=Inicia o instalador Katu OS no modo live
+Comment[pt_BR]=Inicia o instalador Katu OS no modo live
+Exec=/usr/bin/katu-live-start
+Icon=katu-installer
+Terminal=false
+Categories=System;
+OnlyShowIn=KDE;
+X-GNOME-Autostart-enabled=true
+X-KDE-autostart-condition=katu-live-mode

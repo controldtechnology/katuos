@@ -1,0 +1,9 @@
+NAME="Katu OS"
+VERSION="1.0"
+CODENAME="Amazônia"
+ID=katu
+ID_LIKE=debian
+PRETTY_NAME="Katu OS 1.0 (Amazônia)"
+HOME_URL="https://katuos.com.br"
+SUPPORT_URL="https://katuos.com.br/suporte"
+BUG_REPORT_URL="https://katuos.com.br/bugs"

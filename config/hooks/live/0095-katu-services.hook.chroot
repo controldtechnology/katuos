@@ -1,0 +1,23 @@
+#!/bin/bash
+# Hook: Ativar serviços e scripts Katu OS
+
+set -Eeuo pipefail
+echo ">>> [Katu Hook] Configurando serviços..."
+
+# Tornar scripts executáveis
+chmod +x /usr/bin/katu-live-start 2>/dev/null || true
+chmod +x /usr/lib/katu/katu-update-check 2>/dev/null || true
+chmod +x /usr/lib/katu/katu-first-boot 2>/dev/null || true
+
+# Ativar serviço de primeiro boot (só roda no sistema instalado)
+if [ -f /etc/systemd/system/katu-firstboot.service ]; then
+    systemctl enable katu-firstboot.service 2>/dev/null || true
+fi
+
+# Criar diretório de estado do Katu
+mkdir -p /var/lib/katu
+
+# Criar diretório de config para o usuário katu (live)
+mkdir -p /etc/skel/.config/katu
+
+echo ">>> [Katu Hook] Serviços configurados."

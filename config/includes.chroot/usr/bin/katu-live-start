@@ -1,0 +1,24 @@
+#!/bin/bash
+# Script executado no boot do live para configurar ambiente e iniciar instalador
+
+WALLPAPER="/usr/share/wallpapers/katu/contents/images/katu-amazonia-4k.png"
+MARKER="$HOME/.katu-live-configured"
+
+# Aplicar wallpaper Katu OS (só na primeira vez por sessão)
+if [ ! -f "$MARKER" ] && [ -f "$WALLPAPER" ]; then
+    # Aguardar Plasma estar pronto
+    sleep 4
+    plasma-apply-wallpaperimage "$WALLPAPER" 2>/dev/null || true
+    touch "$MARKER"
+fi
+
+# Iniciar o instalador se estiver no modo live
+if grep -q "boot=live" /proc/cmdline 2>/dev/null; then
+    sleep 2
+    # Verificar se Calamares já está rodando
+    if ! pgrep -x calamares > /dev/null; then
+        pkexec /usr/bin/calamares 2>/dev/null || \
+        kdesudo /usr/bin/calamares 2>/dev/null || \
+        calamares 2>/dev/null &
+    fi
+fi

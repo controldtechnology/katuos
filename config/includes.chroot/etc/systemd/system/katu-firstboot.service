@@ -1,0 +1,12 @@
+[Unit]
+Description=Katu OS First Boot Setup
+After=network.target
+ConditionPathExists=!/var/lib/katu/.first-boot-done
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /usr/lib/katu/katu-first-boot
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
