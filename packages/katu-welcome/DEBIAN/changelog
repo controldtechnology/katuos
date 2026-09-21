@@ -1,4 +1,4 @@
-﻿katu-welcome (1.0-1) stable; urgency=low
+katu-welcome (1.0-1) stable; urgency=low
 
   * Initial release: aplicativo de boas-vindas PyQt5 com 8 cartões de ação.
 

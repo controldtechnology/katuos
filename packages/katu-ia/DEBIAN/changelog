@@ -1,4 +1,4 @@
-﻿katu-ia (1.0-1) stable; urgency=low
+katu-ia (1.0-1) stable; urgency=low
 
   * Initial release: hub de IA com Claude, GPT-4, Gemini, Ollama e prompts para devs.
 

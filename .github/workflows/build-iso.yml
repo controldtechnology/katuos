@@ -47,7 +47,22 @@ jobs:
           echo "=== Espaço depois ==="
           df -h /
 
-      # ── 3. Instalar live-build e dependências ─────────────────────────
+      # ── 3. Corrigir line endings (BOM + CRLF → LF) ───────────────────
+      - name: Corrigir line endings Windows → Linux
+        run: |
+          sudo apt-get install -y dos2unix 2>/dev/null || true
+          # Remover BOM e converter CRLF->LF em todos os arquivos de texto
+          find packages/ config/ installer/ scripts/ -type f \
+            ! -name "*.png" ! -name "*.jpg" ! -name "*.ico" ! -name "*.gif" \
+            ! -name "*.pdf" ! -name "*.iso" ! -name "*.deb" \
+            -exec dos2unix -q {} \; 2>/dev/null || true
+          # Garantir permissão de execução nos scripts
+          find packages/ -name "postinst" -o -name "preinst" -o -name "postrm" -o -name "prerm" | xargs -r chmod 755
+          find config/hooks/ -name "*.chroot" | xargs -r chmod 755
+          find scripts/ -name "*.sh" | xargs -r chmod 755
+          echo "Line endings corrigidos"
+
+      # ── 4. Instalar live-build e dependências ─────────────────────────
       - name: Instalar live-build e ferramentas
         run: |
           sudo apt-get update -qq
@@ -73,7 +88,7 @@ jobs:
           lb --version
           echo "live-build instalado com sucesso"
 
-      # ── 4. Construir pacotes .deb próprios do Katu ────────────────────
+      # ── 5. Construir pacotes .deb próprios do Katu ────────────────────
       - name: Construir pacotes Katu .deb
         run: |
           set -e
@@ -105,7 +120,7 @@ jobs:
           echo "=== Pacotes gerados ==="
           ls -lh build/packages/*.deb 2>/dev/null || echo "(nenhum)"
 
-      # ── 5. Preparar configuração live-build ───────────────────────────
+      # ── 6. Preparar configuração live-build ───────────────────────────
       - name: Preparar live-build config
         run: |
           set -e
@@ -145,7 +160,7 @@ jobs:
           echo "Config preparada. Listando:"
           ls build/config/
 
-      # ── 6. Executar lb config ─────────────────────────────────────────
+      # ── 7. Executar lb config ─────────────────────────────────────────
       - name: lb config
         working-directory: build
         run: |
@@ -170,7 +185,7 @@ jobs:
             --verbose
           echo "lb config concluído"
 
-      # ── 7. Executar lb build ──────────────────────────────────────────
+      # ── 8. Executar lb build ──────────────────────────────────────────
       - name: lb build (pode demorar 45-90 minutos)
         working-directory: build
         run: |
@@ -178,7 +193,7 @@ jobs:
           sudo lb build 2>&1 | tee ../logs/build.log
           echo "=== Build concluído: $(date) ==="
 
-      # ── 8. Localizar e renomear ISO ───────────────────────────────────
+      # ── 9. Localizar e renomear ISO ───────────────────────────────────
       - name: Localizar ISO gerada
         run: |
           ISO=$(find build/ -name "*.iso" -o -name "*.hybrid.iso" | head -1)
@@ -195,7 +210,7 @@ jobs:
           echo "ISO_PATH=output/katu-os-1.0-amd64.iso" >> $GITHUB_ENV
           echo "ISO_SIZE=$(du -sh output/katu-os-1.0-amd64.iso | cut -f1)" >> $GITHUB_ENV
 
-      # ── 9. Upload do artefato ─────────────────────────────────────────
+      # ── 10. Upload do artefato ─────────────────────────────────────────
       - name: Upload ISO como artefato
         uses: actions/upload-artifact@v4
         with:
@@ -206,7 +221,7 @@ jobs:
           retention-days: 30
           compression-level: 0
 
-      # ── 10. Upload do log de build ────────────────────────────────────
+      # ── 11. Upload do log de build ────────────────────────────────────
       - name: Upload log de build
         if: always()
         uses: actions/upload-artifact@v4
@@ -215,7 +230,7 @@ jobs:
           path: logs/build.log
           retention-days: 7
 
-      # ── 11. Criar Release no GitHub (opcional) ────────────────────────
+      # ── 12. Criar Release no GitHub (opcional) ────────────────────────
       - name: Criar Release GitHub
         if: github.event.inputs.upload_release == 'true'
         uses: softprops/action-gh-release@v2
@@ -255,7 +270,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # ── 12. Resumo final ──────────────────────────────────────────────
+      # ── 13. Resumo final ──────────────────────────────────────────────
       - name: Resumo do build
         if: always()
         run: |

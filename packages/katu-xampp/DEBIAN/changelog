@@ -1,4 +1,4 @@
-﻿katu-xampp (1.0-1) stable; urgency=low
+katu-xampp (1.0-1) stable; urgency=low
 
   * Initial release: painel LAMP visual com Apache2, MariaDB, PHP 8.2 e phpMyAdmin.
   * Inclui comando `lampp` compatível com XAMPP clássico.
