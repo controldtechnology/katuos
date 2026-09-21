@@ -1,0 +1,271 @@
+name: Build Katu OS ISO
+
+on:
+  push:
+    branches: [master, main]
+  workflow_dispatch:
+    inputs:
+      upload_release:
+        description: 'Criar release no GitHub com a ISO?'
+        required: false
+        default: 'false'
+        type: boolean
+
+jobs:
+  build-iso:
+    name: Build Katu OS 1.0 (Debian Trixie + KDE)
+    runs-on: ubuntu-22.04
+    timeout-minutes: 150
+
+    steps:
+      # ── 1. Checkout ─────────────────────────────────────────────────────
+      - name: Checkout código
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      # ── 2. Liberar espaço em disco ────────────────────────────────────
+      - name: Liberar espaço em disco
+        run: |
+          echo "=== Espaço antes ==="
+          df -h /
+          # Remover pacotes grandes pré-instalados (~15GB liberados)
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /usr/local/share/boost
+          sudo rm -rf /usr/lib/jvm
+          sudo rm -rf /usr/share/swift
+          sudo rm -rf /usr/local/julia*
+          sudo apt-get remove -y \
+            '^dotnet-.*' '^llvm-.*' 'php.*' azure-cli \
+            google-cloud-cli google-chrome-stable firefox \
+            mono-devel libgl1-mesa-dri 2>/dev/null || true
+          sudo apt-get autoremove -y 2>/dev/null || true
+          sudo apt-get clean
+          sudo rm -rf /var/cache/apt/archives/*
+          echo "=== Espaço depois ==="
+          df -h /
+
+      # ── 3. Instalar live-build e dependências ─────────────────────────
+      - name: Instalar live-build e ferramentas
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y \
+            live-build \
+            debootstrap \
+            squashfs-tools \
+            xorriso \
+            isolinux \
+            syslinux-common \
+            syslinux-efi \
+            dpkg-dev \
+            apt-utils \
+            rsync \
+            gzip \
+            xz-utils \
+            python3-pyqt5 \
+            python3-pip \
+            wget \
+            curl \
+            ca-certificates \
+            gnupg
+          lb --version
+          echo "live-build instalado com sucesso"
+
+      # ── 4. Construir pacotes .deb próprios do Katu ────────────────────
+      - name: Construir pacotes Katu .deb
+        run: |
+          set -e
+          mkdir -p build/packages output logs
+
+          # Construir cada pacote
+          for pkg_dir in packages/*/; do
+            pkg_name=$(basename "$pkg_dir")
+            echo "=== Construindo: $pkg_name ==="
+
+            # Corrigir permissões dos scripts DEBIAN
+            find "${pkg_dir}/DEBIAN" -name "postinst" -o -name "preinst" \
+                 -o -name "postrm" -o -name "prerm" 2>/dev/null | \
+                xargs -r chmod 755
+
+            if sudo dpkg-deb --build "$pkg_dir" "build/packages/${pkg_name}.deb"; then
+              echo "✓ $pkg_name.deb"
+            else
+              echo "! Aviso: falha ao construir $pkg_name"
+            fi
+          done
+
+          # Criar repositório local
+          ls build/packages/*.deb 2>/dev/null && \
+            cd build/packages && \
+            sudo dpkg-scanpackages . /dev/null > Packages 2>/dev/null && \
+            gzip -k Packages && cd ../..
+
+          echo "=== Pacotes gerados ==="
+          ls -lh build/packages/*.deb 2>/dev/null || echo "(nenhum)"
+
+      # ── 5. Preparar configuração live-build ───────────────────────────
+      - name: Preparar live-build config
+        run: |
+          set -e
+          mkdir -p build
+
+          # Copiar config para o diretório de build
+          rsync -a config/ build/config/
+
+          # Copiar temas visuais para includes.chroot
+          if [ -d sddm ]; then
+            mkdir -p build/config/includes.chroot/usr/share/sddm/themes
+            rsync -a sddm/ build/config/includes.chroot/usr/share/sddm/themes/
+          fi
+          if [ -d plymouth ]; then
+            mkdir -p build/config/includes.chroot/usr/share/plymouth/themes
+            rsync -a plymouth/ build/config/includes.chroot/usr/share/plymouth/themes/
+          fi
+          if [ -d grub ]; then
+            mkdir -p build/config/includes.binary/boot/grub/themes
+            rsync -a grub/ build/config/includes.binary/boot/grub/themes/
+          fi
+          if [ -d plasma ]; then
+            mkdir -p build/config/includes.chroot/usr/share/plasma
+            rsync -a plasma/ build/config/includes.chroot/usr/share/plasma/
+          fi
+          if [ -d installer/calamares ]; then
+            mkdir -p build/config/includes.chroot/etc/calamares
+            rsync -a installer/calamares/ build/config/includes.chroot/etc/calamares/
+          fi
+
+          # Repositório local dos pacotes Katu
+          mkdir -p build/config/archives
+          cat > build/config/archives/katu-local.list.chroot << EOF
+          deb [trusted=yes] file://$(pwd)/build/packages ./
+          EOF
+
+          echo "Config preparada. Listando:"
+          ls build/config/
+
+      # ── 6. Executar lb config ─────────────────────────────────────────
+      - name: lb config
+        working-directory: build
+        run: |
+          sudo lb config \
+            --distribution trixie \
+            --architecture amd64 \
+            --mirror-bootstrap "http://deb.debian.org/debian/" \
+            --mirror-chroot "http://deb.debian.org/debian/" \
+            --mirror-chroot-security "http://security.debian.org/debian-security/" \
+            --archive-areas "main contrib non-free non-free-firmware" \
+            --bootloaders "grub-efi,grub-pc" \
+            --debian-installer none \
+            --memtest none \
+            --iso-application "Katu OS" \
+            --iso-preparer "Katu OS Team" \
+            --iso-publisher "katuos.com.br" \
+            --iso-volume "KATU_OS_1.0" \
+            --image-type iso-hybrid \
+            --hostname "katu" \
+            --username "katu" \
+            --compression xz \
+            --verbose
+          echo "lb config concluído"
+
+      # ── 7. Executar lb build ──────────────────────────────────────────
+      - name: lb build (pode demorar 45-90 minutos)
+        working-directory: build
+        run: |
+          echo "=== Iniciando lb build: $(date) ==="
+          sudo lb build 2>&1 | tee ../logs/build.log
+          echo "=== Build concluído: $(date) ==="
+
+      # ── 8. Localizar e renomear ISO ───────────────────────────────────
+      - name: Localizar ISO gerada
+        run: |
+          ISO=$(find build/ -name "*.iso" -o -name "*.hybrid.iso" | head -1)
+          if [ -z "$ISO" ]; then
+            echo "ERRO: ISO não encontrada!"
+            ls -la build/
+            exit 1
+          fi
+          echo "ISO encontrada: $ISO"
+          mkdir -p output
+          cp "$ISO" output/katu-os-1.0-amd64.iso
+          sha256sum output/katu-os-1.0-amd64.iso > output/katu-os-1.0-amd64.iso.sha256
+          ls -lh output/
+          echo "ISO_PATH=output/katu-os-1.0-amd64.iso" >> $GITHUB_ENV
+          echo "ISO_SIZE=$(du -sh output/katu-os-1.0-amd64.iso | cut -f1)" >> $GITHUB_ENV
+
+      # ── 9. Upload do artefato ─────────────────────────────────────────
+      - name: Upload ISO como artefato
+        uses: actions/upload-artifact@v4
+        with:
+          name: katu-os-1.0-amd64-iso
+          path: |
+            output/katu-os-1.0-amd64.iso
+            output/katu-os-1.0-amd64.iso.sha256
+          retention-days: 30
+          compression-level: 0
+
+      # ── 10. Upload do log de build ────────────────────────────────────
+      - name: Upload log de build
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-log
+          path: logs/build.log
+          retention-days: 7
+
+      # ── 11. Criar Release no GitHub (opcional) ────────────────────────
+      - name: Criar Release GitHub
+        if: github.event.inputs.upload_release == 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.0
+          name: Katu OS 1.0 — Amazônia Dark
+          body: |
+            ## Katu OS 1.0 — Lançamento Inicial
+
+            Distribuição Linux brasileira baseada em **Debian 13 Trixie + KDE Plasma**.
+
+            ### O que está incluído
+            - Sistema base Debian 13 Trixie
+            - KDE Plasma com tema Amazônia Dark
+            - Firefox + Google Chrome
+            - LibreOffice completo em PT-BR
+            - Instalador visual estilo Windows 11
+            - Hub de IA (Claude, GPT-4, Gemini, Ollama)
+            - Painel LAMP / Katu XAMPP
+
+            ### Como instalar
+            1. Baixe o arquivo `.iso`
+            2. Grave em pendrive com [Balena Etcher](https://etcher.balena.io/)
+            3. Reinicie o computador pelo pendrive
+            4. Clique em "Instalar Katu OS"
+
+            ### Verificação de integridade
+            ```
+            sha256sum katu-os-1.0-amd64.iso
+            ```
+            Compare com o arquivo `.sha256` incluído.
+          files: |
+            output/katu-os-1.0-amd64.iso
+            output/katu-os-1.0-amd64.iso.sha256
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # ── 12. Resumo final ──────────────────────────────────────────────
+      - name: Resumo do build
+        if: always()
+        run: |
+          echo "## Resultado do Build" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ -f output/katu-os-1.0-amd64.iso ]; then
+            echo "✅ ISO gerada com sucesso!" >> $GITHUB_STEP_SUMMARY
+            echo "- **Arquivo:** katu-os-1.0-amd64.iso" >> $GITHUB_STEP_SUMMARY
+            echo "- **Tamanho:** ${{ env.ISO_SIZE }}" >> $GITHUB_STEP_SUMMARY
+            echo "- **SHA256:** $(cat output/katu-os-1.0-amd64.iso.sha256 2>/dev/null | cut -c1-12)..." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Build falhou. Verifique o log de build." >> $GITHUB_STEP_SUMMARY
+          fi
