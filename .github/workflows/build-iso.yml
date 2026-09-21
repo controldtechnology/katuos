@@ -50,7 +50,7 @@ jobs:
             debootstrap squashfs-tools xorriso isolinux \
             syslinux-common syslinux-efi dpkg-dev apt-utils rsync \
             gzip xz-utils wget curl ca-certificates gnupg dos2unix \
-            python3-pyqt5 python3-pip
+            python3-pyqt5 python3-pip debian-archive-keyring
 
           # Instalar live-build do Debian Trixie (versao compativel com todas as opcoes)
           sudo tee /etc/apt/sources.list.d/debian-trixie-lb.list > /dev/null << 'EOF'
@@ -177,8 +177,10 @@ jobs:
       - name: lb build
         working-directory: build
         run: |
+          set -eo pipefail
+          sudo mkdir -p ../logs
           echo "=== Iniciando lb build: $(date) ==="
-          sudo lb build 2>&1 | tee ../logs/build.log
+          sudo lb build 2>&1 | sudo tee ../logs/build.log
           echo "=== Build concluido: $(date) ==="
 
       # ── 9. Localizar ISO gerada ───────────────────────────────────────
