@@ -1,0 +1,31 @@
+#!/bin/sh
+# Cria copias sem versao do kernel e initrd para compatibilidade com grub.cfg
+# O live-build gera vmlinuz-X.Y.Z-amd64 mas nosso grub.cfg usa /live/vmlinuz
+set -e
+
+LIVE_DIR="binary/live"
+if [ ! -d "$LIVE_DIR" ]; then
+    echo "WARNING: $LIVE_DIR nao encontrado, pulando copia do kernel"
+    exit 0
+fi
+
+cd "$LIVE_DIR"
+
+for K in vmlinuz-*; do
+    if [ -f "$K" ]; then
+        cp -v "$K" vmlinuz
+        echo "Kernel copiado: $K -> vmlinuz"
+        break
+    fi
+done
+
+for I in initrd.img-*; do
+    if [ -f "$I" ]; then
+        cp -v "$I" initrd.img
+        echo "Initrd copiado: $I -> initrd.img"
+        break
+    fi
+done
+
+[ -f "vmlinuz" ] && echo "OK: /live/vmlinuz criado" || { echo "ERRO: vmlinuz nao criado!"; exit 1; }
+[ -f "initrd.img" ] && echo "OK: /live/initrd.img criado" || { echo "ERRO: initrd.img nao criado!"; exit 1; }

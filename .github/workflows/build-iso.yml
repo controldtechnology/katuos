@@ -87,7 +87,7 @@ jobs:
             -exec dos2unix -q {} \; 2>/dev/null || true
           find packages/ -name "postinst" -o -name "preinst" \
             -o -name "postrm" -o -name "prerm" | xargs -r chmod 755
-          find config/hooks/ -name "*.chroot" | xargs -r chmod 755
+          find config/hooks/ -name "*.chroot" -o -name "*.binary" | xargs -r chmod 755
           find scripts/ -name "*.sh" | xargs -r chmod 755
           echo "Line endings corrigidos"
 
