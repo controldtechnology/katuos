@@ -2,11 +2,9 @@ Package: katu-installer
 Version: 1.0
 Architecture: all
 Maintainer: Katu OS Team <katuos@gmail.com>
-Depends: python3 (>= 3.10), python3-pyqt5 | python3-pyside6, calamares, katu-release
+Depends: calamares, pkexec, kdialog, katu-release
 Priority: optional
 Section: misc
 Description: Katu OS installer wizard
- Friendly installation wizard designed for Brazilian users.
- Guides through: system requirements check, disk selection,
- user creation, installation progress and reboot.
- Launches Calamares for the actual installation.
+ Starts the Calamares installation wizard with Katu configuration
+ and preserves diagnostic output when the installer fails to launch.

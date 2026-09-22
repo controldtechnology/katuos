@@ -10,6 +10,12 @@ katu-release
 calamares
 calamares-settings-debian
 katu-installer
+grub-common
+grub2-common
+grub-pc-bin
+grub-efi-amd64-bin
+efibootmgr
+os-prober
 
 # Hub de IA para desenvolvedores (§AI)
 katu-ia

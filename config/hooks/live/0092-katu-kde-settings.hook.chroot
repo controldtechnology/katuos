@@ -136,9 +136,8 @@ EOF
 mkdir -p /etc/polkit-1/rules.d
 cat > /etc/polkit-1/rules.d/49-katu-calamares.rules << 'EOF'
 polkit.addRule(function(action, subject) {
-    if (action.id === "org.freedesktop.policykit.exec" &&
-        action.lookup("program") === "/usr/bin/calamares" &&
-        subject.user === "katu") {
+    if (action.id === "com.github.calamares.calamares.pkexec.run" &&
+        subject.user === "katu" && subject.local && subject.active) {
         return polkit.Result.YES;
     }
 });

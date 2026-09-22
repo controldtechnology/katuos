@@ -1,2 +1,17 @@
 #!/bin/bash
-exec python3 /usr/lib/katu-installer/instalador.py "$@"
+# All install entry points use the real Calamares wizard and its progress.
+set -u
+umask 077
+logdir="${XDG_STATE_HOME:-$HOME/.local/state}/katu-installer"
+mkdir -p "$logdir" || exit 1
+logfile=$(mktemp "$logdir/session-XXXXXXXX.log") || exit 1
+if [ ! -r /run/live/medium/live/filesystem.squashfs ]; then
+    kdialog --error 'Inicie pela ISO do Katu OS para instalar o sistema.'
+    exit 1
+fi
+pkexec /usr/bin/calamares "$@" >"$logfile" 2>&1
+status=$?
+if [ "$status" -ne 0 ]; then
+    kdialog --error "O instalador não conseguiu continuar. Detalhes em: $logfile"
+fi
+exit "$status"

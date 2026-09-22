@@ -17,8 +17,6 @@ if grep -q "boot=live" /proc/cmdline 2>/dev/null; then
     sleep 2
     # Verificar se Calamares já está rodando
     if ! pgrep -x calamares > /dev/null; then
-        pkexec /usr/bin/calamares 2>/dev/null || \
-        kdesudo /usr/bin/calamares 2>/dev/null || \
-        calamares 2>/dev/null &
+        katu-installer &
     fi
 fi

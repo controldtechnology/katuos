@@ -50,7 +50,7 @@ jobs:
             debootstrap squashfs-tools xorriso isolinux \
             syslinux-common syslinux-efi dpkg-dev apt-utils rsync \
             gzip xz-utils wget curl ca-certificates gnupg dos2unix \
-            python3-pyqt5 python3-pip
+            python3-pyqt5 python3-pip python3-yaml
 
           # Instalar live-build e debian-archive-keyring do Debian Trixie
           # (Ubuntu 2021 keyring nao tem a chave Trixie 762F67A0B2C39DE4)
@@ -92,6 +92,9 @@ jobs:
           echo "Line endings corrigidos"
 
       # ── 5. Construir pacotes .deb proprios do Katu ────────────────────
+      - name: Validar configuracao do instalador
+        run: python3 scripts/validate-installer.py
+
       - name: Construir pacotes Katu .deb
         run: |
           set -e
@@ -187,6 +190,9 @@ jobs:
           echo "=== Iniciando lb build: $(date) ==="
           sudo lb build 2>&1 | sudo tee ../logs/build.log
           echo "=== Build concluido: $(date) ==="
+
+      - name: Validar instalador no sistema construido
+        run: sudo python3 scripts/validate-installer.py --root build/chroot
 
       # ── 9. Localizar ISO gerada ───────────────────────────────────────
       - name: Localizar ISO gerada

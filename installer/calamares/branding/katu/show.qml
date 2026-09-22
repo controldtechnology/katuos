@@ -4,9 +4,8 @@
 
 import QtQuick 2.15
 import QtQuick.Controls 2.15
-import Calamares 1.0 as Calamares
 
-Calamares.Slideshow {
+Item {
     id: slideshow
 
     property color katuGreen:  "#00c853"
