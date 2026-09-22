@@ -50,6 +50,17 @@ plasma-systemmonitor
 # Informações do sistema no terminal
 fastfetch
 
+# Live system — OBRIGATÓRIO para boot live funcionar
+live-boot
+live-boot-initramfs-tools
+live-config
+live-config-systemd
+
+# Plymouth — splash de boot
+plymouth
+plymouth-themes
+plymouth-theme-spinner
+
 # Sistema
 sudo
 bash-completion
@@ -58,3 +69,7 @@ ca-certificates
 gnupg
 lsb-release
 dbus-user-session
+
+# VirtualBox guest support
+virtualbox-guest-utils
+virtualbox-guest-x11

@@ -1,0 +1,48 @@
+#!/bin/bash
+# Hook: Garante módulos essenciais no initramfs para boot live funcionar
+# Sem estes módulos, live-boot não consegue montar o filesystem.squashfs
+# no CD-ROM virtual do VirtualBox.
+
+set -Eeuo pipefail
+
+echo ">>> [Katu Hook] Configurando initramfs para boot live..."
+
+# Marcar live-boot e live-config como instalados manualmente
+# (evita que apt-get autoremove os remova)
+apt-mark manual live-boot live-boot-initramfs-tools live-config live-config-systemd \
+    2>/dev/null || true
+
+# Módulos OBRIGATÓRIOS para live-boot no initramfs:
+#   iso9660   — montar a ISO 9660 do CD-ROM
+#   sr_mod    — driver do CD-ROM/DVD SCSI
+#   cdrom     — suporte genérico a CD-ROM
+#   squashfs  — montar o filesystem.squashfs
+#   overlay   — sistema de arquivos overlay para o live (aufs/overlayfs)
+#   loop      — loop device (ISO em pendrive via loopback)
+MODULES_FILE="/etc/initramfs-tools/modules"
+
+for mod in iso9660 sr_mod cdrom squashfs overlay loop; do
+    if ! grep -qx "$mod" "$MODULES_FILE" 2>/dev/null; then
+        echo "$mod" >> "$MODULES_FILE"
+        echo "  Módulo adicionado ao initramfs: $mod"
+    fi
+done
+
+# Garantir que initramfs-tools está configurado para incluir drivers de CD
+INITRAMFS_CONF="/etc/initramfs-tools/conf.d/katu-live.conf"
+cat > "$INITRAMFS_CONF" << 'EOF'
+# Katu OS — configuração initramfs para boot live
+# MODULES=most garante drivers de CD-ROM, USB e storage no initramfs
+MODULES=most
+EOF
+
+echo ">>> [Katu Hook] Módulos initramfs configurados."
+
+# Verificar se live-boot está instalado
+if ! dpkg -l live-boot 2>/dev/null | grep -q '^ii'; then
+    echo "AVISO: live-boot não está instalado! Tentando instalar..."
+    apt-get install -y live-boot live-boot-initramfs-tools live-config live-config-systemd \
+        || echo "ERRO: Falha ao instalar live-boot"
+fi
+
+echo ">>> [Katu Hook] live-boot status: $(dpkg -l live-boot 2>/dev/null | grep '^ii' | awk '{print $2,$3}' || echo 'NÃO INSTALADO')"

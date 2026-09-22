@@ -5,7 +5,12 @@ set -Eeuo pipefail
 
 echo ">>> [Katu Hook] Executando limpeza final..."
 
-# Limpar cache APT
+# Proteger pacotes live essenciais ANTES do autoremove
+apt-mark manual \
+    live-boot live-boot-initramfs-tools live-config live-config-systemd \
+    initramfs-tools 2>/dev/null || true
+
+# Limpar cache APT (sem remover pacotes essenciais)
 apt-get clean
 apt-get autoremove --purge -y 2>/dev/null || true
 rm -rf /var/lib/apt/lists/*
@@ -26,5 +31,21 @@ rm -f /home/*/.bash_history 2>/dev/null || true
 # Limpar machine-id (será gerado no primeiro boot)
 truncate -s 0 /etc/machine-id 2>/dev/null || true
 rm -f /var/lib/dbus/machine-id 2>/dev/null || true
+
+# Verificação final — live-boot DEVE estar instalado
+if ! dpkg -l live-boot 2>/dev/null | grep -q '^ii'; then
+    echo "ERRO FATAL: live-boot foi removido pelo autoremove!" >&2
+    echo "O initramfs NÃO terá suporte live. Abortando build." >&2
+    exit 1
+fi
+
+echo ">>> [Katu Hook] live-boot confirmado: $(dpkg -l live-boot | grep '^ii' | awk '{print $2,$3}')"
+
+# Regenerar initramfs com todos os módulos corretos ANTES do fim do build
+# Isto garante que os módulos adicionados em 0004 estejam presentes
+echo ">>> [Katu Hook] Regenerando initramfs..."
+update-initramfs -u -k all 2>&1 || {
+    echo "AVISO: update-initramfs falhou — usando initramfs existente" >&2
+}
 
 echo ">>> [Katu Hook] Limpeza concluída."
