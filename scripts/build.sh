@@ -233,6 +233,14 @@ log_step "6/6 — Gerando checksum e build-info..."
 
 bash "${SCRIPT_DIR}/checksum.sh" "${ISO_FINAL}"
 
+# Validar conteúdo da ISO
+log_step "Validando conteúdo da ISO..."
+bash "${SCRIPT_DIR}/validate-iso.sh" "${ISO_FINAL}" || {
+    log_error "Validação da ISO falhou! A ISO pode ter problemas."
+    log_error "Verifique o conteúdo antes de distribuir."
+    exit 1
+}
+
 # build-info.txt
 cat > "${OUTPUT_DIR}/build-info.txt" << EOF
 KATU_ISO=${ISO_NAME}

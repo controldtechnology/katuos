@@ -1,14 +1,15 @@
 #!/bin/sh
-# Cria /live/vmlinuz e /live/initrd.img sem versão para compatibilidade com grub.cfg
-set -e
+# Hook binary: cria /live/vmlinuz e /live/initrd.img sem versão
+# Necessário porque o grub.cfg referencia caminhos fixos sem versão.
+# live-build roda este hook com CWD = diretório raiz do build (onde fica binary/).
+set -eu
 
-echo "=== Hook binary kernel: CWD=$(pwd) ==="
-ls -la 2>/dev/null || true
+echo "=== [Katu Hook Binary] Criando links de kernel sem versão ==="
+echo "CWD: $(pwd)"
 
-# live-build binary hooks rodam dentro do diretório binary/
-# Tentar paths relativos ao cwd atual
+# Localizar o diretório live/ dentro da árvore binary/
 LIVE_DIR=""
-for try in "live" "binary/live" "../binary/live"; do
+for try in "binary/live" "live"; do
     if [ -d "$try" ]; then
         LIVE_DIR="$try"
         echo "Diretório live encontrado: $try"
@@ -17,30 +18,71 @@ for try in "live" "binary/live" "../binary/live"; do
 done
 
 if [ -z "$LIVE_DIR" ]; then
-    echo "WARNING: diretório live não encontrado — listando diretórios:"
-    find . -maxdepth 3 -name "vmlinuz*" 2>/dev/null || true
-    exit 0
+    echo "ERRO FATAL: diretório live não encontrado." >&2
+    echo "Conteúdo do diretório atual:" >&2
+    ls -la >&2
+    exit 1
 fi
 
-cd "$LIVE_DIR"
 echo "Conteúdo de $LIVE_DIR:"
-ls -la
+ls -la "$LIVE_DIR"
 
-for K in vmlinuz-*; do
-    if [ -f "$K" ]; then
-        cp -v "$K" vmlinuz
-        echo "OK: $K -> vmlinuz"
+# --- Kernel ---
+KERNEL_SRC=""
+for k in "$LIVE_DIR"/vmlinuz-*; do
+    if [ -f "$k" ]; then
+        KERNEL_SRC="$k"
         break
     fi
 done
 
-for I in initrd.img-*; do
-    if [ -f "$I" ]; then
-        cp -v "$I" initrd.img
-        echo "OK: $I -> initrd.img"
+if [ -z "$KERNEL_SRC" ]; then
+    # live-build pode já ter criado vmlinuz sem versão
+    if [ -f "$LIVE_DIR/vmlinuz" ]; then
+        echo "OK: $LIVE_DIR/vmlinuz já existe (criado pelo live-build)."
+    else
+        echo "ERRO FATAL: nenhum kernel vmlinuz encontrado em $LIVE_DIR/" >&2
+        ls -la "$LIVE_DIR/" >&2
+        exit 1
+    fi
+else
+    cp -v "$KERNEL_SRC" "$LIVE_DIR/vmlinuz"
+    echo "OK: $(basename "$KERNEL_SRC") → vmlinuz"
+fi
+
+# --- Initrd ---
+INITRD_SRC=""
+for i in "$LIVE_DIR"/initrd.img-*; do
+    if [ -f "$i" ]; then
+        INITRD_SRC="$i"
         break
     fi
 done
 
-[ -f "vmlinuz" ]  && echo "OK: /live/vmlinuz criado"  || echo "AVISO: vmlinuz nao criado"
-[ -f "initrd.img" ] && echo "OK: /live/initrd.img criado" || echo "AVISO: initrd.img nao criado"
+if [ -z "$INITRD_SRC" ]; then
+    if [ -f "$LIVE_DIR/initrd.img" ]; then
+        echo "OK: $LIVE_DIR/initrd.img já existe (criado pelo live-build)."
+    else
+        echo "ERRO FATAL: nenhum initrd encontrado em $LIVE_DIR/" >&2
+        ls -la "$LIVE_DIR/" >&2
+        exit 1
+    fi
+else
+    cp -v "$INITRD_SRC" "$LIVE_DIR/initrd.img"
+    echo "OK: $(basename "$INITRD_SRC") → initrd.img"
+fi
+
+# --- Verificação final ---
+if [ ! -f "$LIVE_DIR/vmlinuz" ]; then
+    echo "ERRO FATAL: $LIVE_DIR/vmlinuz não foi criado." >&2
+    exit 1
+fi
+
+if [ ! -f "$LIVE_DIR/initrd.img" ]; then
+    echo "ERRO FATAL: $LIVE_DIR/initrd.img não foi criado." >&2
+    exit 1
+fi
+
+echo "=== [Katu Hook Binary] Concluído com sucesso ==="
+echo "  vmlinuz:   $(ls -lh "$LIVE_DIR/vmlinuz")"
+echo "  initrd.img: $(ls -lh "$LIVE_DIR/initrd.img")"

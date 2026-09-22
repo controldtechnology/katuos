@@ -121,4 +121,30 @@ BackgroundNormal=20,35,20
 ForegroundNormal=248,249,250
 EOF
 
+# Autostart: aplicar wallpaper e lançar Calamares no live mode
+mkdir -p "${SKEL_CONFIG}/autostart"
+cat > "${SKEL_CONFIG}/autostart/katu-live-start.desktop" << 'EOF'
+[Desktop Entry]
+Type=Application
+Name=Katu OS Live Setup
+Exec=/usr/bin/katu-live-start
+Terminal=false
+X-GNOME-Autostart-enabled=true
+EOF
+
+# Permissão para Calamares rodar via polkit sem senha no live
+mkdir -p /etc/polkit-1/rules.d
+cat > /etc/polkit-1/rules.d/49-katu-calamares.rules << 'EOF'
+polkit.addRule(function(action, subject) {
+    if (action.id === "org.freedesktop.policykit.exec" &&
+        action.lookup("program") === "/usr/bin/calamares" &&
+        subject.user === "katu") {
+        return polkit.Result.YES;
+    }
+});
+EOF
+
+# Tornar katu-live-start executável
+chmod +x /usr/bin/katu-live-start 2>/dev/null || true
+
 echo ">>> [Katu Hook] Configurações KDE aplicadas."
