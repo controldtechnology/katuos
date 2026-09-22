@@ -59,7 +59,6 @@ live-config-systemd
 # Plymouth — splash de boot
 plymouth
 plymouth-themes
-plymouth-theme-spinner
 
 # Sistema
 sudo
@@ -69,7 +68,3 @@ ca-certificates
 gnupg
 lsb-release
 dbus-user-session
-
-# VirtualBox guest support
-virtualbox-guest-utils
-virtualbox-guest-x11
