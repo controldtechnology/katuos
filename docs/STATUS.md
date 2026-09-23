@@ -1,6 +1,35 @@
 # STATUS — KATU OS
 
-Atualizado: 2026-09-20
+Atualizado: 2026-09-22
+
+## Situação atual — build concluído e boot live aprovado no VirtualBox
+
+- Build [35756634827](https://github.com/controldtechnology/katuos/actions/runs/35756634827): concluído com sucesso em 24m53s.
+- Commit: `ed2dab67f83493bc63ff8286805d5035df457f0b`.
+- Validação de conteúdo da ISO (kernel, initrd, squashfs e GRUB): aprovada no CI.
+- Artefato: `katu-os-1.0-amd64-iso`, disponível no build acima.
+- Cópia local: `output/build-35756634827/katu-os-1.0-amd64.iso` (3.499.745.280 bytes); download concluído e SHA-256 conferido com o arquivo publicado em 2026-09-22.
+- SHA-256: `bd8ad41d1cbd43104e04adedc6890c1ea5ab8b63fd9311ab35ee66939f47bc1f`.
+- A etapa de criar Release GitHub foi pulada; este build disponibilizou um artefato do Actions.
+- Correções de boot presentes no código: remoção de `splash`, blacklist de `vmwgfx`, `live-media=removable` e reforços no live-boot/initramfs.
+- Teste em 2026-09-22: ISO iniciou até o KDE Plasma, com wallpaper Katu e centro de boas-vindas visíveis, sem BusyBox.
+- VM: `Katu-ISO-35756634827`; VirtualBox 7.2.18; 3072 MB RAM; 1 CPU; EFI; VBoxSVGA; 128 MB VRAM; 3D desligado; ISO em DVD SATA; sem disco de instalação.
+- Evidência: `output/virtualbox/boot-test.png`.
+- Primeira tentativa com 2 CPUs não avançou do firmware EFI durante a observação. Ao reiniciar com 1 CPU, o boot chegou ao Plasma. O log do host registrou execução NEM/Hyper-V em modo lento; a causa exata da parada com 2 CPUs não foi determinada.
+- Mensagens de erro de `vboxvideo` apareceram durante o boot, mas não impediram a sessão gráfica.
+- Escopo validado: inicialização live até o desktop. Instalação em disco e funcionamento dos aplicativos ainda não foram testados.
+
+### Falha encontrada no primeiro teste de instalação
+
+- O particionamento e a cópia do sistema concluíram no VDI de 40 GiB.
+- A instalação parou no bootloader com `grub-install ... returned error code 127`.
+- Causa: o módulo `packages` removia o Calamares e executava a limpeza de dependências antes do módulo `bootloader`; o conjunto GRUB podia ser marcado como automático e removido.
+- Correção aplicada: GRUB/EFI agora é marcado como manual no hook final e explicitamente preservado pelo módulo `packages` antes da etapa de bootloader. A validação do build também exige esse conjunto.
+- Build corrigido em andamento na branch `fix/calamares-installation`.
+
+O registro abaixo é histórico (2026-09-20); as indicações de build não executado e bloqueio por ambiente Linux foram superadas pelo build no GitHub Actions.
+
+## Registro histórico
 
 ---
 

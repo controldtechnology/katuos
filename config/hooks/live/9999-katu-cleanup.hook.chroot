@@ -8,7 +8,8 @@ echo ">>> [Katu Hook] Executando limpeza final..."
 # Proteger pacotes live essenciais ANTES do autoremove
 apt-mark manual \
     live-boot live-boot-initramfs-tools live-config live-config-systemd \
-    initramfs-tools 2>/dev/null || true
+    initramfs-tools grub-common grub2-common grub-pc-bin \
+    grub-efi-amd64-bin efibootmgr 2>/dev/null || true
 
 # Limpar cache APT (sem remover pacotes essenciais)
 apt-get clean

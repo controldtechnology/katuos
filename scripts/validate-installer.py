@@ -29,7 +29,11 @@ assert boot['installEFIFallback'] is True
 assert steps.index('grubcfg') < steps.index('bootloader') < steps.index('umount')
 assert steps.index('shellprocess') < steps.index('bootloader')
 for operation in configs['packages']['operations']:
-    assert 'install' not in operation, 'Offline installation must not fetch packages'
+    if 'install' in operation:
+        assert set(operation['install']) == {
+            'grub-common', 'grub2-common', 'grub-pc-bin',
+            'grub-efi-amd64-bin', 'efibootmgr'
+        }
 for mapping in configs['unpackfs']['unpack']:
     assert {'source', 'sourcefs', 'destination'} <= mapping.keys()
 
