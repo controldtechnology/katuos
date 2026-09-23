@@ -25,7 +25,9 @@ Atualizado: 2026-09-22
 - A instalação parou no bootloader com `grub-install ... returned error code 127`.
 - Causa: o módulo `packages` removia o Calamares e executava a limpeza de dependências antes do módulo `bootloader`; o conjunto GRUB podia ser marcado como automático e removido.
 - Correção aplicada: GRUB/EFI agora é marcado como manual no hook final e explicitamente preservado pelo módulo `packages` antes da etapa de bootloader. A validação do build também exige esse conjunto.
-- Build corrigido em andamento na branch `fix/calamares-installation`.
+- Build corrigido concluído: [35853181664](https://github.com/controldtechnology/katuos/actions/runs/35853181664), commit `a095e62`.
+- As validações do instalador no sistema construído e da ISO passaram; artefato `katu-os-1.0-amd64-iso` (ID `10747151747`) disponível no build.
+- Teste manual no VDI: depois de preservar o GRUB, `grub-install` terminou sem erros e `grub-mkconfig` encontrou kernel e initrd. O primeiro boot automático pelo VDI ainda não foi capturado porque a sessão do VirtualBox perdeu o registro durante o desligamento.
 
 O registro abaixo é histórico (2026-09-20); as indicações de build não executado e bloqueio por ambiente Linux foram superadas pelo build no GitHub Actions.
 
