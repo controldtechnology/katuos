@@ -13,7 +13,10 @@ import sys, tempfile
 from pathlib import Path
 project = Path(sys.argv[1])
 sys.path.insert(0, str(project / 'scripts'))
-from boot_checks import grub_entries, require, rootfs_check, kernel_version, initrd_check
+from boot_checks import grub_entries, require, rootfs_check, kernel_version, initrd_check, png_check
+for directory in ['packages', 'installer', 'sddm', 'plymouth', 'grub', 'config/includes.chroot']:
+    for asset in (project / directory).rglob('*.png'):
+        png_check(asset)
 for config in (project / 'config/bootloaders').rglob('grub.cfg'):
     grub_entries(config)
 grub_entries(project / 'config/includes.binary/boot/grub/loopback.cfg')

@@ -80,3 +80,32 @@ não impediram esse avanço. Evidências: `driver-test.png`, `driver-result.png`
 Correção focal: retirar blacklist das entradas normais; manter nomodeset apenas
 na entrada de compatibilidade. O desktop ainda precisa passar pelos critérios
 funcionais; aparecer uma imagem de fundo não é suficiente.
+
+## Continuação: instalação, boot e assets
+
+- O Calamares concluiu a instalação em 23/09 às 13:13:37, com
+  `completion: succeeded`, GRUB EFI e fallback `bootx64.efi`.
+  Log preservado em `output/audit-20260923/calamares-completed.log`.
+- O DVD da VM de auditoria foi esvaziado e a VM iniciou pelo VDI até o SDDM.
+  Evidência: `output/audit-20260923/boot-without-iso.png`.
+  A tela apresenta problemas visuais; login e desktop instalado ainda não
+  foram aprovados. A ISO antiga exigiu carregar vmwgfx manualmente no Live.
+- Nove PNGs do Calamares e 20 PNGs de katu-branding/katu-welcome estavam
+  corrompidos por conversão binário/texto. A assinatura começava com
+  `ef bf bd 50 4e 47`, em vez de `89 50 4e 47 0d 0a 1a 0a`.
+  Restaurados de versões válidas do histórico Git, sem recriar o design.
+  Preflight e validador do instalador passam a verificar assinatura,
+  integridade CRC dos chunks e término dos PNGs.
+- Build Actions `35887374645` (commit e97f234) falhou no smoke QEMU após
+  os 11 checks estruturais passarem. O serial registra falha do serviço
+  katu-qa-live, sem marcador PASS nem diagnóstico suficiente para atribuir
+  causa. Evidências baixadas em `output/audit-20260923/actions-evidence/`.
+  O helper agora envia erros e diagnóstico do SDDM ao serial; o runner
+  rejeita imediatamente um marcador FAIL e usa os parâmetros do GRUB real.
+- Os 12 testes locais de regressão passaram, incluindo corrupção PNG e
+  bloqueio de release por evidência ausente/incompatível. A configuração
+  do instalador também passou na validação local.
+
+As correções locais ainda precisam de uma nova ISO e novos testes Live,
+instalação, desktop e boot sem mídia para o SHA-256 dessa ISO. Não houve
+publicação de release. USB físico continua NOT TESTED.

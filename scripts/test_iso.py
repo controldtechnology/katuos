@@ -12,7 +12,7 @@ import subprocess
 import tempfile
 import time
 from pathlib import Path
-from boot_checks import require, run, sha256_file
+from boot_checks import require, run, sha256_file, grub_entries
 
 parser = argparse.ArgumentParser()
 parser.add_argument('iso', type=Path)
@@ -26,8 +26,14 @@ try:
     require(shutil.which('qemu-system-x86_64'), 'QEMU missing: NOT TESTED; gate blocked')
     with tempfile.TemporaryDirectory(prefix='katu-smoke-') as temp:
         work = Path(temp)
-        for source, target in [('/live/vmlinuz', 'vmlinuz'), ('/live/initrd.img', 'initrd')]:
+        for source, target in [('/live/vmlinuz', 'vmlinuz'), ('/live/initrd.img', 'initrd'),
+                               ('/boot/grub/grub.cfg', 'grub.cfg')]:
             run('xorriso', '-osirrox', 'on', '-indev', args.iso, '-extract', source, work / target)
+        entry = grub_entries(work / 'grub.cfg')[0]
+        require(entry['kernel'] == '/live/vmlinuz' and entry['initrds'] == ['/live/initrd.img'],
+                'Smoke runner must be updated for changed default boot paths')
+        boot_params = [p for p in entry['params'] if p not in ('quiet', 'splash')]
+        report['boot_parameters'] = boot_params
         nonce = secrets.token_hex(16)
         serial = Path(str(args.iso) + '.serial.log')
         stderr = Path(str(args.iso) + '.qemu.log')
@@ -36,7 +42,7 @@ try:
                    '-serial', 'file:' + str(serial), '-nic', 'user,model=e1000',
                    '-cdrom', str(args.iso.resolve()), '-kernel', str(work / 'vmlinuz'),
                    '-initrd', str(work / 'initrd'), '-append',
-                   f'boot=live components username=katu hostname=katu console=tty0 console=ttyS0,115200 katu.qa={nonce}']
+                   ' '.join(boot_params + ['console=tty0', 'console=ttyS0,115200', f'katu.qa={nonce}'])]
         with stderr.open('w') as error_log:
             process = subprocess.Popen(command, stdout=error_log, stderr=error_log)
             deadline = time.monotonic() + args.timeout
@@ -44,6 +50,8 @@ try:
                 log = serial.read_text(errors='replace') if serial.exists() else ''
                 require('(initramfs)' not in log and 'Kernel panic' not in log and 'emergency mode' not in log,
                         'Unexpected initramfs/panic/emergency shell: release rejected')
+                require(f'KATU_QA_FAIL:{nonce}' not in log,
+                        'Live acceptance failed; inspect the serial log diagnostics')
                 if f'KATU_QA_PASS:{nonce}:systemd:sddm:plasmashell:overlay' in log:
                     report['status'] = 'PASS'
                     report['evidence'] = str(serial)

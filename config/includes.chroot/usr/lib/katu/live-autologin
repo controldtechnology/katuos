@@ -1,0 +1,27 @@
+#!/bin/sh
+set -eu
+
+id katu >/dev/null
+session=
+for candidate in plasma.desktop plasmawayland.desktop; do
+    if [ -f "/usr/share/wayland-sessions/$candidate" ]; then
+        session=$candidate
+        break
+    fi
+done
+if [ -z "$session" ]; then
+    for candidate in plasmax11.desktop plasma.desktop; do
+        if [ -f "/usr/share/xsessions/$candidate" ]; then
+            session=$candidate
+            break
+        fi
+    done
+fi
+test -n "$session"
+install -d -m 755 /etc/sddm.conf.d
+cat > /etc/sddm.conf.d/10-katu-live-autologin.conf <<EOF
+[Autologin]
+User=katu
+Session=$session
+Relogin=false
+EOF

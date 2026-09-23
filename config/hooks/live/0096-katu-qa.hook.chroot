@@ -2,3 +2,5 @@
 set -eu
 chmod 755 /usr/lib/katu/qa-live-smoke
 systemctl enable katu-qa-live.service
+chmod 755 /usr/lib/katu/live-autologin
+systemctl enable katu-live-autologin.service

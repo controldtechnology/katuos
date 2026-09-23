@@ -1,0 +1,13 @@
+[Unit]
+Description=Enable automatic login in Katu Live sessions
+ConditionKernelCommandLine=boot=live
+After=live-config.service
+Before=display-manager.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/lib/katu/live-autologin
+RemainAfterExit=yes
+
+[Install]
+WantedBy=graphical.target

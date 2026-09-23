@@ -22,6 +22,7 @@ def passed(name):
     print(name + ': PASS', flush=True)
 
 try:
+    __import__('yaml')  # Fail before the expensive extraction if installer validator cannot run.
     for tool in ['xorriso', 'unsquashfs', 'unmkinitramfs', 'grub-script-check', 'mcopy']:
         require(shutil.which(tool), f'Required tool missing: {tool}')
     require(args.iso.is_file(), 'ISO missing')
@@ -76,8 +77,13 @@ try:
         passed('INSTALLER STRUCTURE')
         for name in ['boot/grub/themes/katu/theme.txt', 'usr/share/plymouth/themes/katu/katu.plymouth',
                      'usr/share/sddm/themes/katu/Main.qml', 'etc/calamares/branding/katu/branding.desc',
-                     'usr/share/applications/katu-install.desktop']:
+                     'usr/share/applications/katu-install.desktop',
+                     'usr/lib/systemd/system/katu-live-autologin.service',
+                     'usr/lib/katu/live-autologin']:
             require(rooted(root, name).is_file(), f'Missing branding/installer asset: {name}')
+        live_login = rooted(root, 'usr/lib/systemd/system/katu-live-autologin.service').read_text()
+        require('ConditionKernelCommandLine=boot=live' in live_login,
+                'Live auto-login must not apply to the installed system')
         require('Katu' in rooted(root, 'etc/os-release').read_text(), 'OS branding missing')
         require(any(rooted(root, 'usr/share/wallpapers/katu').rglob('*.png')), 'Wallpaper missing')
         passed('BRANDING STRUCTURE')

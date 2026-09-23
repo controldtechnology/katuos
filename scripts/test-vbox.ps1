@@ -1,9 +1,11 @@
 param(
-    [ValidateSet('Create','Start','Capture','Command','Keys','Console','Interrupt','PowerOff','ForwardSSH','SSH','Sync','SyncSource')][string]$Action,
+    [ValidateSet('Create','Start','Show','Capture','Command','Keys','Key','Console','Desktop','Interrupt','PowerOff','ForwardSSH','SSH','Sync','SyncSource')][string]$Action,
     [string]$Iso,
     [string]$Command,
     [string]$CommandBase64,
     [string[]]$Keys,
+    [ValidateSet('Tab','Enter','AltN','AltF4','Escape','Down','Up','Space','CtrlA')][string]$Key,
+    [ValidateRange(1,20)][int]$Count = 1,
     [string]$Evidence = 'screen'
 )
 $ErrorActionPreference = 'Stop'
@@ -23,6 +25,7 @@ switch ($Action) {
         Invoke-VBox storageattach $vm --storagectl SATA --port 1 --device 0 --type dvddrive --medium $Iso
     }
     'Start' { Invoke-VBox startvm $vm --type headless }
+    'Show' { Invoke-VBox startvm $vm --type separate }
     'Capture' {
         if ($Evidence -notmatch '^[a-zA-Z0-9_-]+$') { throw 'Invalid evidence name' }
         Invoke-VBox controlvm $vm screenshotpng "$base/$Evidence.png"
@@ -33,7 +36,15 @@ switch ($Action) {
         Invoke-VBox controlvm $vm keyboardputscancode 1c 9c
     }
     'Keys' { Invoke-VBox controlvm $vm keyboardputscancode @Keys }
+    'Key' {
+        $scan = @{
+            Tab='0f 8f'; Enter='1c 9c'; AltN='38 31 b1 b8'; AltF4='38 3e be b8';
+            Escape='01 81'; Down='e0 50 e0 d0'; Up='e0 48 e0 c8'; Space='39 b9'; CtrlA='1d 1e 9e 9d'
+        }[$Key] -split ' '
+        for ($i=0; $i -lt $Count; $i++) { Invoke-VBox controlvm $vm keyboardputscancode @scan }
+    }
     'Console' { Invoke-VBox controlvm $vm keyboardputscancode 1d 38 3c bc b8 9d }
+    'Desktop' { Invoke-VBox controlvm $vm keyboardputscancode 1d 38 3b bb b8 9d }
     'Interrupt' { Invoke-VBox controlvm $vm keyboardputscancode 1d 2e ae 9d }
     'ForwardSSH' { Invoke-VBox controlvm $vm natpf1 'audit-ssh,tcp,127.0.0.1,2226,,22' }
     'SSH' {
@@ -50,4 +61,9 @@ switch ($Action) {
         if ($LASTEXITCODE -ne 0) { throw "Source copy failed: $LASTEXITCODE" }
     }
     'PowerOff' { Invoke-VBox controlvm $vm poweroff }
+}
+if ($Action -ne 'Capture' -and $PSBoundParameters.ContainsKey('Evidence')) {
+    if ($Evidence -notmatch '^[a-zA-Z0-9_-]+$') { throw 'Invalid evidence name' }
+    Start-Sleep -Seconds 2
+    Invoke-VBox controlvm $vm screenshotpng "$base/$Evidence.png"
 }

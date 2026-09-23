@@ -3,6 +3,7 @@ import re
 import shlex
 import struct
 import hashlib
+import zlib
 import subprocess
 from pathlib import Path
 
@@ -18,6 +19,30 @@ def sha256_file(path):
 def require(condition, message):
     if not condition:
         raise RuntimeError(message)
+
+
+def png_check(path):
+    """Reject text-converted, truncated or corrupt PNG assets without dependencies."""
+    data = path.read_bytes()
+    require(data[:8] == b'\x89PNG\r\n\x1a\n', f'Invalid PNG signature: {path}')
+    offset = 8
+    seen = []
+    while offset < len(data):
+        require(offset + 12 <= len(data), f'Truncated PNG: {path}')
+        size = int.from_bytes(data[offset:offset + 4], 'big')
+        end = offset + 12 + size
+        require(end <= len(data), f'Truncated PNG chunk: {path}')
+        kind = data[offset + 4:offset + 8]
+        payload = data[offset + 8:end - 4]
+        crc = int.from_bytes(data[end - 4:end], 'big')
+        require(zlib.crc32(kind + payload) == crc, f'Invalid PNG CRC: {path}')
+        seen.append(kind)
+        offset = end
+        if kind == b'IEND':
+            require(size == 0 and offset == len(data), f'Invalid PNG ending: {path}')
+            break
+    require(seen and seen[0] == b'IHDR' and b'IDAT' in seen and seen[-1] == b'IEND',
+            f'Incomplete PNG: {path}')
 
 
 def run(*args):

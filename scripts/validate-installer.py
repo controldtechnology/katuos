@@ -3,11 +3,15 @@
 import argparse
 from pathlib import Path
 import yaml
+from boot_checks import png_check
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--root', type=Path)
 args = parser.parse_args()
 base = args.root / 'etc/calamares' if args.root else Path(__file__).resolve().parents[1] / 'installer/calamares'
+
+for name in ['logo.png', 'icon.png', 'welcome.png'] + [f'slide-{i:02d}.png' for i in range(1, 7)]:
+    png_check(base / 'branding/katu' / name)
 
 def config(name):
     path = base / name

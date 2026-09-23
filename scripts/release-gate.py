@@ -22,6 +22,9 @@ for kind in ['validation', 'smoke']:
     reports[kind] = json.loads(Path(str(args.iso) + '.' + kind + '.json').read_text())
     require(reports[kind]['status'] == 'PASS' and reports[kind]['sha256'] == digest,
             f'{kind}: not PASS for this exact ISO')
+for name in ['ISO STRUCTURE', 'GRUB', 'SQUASHFS', 'KERNEL', 'INITRD', 'LIVE-BOOT',
+             'KERNEL/MODULES', 'INSTALLER STRUCTURE', 'BRANDING STRUCTURE', 'UEFI STRUCTURE', 'BIOS STRUCTURE']:
+    require(reports['validation'].get('checks', {}).get(name) == 'PASS', f'Missing check: {name}')
 manual = {'sha256': digest, 'tests': {name: 'NOT TESTED' for name in
           ['VIRTUALBOX LIVE', 'VIRTUALBOX INSTALLATION', 'BOOT WITHOUT ISO', 'BRANDING', 'PHYSICAL USB']}}
 if args.manual:
@@ -35,8 +38,6 @@ if not args.candidate:
                 f'{name}: missing PASS with evidence')
     require(manual['tests'].get('PHYSICAL USB') is not None, 'USB status must be explicit')
     destination = Path(__file__).resolve().parents[1] / 'release' / args.iso.stem
-    destination.mkdir(parents=True, exist_ok=False)
-    shutil.copy2(args.iso, destination / args.iso.name)
 else:
     destination = args.iso.parent
 manifest = {
@@ -48,6 +49,9 @@ manifest = {
     'live_build': subprocess.check_output(['dpkg-query', '-W', '-f=${Version}', 'live-build'], text=True),
     'automated': reports, 'manual': manual, 'release': not args.candidate,
 }
+if not args.candidate:
+    destination.mkdir(parents=True, exist_ok=False)
+    shutil.copy2(args.iso, destination / args.iso.name)
 (destination / 'manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')
 (destination / 'SHA256SUMS').write_text(f'{digest}  {args.iso.name}\n')
 print('CANDIDATE ONLY' if args.candidate else 'RELEASE GATE: PASS')

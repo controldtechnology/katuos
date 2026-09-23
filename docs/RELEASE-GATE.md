@@ -41,6 +41,11 @@ com Debian Live. A instalação do Katu é guiada pelo Calamares no desktop.
 O helper `scripts/test-vbox.ps1` cria uma VM de auditoria sem executar unattended.
 Ele é ferramenta desta auditoria, com nome e diretório de evidências próprios.
 
+No Live, o `katu-live-autologin.service` cria configuração transitória do SDDM
+somente quando `boot=live` está na linha do kernel. Isso permite que o desktop,
+o painel inferior e o teste QEMU iniciem sem senha no modo Live; a instalação
+em disco não recebe essa configuração da camada gravável do Live.
+
 Não adicionar drivers proprietários ou alterar o kernel para resolver o VISO.
 Não voltar a bloquear vmwgfx nas entradas normais: VMSVGA precisa desse driver.
 

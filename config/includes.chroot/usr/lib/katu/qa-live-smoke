@@ -1,9 +1,17 @@
 #!/bin/bash
 set -Eeuo pipefail
+exec > /dev/ttyS0 2>&1
+diagnose() {
+    echo "KATU_QA_FAIL:${nonce:-unknown}"
+    systemctl status sddm --no-pager || true
+    journalctl -b -u sddm -n 60 --no-pager || true
+    findmnt / || true
+    pgrep -a plasmashell || true
+}
+trap diagnose ERR
 grep -qw 'boot=live' /proc/cmdline
 nonce=$(sed -n 's/.*katu.qa=\([a-f0-9]*\).*/\1/p' /proc/cmdline)
 [[ $nonce =~ ^[a-f0-9]{32}$ ]]
-exec > /dev/ttyS0 2>&1
 for attempt in $(seq 1 110); do
     if systemctl is-active --quiet sddm && pgrep -u katu -x plasmashell >/dev/null; then
         uid=$(id -u katu)
@@ -19,5 +27,5 @@ for attempt in $(seq 1 110); do
     fi
     sleep 5
 done
-echo "KATU_QA_FAIL:$nonce"
+diagnose
 exit 1
