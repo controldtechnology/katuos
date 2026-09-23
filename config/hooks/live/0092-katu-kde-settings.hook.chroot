@@ -91,17 +91,9 @@ dbVersion=2
 first run=false
 EOF
 
-# Wallpaper padrão via plasma-org.kde.plasma.desktop-appletsrc
-WALLPAPER="/usr/share/wallpapers/katu/contents/images/katu-amazonia-4k.png"
-cat > "${SKEL_CONFIG}/plasma-org.kde.plasma.desktop-appletsrc" << EOF
-[Containments][1][Wallpaper][org.kde.image][General]
-Image=${WALLPAPER}
-ImageDefault=${WALLPAPER}
-
-[Containments][2][Wallpaper][org.kde.image][General]
-Image=${WALLPAPER}
-ImageDefault=${WALLPAPER}
-EOF
+# O layout completo do painel vem do pacote look-and-feel. Um appletsrc
+# parcial aqui substituiria esse layout e deixaria o rodapé sem menu.
+rm -f "${SKEL_CONFIG}/plasma-org.kde.plasma.desktop-appletsrc"
 
 # KDE look-and-feel e cores
 cat > "${SKEL_CONFIG}/kdeglobals" << 'EOF'

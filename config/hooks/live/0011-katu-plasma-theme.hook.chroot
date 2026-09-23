@@ -40,14 +40,10 @@ cat > "${SKEL_CONFIG}/plasmarc" << 'EOF'
 name=default
 EOF
 
-# Wallpaper padrão Amazônia
+# Wallpaper padrão Amazônia usado pela configuração look-and-feel.
+# Não criar plasma-org.kde.plasma.desktop-appletsrc parcialmente: um arquivo
+# incompleto substitui o layout padrão do Plasma e faz o painel desaparecer.
 WALLPAPER_PATH="/usr/share/wallpapers/katu/contents/images/katu-amazonia-4k.png"
-
-cat > "${SKEL_CONFIG}/plasma-org.kde.plasma.desktop-appletsrc" << EOF
-[Containments][1][Wallpaper][org.kde.image][General]
-Image=${WALLPAPER_PATH}
-FillMode=2
-EOF
 
 # kscreenlockerrc — lock screen com wallpaper Katu
 cat > "${SKEL_CONFIG}/kscreenlockerrc" << EOF
