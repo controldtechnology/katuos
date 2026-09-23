@@ -1,32 +1,14 @@
-// Katu OS — KDE Plasma Panel Layout
-// Painel único na base, estilo macOS/Windows com lançador Katu
+// Katu OS — layout padrão do Plasma.
+// O Plasma executa este arquivo ao aplicar o pacote look-and-feel.
 
-var plasma = getApiVersion(1);
+var panel = new Panel;
+panel.location = "bottom";
+panel.height = 48;
+panel.hiding = "none";
 
-var layout = {
-    desktops: [{
-        applets: [],
-        wallpaperPlugin: "org.kde.image",
-        wallpaper: {
-            "Image": "/usr/share/wallpapers/katu/contents/images/katu-amazonia-4k.png",
-            "FillMode": 2
-        }
-    }],
-    panels: [{
-        location: "bottom",
-        height: 48,
-        hiding: "none",
-        applets: [
-            { plugin: "org.kde.plasma.kickoff",        config: { icon: "katu-logo", showButtonsFor: "power" } },
-            { plugin: "org.kde.plasma.icontasks",      config: { launchers: [
-                "applications:firefox-esr.desktop",
-                "applications:org.kde.dolphin.desktop",
-                "applications:org.kde.konsole.desktop",
-                "applications:systemsettings.desktop"
-            ]}},
-            { plugin: "org.kde.plasma.marginsseparator" },
-            { plugin: "org.kde.plasma.systemtray" },
-            { plugin: "org.kde.plasma.digitalclock",   config: { dateFormat: "ddd, d MMM", use24hFormat: 2 } }
-        ]
-    }]
-};
+// Menu de aplicativos Katu e tarefas abertas.
+panel.addWidget("org.kde.plasma.kickoff");
+panel.addWidget("org.kde.plasma.icontasks");
+panel.addWidget("org.kde.plasma.marginsseparator");
+panel.addWidget("org.kde.plasma.systemtray");
+panel.addWidget("org.kde.plasma.digitalclock");
