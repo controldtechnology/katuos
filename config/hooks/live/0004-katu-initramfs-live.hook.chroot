@@ -9,8 +9,7 @@ echo ">>> [Katu Hook] Configurando initramfs para boot live..."
 
 # Marcar live-boot e live-config como instalados manualmente
 # (evita que apt-get autoremove os remova)
-apt-mark manual live-boot live-boot-initramfs-tools live-config live-config-systemd \
-    2>/dev/null || true
+apt-mark manual live-boot live-boot-initramfs-tools live-config live-config-systemd
 
 # Módulos OBRIGATÓRIOS para live-boot no initramfs:
 #   iso9660   — montar a ISO 9660 do CD-ROM
@@ -41,8 +40,8 @@ echo ">>> [Katu Hook] Módulos initramfs configurados."
 # Verificar se live-boot está instalado
 if ! dpkg -l live-boot 2>/dev/null | grep -q '^ii'; then
     echo "AVISO: live-boot não está instalado! Tentando instalar..."
-    apt-get install -y live-boot live-boot-initramfs-tools live-config live-config-systemd \
-        || echo "ERRO: Falha ao instalar live-boot"
+    echo "ERRO: pacotes Live obrigatórios ausentes; abortando build" >&2
+    exit 1
 fi
 
 echo ">>> [Katu Hook] live-boot status: $(dpkg -l live-boot 2>/dev/null | grep '^ii' | awk '{print $2,$3}' || echo 'NÃO INSTALADO')"

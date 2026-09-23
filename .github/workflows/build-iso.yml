@@ -4,12 +4,6 @@ on:
   push:
     branches: [master, main]
   workflow_dispatch:
-    inputs:
-      upload_release:
-        description: 'Criar release no GitHub com a ISO?'
-        required: false
-        default: 'false'
-        type: boolean
 
 jobs:
   build-iso:
@@ -50,7 +44,7 @@ jobs:
             debootstrap squashfs-tools xorriso isolinux \
             syslinux-common syslinux-efi dpkg-dev apt-utils rsync \
             gzip xz-utils wget curl ca-certificates gnupg dos2unix \
-            python3-pyqt5 python3-pip python3-yaml
+            python3-pyqt5 python3-pip python3-yaml initramfs-tools-core zstd lz4 cpio mtools grub-common qemu-system-x86
 
           # Instalar live-build e debian-archive-keyring do Debian Trixie
           # (Ubuntu 2021 keyring nao tem a chave Trixie 762F67A0B2C39DE4)
@@ -91,241 +85,31 @@ jobs:
           find scripts/ -name "*.sh" | xargs -r chmod 755
           echo "Line endings corrigidos"
 
-      # ── 5. Construir pacotes .deb proprios do Katu ────────────────────
-      - name: Validar configuracao do instalador
-        run: python3 scripts/validate-installer.py
+      - name: Clean build, preflight, final ISO validation and QEMU smoke
+        run: sudo bash scripts/build.sh
 
-      - name: Construir pacotes Katu .deb
-        run: |
-          set -e
-          mkdir -p build/packages output logs
-
-          for pkg_dir in packages/*/; do
-            pkg_name=$(basename "$pkg_dir")
-            echo "=== Construindo: $pkg_name ==="
-            find "${pkg_dir}/DEBIAN" -name "postinst" -o -name "preinst" \
-              -o -name "postrm" -o -name "prerm" 2>/dev/null | xargs -r chmod 755
-            if sudo dpkg-deb --build "$pkg_dir" "build/packages/${pkg_name}.deb"; then
-              echo "OK: $pkg_name.deb"
-            else
-              echo "AVISO: falha ao construir $pkg_name — continuando"
-            fi
-          done
-
-          if ls build/packages/*.deb 2>/dev/null; then
-            cd build/packages
-            sudo dpkg-scanpackages . /dev/null > Packages 2>/dev/null
-            gzip -k Packages
-            cd ../..
-          fi
-          ls -lh build/packages/*.deb 2>/dev/null || echo "(nenhum pacote gerado)"
-
-      # ── 6. Preparar configuracao live-build ──────────────────────────
-      - name: Preparar live-build config
-        run: |
-          set -e
-          mkdir -p build
-
-          rsync -a config/ build/config/
-
-          if [ -d sddm ]; then
-            mkdir -p build/config/includes.chroot/usr/share/sddm/themes
-            rsync -a sddm/ build/config/includes.chroot/usr/share/sddm/themes/
-          fi
-          if [ -d plymouth ]; then
-            mkdir -p build/config/includes.chroot/usr/share/plymouth/themes
-            rsync -a plymouth/ build/config/includes.chroot/usr/share/plymouth/themes/
-          fi
-          if [ -d grub ]; then
-            mkdir -p build/config/includes.binary/boot/grub/themes
-            rsync -a grub/ build/config/includes.binary/boot/grub/themes/
-          fi
-          if [ -d plasma ]; then
-            mkdir -p build/config/includes.chroot/usr/share/plasma
-            rsync -a plasma/ build/config/includes.chroot/usr/share/plasma/
-          fi
-          if [ -d installer/calamares ]; then
-            mkdir -p build/config/includes.chroot/etc/calamares
-            rsync -a installer/calamares/ build/config/includes.chroot/etc/calamares/
-          fi
-
-          # Repositorio local dos pacotes Katu
-          mkdir -p build/config/archives
-          printf 'deb [trusted=yes] file://%s/build/packages ./\n' "$(pwd)" \
-            > build/config/archives/katu-local.list.chroot
-
-          echo "Config preparada:"
-          ls build/config/
-
-      # ── 7. lb config ─────────────────────────────────────────────────
-      - name: lb config
-        working-directory: build
-        run: |
-          sudo lb config \
-            --distribution trixie \
-            --architecture amd64 \
-            --mirror-bootstrap "http://deb.debian.org/debian/" \
-            --mirror-chroot "http://deb.debian.org/debian/" \
-            --mirror-chroot-security "http://security.debian.org/debian-security/" \
-            --archive-areas "main contrib non-free non-free-firmware" \
-            --binary-images iso-hybrid \
-            --bootloaders grub-efi,grub-pc \
-            --debian-installer none \
-            --memtest none \
-            --iso-application "Katu OS" \
-            --iso-preparer "Katu OS Team" \
-            --iso-publisher "katuos.com.br" \
-            --iso-volume "KATU_OS_1.0" \
-            --bootappend-live "boot=live components username=katu hostname=katu" \
-            --compression xz \
-            --verbose
-          echo "lb config OK"
-
-      # ── 8. lb build (45-90 minutos) ──────────────────────────────────
-      - name: lb build
-        working-directory: build
-        run: |
-          set -eo pipefail
-          sudo mkdir -p ../logs
-          echo "=== Iniciando lb build: $(date) ==="
-          sudo lb build 2>&1 | sudo tee ../logs/build.log
-          echo "=== Build concluido: $(date) ==="
-
-      - name: Validar instalador no sistema construido
-        run: sudo python3 scripts/validate-installer.py --root build/chroot
-
-      # ── 9. Localizar ISO gerada ───────────────────────────────────────
-      - name: Localizar ISO gerada
-        run: |
-          ISO=$(find build/ -name "*.iso" | head -1)
-          if [ -z "$ISO" ]; then
-            echo "ERRO: ISO nao encontrada!"
-            ls -la build/
-            exit 1
-          fi
-          echo "ISO encontrada: $ISO"
-          mkdir -p output
-          cp "$ISO" output/katu-os-1.0-amd64.iso
-          sha256sum output/katu-os-1.0-amd64.iso > output/katu-os-1.0-amd64.iso.sha256
-          ls -lh output/
-          echo "ISO_PATH=output/katu-os-1.0-amd64.iso" >> $GITHUB_ENV
-          echo "ISO_SIZE=$(du -sh output/katu-os-1.0-amd64.iso | cut -f1)" >> $GITHUB_ENV
-
-      # ── 10. Validar conteúdo da ISO ──────────────────────────────────
-      - name: Validar ISO (kernel + initrd + squashfs + GRUB)
-        run: |
-          set -e
-          ISO="output/katu-os-1.0-amd64.iso"
-          echo "=== Validando ISO: $ISO ==="
-
-          # Instalar isoinfo se necessário
-          command -v isoinfo &>/dev/null || sudo apt-get install -y -qq genisoimage
-
-          ERROS=0
-
-          check_in_iso() {
-            local path="$1"
-            local desc="$2"
-            # isoinfo lista arquivos em maiúsculas com sufixo ;1
-            local name
-            name=$(basename "$path" | tr '[:lower:]' '[:upper:]')
-            if isoinfo -l -i "$ISO" 2>/dev/null | grep -qi "$name"; then
-              echo "  OK: $desc ($path)"
-            else
-              echo "  ERRO: $desc NAO encontrado: $path" >&2
-              ERROS=$((ERROS + 1))
-            fi
-          }
-
-          check_in_iso "/live/vmlinuz"             "Kernel"
-          check_in_iso "/live/initrd.img"          "Initrd"
-          check_in_iso "/live/filesystem.squashfs" "Squashfs"
-          check_in_iso "/boot/grub/grub.cfg"       "GRUB config"
-
-          # Montar e verificar que grub.cfg não tem wildcards
-          MNTDIR=$(mktemp -d)
-          if sudo mount -o loop,ro "$ISO" "$MNTDIR" 2>/dev/null; then
-            if grep -q 'vmlinuz-\*\|initrd\.img-\*' "$MNTDIR/boot/grub/grub.cfg" 2>/dev/null; then
-              echo "  ERRO CRITICO: grub.cfg tem wildcards literais — boot vai falhar!" >&2
-              ERROS=$((ERROS + 1))
-            else
-              echo "  OK: grub.cfg sem wildcards problemáticos"
-            fi
-            sudo umount "$MNTDIR" || true
-          fi
-          rmdir "$MNTDIR" || true
-
-          if [ $ERROS -gt 0 ]; then
-            echo ""
-            echo "VALIDACAO FALHOU: $ERROS erro(s) critico(s)"
-            echo "ISO NAO esta pronta para distribuicao."
-            exit 1
-          fi
-          echo "VALIDACAO OK — ISO pronta"
-
-      # ── 11. Upload ISO como artefato ─────────────────────────────────
-      - name: Upload ISO
+      - name: Upload validated candidate (not a release)
         uses: actions/upload-artifact@v4
         with:
-          name: katu-os-1.0-amd64-iso
+          name: katu-os-candidate-${{ github.run_id }}
           path: |
-            output/katu-os-1.0-amd64.iso
-            output/katu-os-1.0-amd64.iso.sha256
-          retention-days: 30
+            output/candidate-*/*.iso
+            output/candidate-*/SHA256SUMS
+            output/candidate-*/manifest.json
+            output/candidate-*/*.json
           compression-level: 0
+          retention-days: 30
 
-      # ── 11. Upload log de build (sempre) ─────────────────────────────
-      - name: Upload log de build
+      - name: Upload diagnostic evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: build-log
-          path: logs/build.log
-          retention-days: 7
+          name: katu-build-evidence-${{ github.run_id }}
+          path: |
+            output/candidate-*/*.log
+            output/candidate-*/*.json
+          retention-days: 30
 
-      # ── 12. Criar Release GitHub (opcional) ──────────────────────────
-      - name: Criar Release GitHub
-        if: github.event.inputs.upload_release == 'true'
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: v1.0.0
-          name: Katu OS 1.0 - Amazonia Dark
-          body: |
-            ## Katu OS 1.0 - Lancamento Inicial
-
-            Distribuicao Linux brasileira baseada em **Debian 13 Trixie + KDE Plasma**.
-
-            ### O que esta incluido
-            - Sistema base Debian 13 Trixie
-            - KDE Plasma com tema Amazonia Dark
-            - Firefox + Google Chrome
-            - LibreOffice completo em PT-BR
-            - Instalador visual estilo Windows 11
-            - Hub de IA (Claude, GPT-4, Gemini, Ollama)
-            - Painel LAMP / Katu XAMPP
-
-            ### Como instalar
-            1. Baixe o arquivo `.iso`
-            2. Grave em pendrive com Balena Etcher (https://etcher.balena.io/)
-            3. Reinicie o computador pelo pendrive
-            4. Clique em "Instalar Katu OS"
-          files: |
-            output/katu-os-1.0-amd64.iso
-            output/katu-os-1.0-amd64.iso.sha256
-          draft: false
-          prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      # ── 13. Resumo final ──────────────────────────────────────────────
-      - name: Resumo do build
-        if: always()
+      - name: Release policy
         run: |
-          echo "## Resultado do Build" >> $GITHUB_STEP_SUMMARY
-          if [ -f output/katu-os-1.0-amd64.iso ]; then
-            echo "ISO gerada com sucesso!" >> $GITHUB_STEP_SUMMARY
-            echo "- Arquivo: katu-os-1.0-amd64.iso" >> $GITHUB_STEP_SUMMARY
-            echo "- Tamanho: ${{ env.ISO_SIZE }}" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "Build falhou. Verifique o log de build." >> $GITHUB_STEP_SUMMARY
-          fi
+          echo 'Candidate only. Release requires scripts/release-gate.py and manual evidence for the exact SHA-256.' >> "$GITHUB_STEP_SUMMARY"

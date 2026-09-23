@@ -1,0 +1,4 @@
+#!/bin/sh
+set -eu
+chmod 755 /usr/lib/katu/qa-live-smoke
+systemctl enable katu-qa-live.service

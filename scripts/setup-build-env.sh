@@ -74,6 +74,13 @@ DEPS=(
     debhelper
     dh-python
     python3
+    python3-yaml
+    initramfs-tools-core
+    zstd
+    lz4
+    cpio
+    grub-common
+    qemu-system-x86
     python3-pyqt5
     git
     wget

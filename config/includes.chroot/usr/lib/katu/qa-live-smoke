@@ -1,0 +1,23 @@
+#!/bin/bash
+set -Eeuo pipefail
+grep -qw 'boot=live' /proc/cmdline
+nonce=$(sed -n 's/.*katu.qa=\([a-f0-9]*\).*/\1/p' /proc/cmdline)
+[[ $nonce =~ ^[a-f0-9]{32}$ ]]
+exec > /dev/ttyS0 2>&1
+for attempt in $(seq 1 110); do
+    if systemctl is-active --quiet sddm && pgrep -u katu -x plasmashell >/dev/null; then
+        uid=$(id -u katu)
+        if runuser -u katu -- env XDG_RUNTIME_DIR="/run/user/$uid" \
+            DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$uid/bus" \
+            busctl --user status org.kde.plasmashell >/dev/null 2>&1; then
+            findmnt -n -t overlay /
+            test -r /run/live/medium/live/filesystem.squashfs
+            test -x /usr/bin/calamares
+            echo "KATU_QA_PASS:$nonce:systemd:sddm:plasmashell:overlay"
+            exit 0
+        fi
+    fi
+    sleep 5
+done
+echo "KATU_QA_FAIL:$nonce"
+exit 1

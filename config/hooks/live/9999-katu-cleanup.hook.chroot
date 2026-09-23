@@ -9,11 +9,11 @@ echo ">>> [Katu Hook] Executando limpeza final..."
 apt-mark manual \
     live-boot live-boot-initramfs-tools live-config live-config-systemd \
     initramfs-tools grub-common grub2-common grub-pc-bin \
-    grub-efi-amd64-bin efibootmgr 2>/dev/null || true
+    grub-efi-amd64-bin efibootmgr
 
 # Limpar cache APT (sem remover pacotes essenciais)
 apt-get clean
-apt-get autoremove --purge -y 2>/dev/null || true
+apt-get autoremove --purge -y
 rm -rf /var/lib/apt/lists/*
 rm -rf /var/cache/apt/archives/*.deb
 rm -rf /var/cache/apt/archives/partial/*
@@ -45,8 +45,12 @@ echo ">>> [Katu Hook] live-boot confirmado: $(dpkg -l live-boot | grep '^ii' | a
 # Regenerar initramfs com todos os módulos corretos ANTES do fim do build
 # Isto garante que os módulos adicionados em 0004 estejam presentes
 echo ">>> [Katu Hook] Regenerando initramfs..."
-update-initramfs -u -k all 2>&1 || {
-    echo "AVISO: update-initramfs falhou — usando initramfs existente" >&2
-}
+update-initramfs -u -k all
+for image in /boot/initrd.img-*; do
+    test -s "$image"
+    listing=$(lsinitramfs "$image")
+    grep -qx 'scripts/live' <<< "$listing"
+    grep -Eq '(^|/)lib/live/boot/9990-main.sh$' <<< "$listing"
+done
 
 echo ">>> [Katu Hook] Limpeza concluída."
