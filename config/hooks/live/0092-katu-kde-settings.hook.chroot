@@ -120,9 +120,19 @@ BackgroundNormal=0,34,17
 ForegroundNormal=238,238,221
 EOF
 
-# O único autostart do Live fica em /etc/xdg/autostart/katu-installer-live.desktop.
-# Evitar uma cópia em /etc/skel: dois arquivos diferentes iniciariam duas janelas.
-rm -f "${SKEL_CONFIG}/autostart/katu-live-start.desktop"
+# A cópia do usuário usa o mesmo nome da entrada de /etc/xdg/autostart.
+# Pela precedência do XDG, ela substitui a entrada global em vez de abrir em dobro.
+mkdir -p "${SKEL_CONFIG}/autostart"
+cat > "${SKEL_CONFIG}/autostart/katu-installer-live.desktop" << 'EOF'
+[Desktop Entry]
+Type=Application
+Name=Boas-vindas ao Katu OS
+Name[pt_BR]=Boas-vindas ao Katu OS
+Comment=Apresenta as opções de experimentar ou instalar o sistema
+Exec=/usr/bin/katu-live-start
+Terminal=false
+X-GNOME-Autostart-enabled=true
+EOF
 
 # Permissão para Calamares rodar via polkit sem senha no live
 mkdir -p /etc/polkit-1/rules.d
