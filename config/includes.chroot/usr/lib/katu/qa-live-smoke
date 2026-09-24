@@ -3,6 +3,8 @@ set -Eeuo pipefail
 exec > /dev/ttyS0 2>&1
 export SYSTEMD_COLORS=0 SYSTEMD_PAGER=cat SYSTEMD_PAGERSECURE=0
 diagnose() {
+    trap - ERR TERM INT
+    set +e
     echo "KATU_QA_FAIL:${nonce:-unknown}"
     echo '--- SDDM configuration ---'
     for config in /etc/sddm.conf /etc/sddm.conf.d/*.conf; do
@@ -10,7 +12,8 @@ diagnose() {
     done
     echo '--- Available sessions ---'
     find /usr/share/wayland-sessions /usr/share/xsessions -maxdepth 1 -type f -print 2>/dev/null || true
-    systemctl show sddm -p ActiveState -p SubState -p ExecMainStatus --no-pager || true
+    echo "SDDM=$(systemctl is-active sddm || true)"
+    echo "LIVE_AUTOLOGIN=$(systemctl is-active katu-live-autologin.service || true)"
     journalctl -b -u sddm -n 60 --no-pager -o cat || true
     journalctl -b --no-pager -o cat | grep -Ei 'sddm|plasma|autologin|session' | tail -100 || true
     findmnt / || true
@@ -25,7 +28,7 @@ nonce=$(sed -n 's/.*katu.qa=\([a-f0-9]*\).*/\1/p' /proc/cmdline)
 echo "KATU_QA_START:$nonce"
 id katu
 systemctl is-enabled katu-live-autologin.service
-systemctl show katu-live-autologin.service -p ActiveState -p SubState -p ExecMainStatus --no-pager || true
+systemctl is-active katu-live-autologin.service
 for attempt in $(seq 1 110); do
     if (( attempt % 10 == 0 )); then
         echo "KATU_QA_WAIT:$attempt sddm=$(systemctl is-active sddm || true) plasma=$(pgrep -u katu -x plasmashell || true)"
