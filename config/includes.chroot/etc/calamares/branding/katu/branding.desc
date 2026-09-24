@@ -1,5 +1,5 @@
 # Katu OS — Calamares branding
-# Paleta Amazônia Dark: #0d1117 / #00c853 / #ffab00
+# Identidade visual Katu: floresta, rio e luz âmbar.
 
 componentName: katu
 
@@ -40,8 +40,8 @@ slideshow:             "show.qml"
 slideshowAPI:          2
 
 style:
-    sidebarBackground:       "#0d1117"
-    sidebarText:             "#8b949e"
-    sidebarTextSelect:       "#e6edf3"
-    sidebarTextHighlight:    "#00c853"
-    sidebarSelectionColor:   "#161b22"
+    sidebarBackground:       "#001111"
+    sidebarText:             "#C8D3C9"
+    sidebarTextSelect:       "#EEEEDD"
+    sidebarTextHighlight:    "#FFCC55"
+    sidebarSelectionColor:   "#003322"

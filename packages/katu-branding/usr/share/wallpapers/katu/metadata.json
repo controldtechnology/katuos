@@ -19,7 +19,6 @@
             "name": "Amazônia",
             "description": "A natureza encontra a tecnologia.",
             "file": "contents/images/katu-amazonia-4k.png",
-            "default": true
         },
         {
             "id": "katu-onca-4k",
@@ -49,7 +48,8 @@
             "id": "katu-rio-4k",
             "name": "Rio",
             "description": "Conectando caminhos.",
-            "file": "contents/images/katu-rio-4k.png"
+            "file": "contents/images/katu-rio-4k.png",
+            "default": true
         }
     ]
 }

@@ -75,7 +75,7 @@ EOF
 # Tema de notificação do Plasma (usar padrão com accent verde)
 cat > "${SKEL_CONFIG}/plasmarc" << 'EOF'
 [Theme]
-name=default
+name=katu
 
 [General]
 showToolTips=true
@@ -100,17 +100,21 @@ cat > "${SKEL_CONFIG}/kdeglobals" << 'EOF'
 [KDE]
 LookAndFeelPackage=org.katuos.desktop
 SingleClick=false
+widgetStyle=Breeze
 
 [General]
-AccentColor=0,200,83
+ColorScheme=KatuDark
+
+[General]
+AccentColor=221,170,68
 
 [Colors:Button]
-BackgroundNormal=30,50,30
-ForegroundNormal=248,249,250
+BackgroundNormal=0,51,34
+ForegroundNormal=238,238,221
 
 [Colors:Window]
-BackgroundNormal=20,35,20
-ForegroundNormal=248,249,250
+BackgroundNormal=0,34,17
+ForegroundNormal=238,238,221
 EOF
 
 # Autostart: aplicar wallpaper e lançar Calamares no live mode

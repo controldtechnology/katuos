@@ -1,9 +1,8 @@
-// Katu OS Plymouth Theme — Amazônia Dark
-// Fundo: #0d1117 | Accent: #00c853 | Texto: #e6edf3
+// Katu OS Plymouth — floresta profunda e luz âmbar (assets oficiais)
 
 // Fundo preto profundo com leve degradê
-Window.SetBackgroundTopColor(0.051, 0.067, 0.086);    // #0d1117
-Window.SetBackgroundBottomColor(0.035, 0.047, 0.063); // #090f18
+Window.SetBackgroundTopColor(0.0, 0.133, 0.067);      // #002211
+Window.SetBackgroundBottomColor(0.0, 0.067, 0.067);   // #001111
 
 // === Logo central ===
 logo.image = Image("logo.png");

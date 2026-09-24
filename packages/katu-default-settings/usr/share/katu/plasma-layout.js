@@ -4,12 +4,21 @@
 // Painel inferior
 var panel = new Panel;
 panel.location = "bottom";
-panel.height = 48;
+panel.height = 56;
 panel.alignment = "center";
+panel.lengthMode = "fit";
+panel.floating = true;
 panel.hiding = "none";
 
 // Widgets do painel
-panel.addWidget("org.kde.plasma.kickoff");          // Menu Katu (Application Launcher)
+var launcherId = panel.addWidget("org.kde.plasma.kickoff");
+try {
+    var launcher = panel.widgetById(launcherId);
+    launcher.currentConfigGroup = ["General"];
+    launcher.writeConfig("icon", "katu-logo");
+} catch (e) {
+    // A falha de personalização não deve impedir a criação do launcher.
+}
 panel.addWidget("org.kde.plasma.icontasks");         // Tarefas
 panel.addWidget("org.kde.plasma.marginsseparator"); // Separador
 panel.addWidget("org.kde.plasma.systemtray");        // Bandeja do sistema

@@ -1,5 +1,5 @@
 #!/bin/bash
-# Hook: Aplicar tema Amazônia Dark no KDE Plasma
+# Hook: Aplicar identidade visual Katu no KDE Plasma
 
 set -Eeuo pipefail
 
@@ -37,13 +37,13 @@ EOF
 # plasmarc — tema de widgets
 cat > "${SKEL_CONFIG}/plasmarc" << 'EOF'
 [Theme]
-name=default
+name=katu
 EOF
 
 # Wallpaper padrão Amazônia usado pela configuração look-and-feel.
 # Não criar plasma-org.kde.plasma.desktop-appletsrc parcialmente: um arquivo
 # incompleto substitui o layout padrão do Plasma e faz o painel desaparecer.
-WALLPAPER_PATH="/usr/share/wallpapers/katu/contents/images/katu-amazonia-4k.png"
+WALLPAPER_PATH="/usr/share/wallpapers/katu/contents/images/katu-rio-4k.png"
 
 # kscreenlockerrc — lock screen com wallpaper Katu
 cat > "${SKEL_CONFIG}/kscreenlockerrc" << EOF

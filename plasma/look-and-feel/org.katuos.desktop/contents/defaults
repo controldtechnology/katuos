@@ -32,7 +32,7 @@ ScaleFactor=1
 Theme=default
 
 [Wallpaper]
-Image=/usr/share/wallpapers/katu/contents/images/katu-amazonia-4k.png
+Image=/usr/share/wallpapers/katu/contents/images/katu-rio-4k.png
 
 [KDE]
 LookAndFeelPackage=org.katuos.desktop

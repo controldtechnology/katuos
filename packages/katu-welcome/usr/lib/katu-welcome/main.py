@@ -31,25 +31,26 @@ except ImportError:
         print("Erro: PyQt5 ou PySide6 não encontrado.")
         sys.exit(1)
 
-# === Paleta Amazônia Dark ===
+# === Katu Design System 2.0: floresta, rio e luz âmbar ===
 KATU_VERSION       = "1.0"
-KATU_BG            = "#0d1117"
-KATU_BG_ALT        = "#161b22"
-KATU_BG_CARD       = "#1c2128"
-KATU_BORDER        = "#30363d"
-KATU_BORDER_HOVER  = "#484f58"
-KATU_ACCENT        = "#00c853"
-KATU_ACCENT_HOVER  = "#00e676"
-KATU_ACCENT_PRESSED= "#00a040"
-KATU_AMBER         = "#ffab00"
-KATU_TEXT          = "#e6edf3"
-KATU_TEXT_MUTED    = "#8b949e"
-KATU_NEGATIVE      = "#f85149"
-KATU_LINK          = "#58a6ff"
+KATU_BG            = "#001111"
+KATU_BG_ALT        = "#002211"
+KATU_BG_CARD       = "#003322"
+KATU_BORDER        = "#335544"
+KATU_BORDER_HOVER  = "#557766"
+KATU_ACCENT        = "#DDAA44"
+KATU_ACCENT_HOVER  = "#FFCC55"
+KATU_ACCENT_PRESSED= "#AA7733"
+KATU_AMBER         = "#FFCC55"
+KATU_TEXT          = "#EEEEDD"
+KATU_TEXT_MUTED    = "#C8D3C9"
+KATU_NEGATIVE      = "#C85C55"
+KATU_LINK           = "#75B9C6"
 
 STYLESHEET = f"""
 QMainWindow {{
     background-color: {KATU_BG};
+    border: 1px solid {KATU_BORDER};
 }}
 QWidget {{
     background-color: {KATU_BG};
@@ -61,8 +62,8 @@ QScrollArea, QScrollArea > QWidget > QWidget {{
     border: none;
 }}
 QLabel#titulo {{
-    font-size: 26px;
-    font-weight: bold;
+    font-size: 32px;
+    font-weight: 600;
     color: {KATU_TEXT};
     letter-spacing: -0.5px;
 }}
@@ -78,6 +79,21 @@ QLabel#versao {{
 QFrame#separator {{
     background-color: {KATU_BORDER};
     max-height: 1px;
+}}
+QFrame#hero {{
+    background-color: {KATU_BG_ALT};
+    border: 1px solid {KATU_BORDER};
+    border-radius: 14px;
+}}
+QLabel#hero-art {{
+    background-color: {KATU_BG_CARD};
+    border-top-left-radius: 14px;
+    border-bottom-left-radius: 14px;
+}}
+QLabel#hero-copy {{
+    background: transparent;
+    color: {KATU_TEXT_MUTED};
+    font-size: 14px;
 }}
 QPushButton#btn-fechar {{
     background-color: transparent;
@@ -211,13 +227,13 @@ class AcaoThread(QThread):
 
 
 class CardButton(QPushButton):
-    def __init__(self, titulo, descricao, cor_accent, parent=None):
+    def __init__(self, titulo, descricao, icone, cor_accent, parent=None):
         super().__init__(parent)
         self._cor_accent = cor_accent
         self._normal_style = (
             f"QPushButton {{ background-color: {KATU_BG_CARD}; "
             f"border: 1px solid {KATU_BORDER}; border-radius: 10px; "
-            f"padding: 16px; text-align: left; color: {KATU_TEXT}; "
+            f"padding: 12px 14px; text-align: left; color: {KATU_TEXT}; "
             f"min-height: 76px; }}"
             f"QPushButton:hover {{ background-color: {KATU_BG_ALT}; "
             f"border-color: {cor_accent}; }}"
@@ -225,9 +241,15 @@ class CardButton(QPushButton):
         )
         self.setStyleSheet(self._normal_style)
 
-        layout = QVBoxLayout(self)
+        layout = QHBoxLayout(self)
         layout.setContentsMargins(4, 2, 4, 2)
-        layout.setSpacing(4)
+        layout.setSpacing(12)
+
+        icon_label = QLabel()
+        icon_label.setFixedSize(32, 32)
+        icon_label.setAlignment(Qt.AlignCenter)
+        icon_label.setStyleSheet("background: transparent;")
+        icon_label.setPixmap(QIcon.fromTheme(icone).pixmap(QSize(26, 26)))
 
         lbl_titulo = QLabel(f"<b>{titulo}</b>")
         lbl_titulo.setStyleSheet(f"color: {KATU_TEXT}; font-size: 13px; background: transparent;")
@@ -236,29 +258,51 @@ class CardButton(QPushButton):
         lbl_desc.setStyleSheet(f"color: {KATU_TEXT_MUTED}; font-size: 11px; background: transparent;")
         lbl_desc.setWordWrap(True)
 
-        layout.addWidget(lbl_titulo)
-        layout.addWidget(lbl_desc)
+        copy = QVBoxLayout()
+        copy.setContentsMargins(0, 0, 0, 0)
+        copy.setSpacing(5)
+        copy.addWidget(lbl_titulo)
+        copy.addWidget(lbl_desc)
+        layout.addWidget(icon_label)
+        layout.addLayout(copy, 1)
 
 
 class KatuWelcomeWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Bem-vindo ao Katu OS")
-        self.setMinimumSize(720, 580)
-        self.resize(820, 620)
+        self.setMinimumSize(700, 600)
+        self.resize(900, 690)
         self.setStyleSheet(STYLESHEET)
 
         widget_central = QWidget()
         self.setCentralWidget(widget_central)
         layout_principal = QVBoxLayout(widget_central)
-        layout_principal.setContentsMargins(40, 32, 40, 24)
-        layout_principal.setSpacing(20)
+        layout_principal.setContentsMargins(28, 24, 28, 20)
+        layout_principal.setSpacing(14)
 
-        # Cabeçalho
-        cabecalho = QWidget()
-        layout_cabecalho = QVBoxLayout(cabecalho)
-        layout_cabecalho.setSpacing(4)
-        layout_cabecalho.setContentsMargins(0, 0, 0, 0)
+        # Hero editorial com arte oficial; as ações nativas permanecem abaixo.
+        hero = QFrame()
+        hero.setObjectName("hero")
+        hero.setMinimumHeight(170)
+        layout_hero = QHBoxLayout(hero)
+        layout_hero.setContentsMargins(0, 0, 20, 0)
+        layout_hero.setSpacing(22)
+
+        hero_art = QLabel()
+        hero_art.setObjectName("hero-art")
+        hero_art.setMinimumWidth(250)
+        hero_art.setMaximumWidth(360)
+        hero_art.setMinimumHeight(170)
+        hero_art.setAlignment(Qt.AlignCenter)
+        hero_art.setPixmap(QPixmap('/usr/share/katu/welcome/hero.png').scaled(
+            360, 190, Qt.KeepAspectRatioByExpanding, Qt.SmoothTransformation))
+
+        hero_copy = QWidget()
+        hero_copy.setStyleSheet("background: transparent;")
+        layout_hero_copy = QVBoxLayout(hero_copy)
+        layout_hero_copy.setContentsMargins(0, 18, 0, 18)
+        layout_hero_copy.setSpacing(6)
 
         titulo = QLabel("Bem-vindo ao Katu OS")
         titulo.setObjectName("titulo")
@@ -266,12 +310,20 @@ class KatuWelcomeWindow(QMainWindow):
         subtitulo = QLabel("Livre. Brasileiro. Para todos.")
         subtitulo.setObjectName("subtitulo")
 
-        versao = QLabel(f"Versão {KATU_VERSION} · Baseado em Debian 13 Trixie · KDE Plasma")
+        descricao_hero = QLabel("Um espaço livre e acolhedor para trabalhar, estudar e criar.")
+        descricao_hero.setObjectName("hero-copy")
+        descricao_hero.setWordWrap(True)
+
+        versao = QLabel(f"Versão {KATU_VERSION} · Debian 13 · KDE Plasma")
         versao.setObjectName("versao")
 
-        layout_cabecalho.addWidget(titulo)
-        layout_cabecalho.addWidget(subtitulo)
-        layout_cabecalho.addWidget(versao)
+        layout_hero_copy.addWidget(titulo)
+        layout_hero_copy.addWidget(subtitulo)
+        layout_hero_copy.addWidget(descricao_hero)
+        layout_hero_copy.addStretch()
+        layout_hero_copy.addWidget(versao)
+        layout_hero.addWidget(hero_art, 4)
+        layout_hero.addWidget(hero_copy, 5)
 
         # Separador
         sep = QFrame()
@@ -289,7 +341,7 @@ class KatuWelcomeWindow(QMainWindow):
         grade.setContentsMargins(0, 0, 0, 0)
 
         for i, card in enumerate(CARDS):
-            btn = CardButton(card['titulo'], card['descricao'], card['cor_accent'])
+            btn = CardButton(card['titulo'], card['descricao'], card['icone'], card['cor_accent'])
             acao = card['acao']
             btn.clicked.connect(lambda checked, a=acao: self._executar_acao(a))
             grade.addWidget(btn, i // 2, i % 2)
@@ -313,7 +365,7 @@ class KatuWelcomeWindow(QMainWindow):
         layout_rodape.addStretch()
         layout_rodape.addWidget(btn_fechar)
 
-        layout_principal.addWidget(cabecalho)
+        layout_principal.addWidget(hero)
         layout_principal.addWidget(sep)
         layout_principal.addWidget(area_scroll, 1)
         layout_principal.addWidget(rodape)

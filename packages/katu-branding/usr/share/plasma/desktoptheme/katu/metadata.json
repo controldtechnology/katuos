@@ -1,0 +1,15 @@
+{
+  "KPackageStructure": "Plasma/Theme",
+  "KPlugin": {
+    "Authors": [{ "Name": "Katu OS Team", "Email": "katuos@gmail.com" }],
+    "Category": "Plasma Theme",
+    "Description": "Superfícies Katu inspiradas em mata, rio e luz âmbar",
+    "Description[pt_BR]": "Superfícies Katu inspiradas em mata, rio e luz âmbar",
+    "EnabledByDefault": true,
+    "Id": "katu",
+    "License": "MIT",
+    "Name": "Katu",
+    "Name[pt_BR]": "Katu",
+    "Version": "2.0"
+  }
+}

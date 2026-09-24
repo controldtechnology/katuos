@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="96" height="64" viewBox="0 0 96 64">
+  <rect id="selected+hover-bottomleft" x="0" y="56" width="8" height="8" rx="2" fill="#114433" fill-opacity="1"/>
+  <rect id="selected+hover-topleft" x="0" y="0" width="8" height="8" rx="2" fill="#114433" fill-opacity="1"/>
+  <rect id="selected+hover-topright" x="88" y="0" width="8" height="8" rx="2" fill="#114433" fill-opacity="1"/>
+  <rect id="selected+hover-left" x="0" y="8" width="8" height="48" rx="2" fill="#114433" fill-opacity="1"/>
+  <rect id="selected+hover-bottom" x="8" y="56" width="80" height="8" rx="0" fill="#114433" fill-opacity="1"/>
+  <rect id="selected+hover-bottomright" x="88" y="56" width="8" height="8" rx="2" fill="#114433" fill-opacity="1"/>
+  <rect id="selected+hover-right" x="88" y="8" width="8" height="48" rx="2" fill="#114433" fill-opacity="1"/>
+  <rect id="selected+hover-top" x="8" y="0" width="80" height="8" rx="0" fill="#114433" fill-opacity="1"/>
+  <rect id="selected+hover-center" x="8" y="8" width="80" height="48" rx="0" fill="#114433" fill-opacity="1"/>
+  <rect id="hover-bottomleft" x="0" y="56" width="8" height="8" rx="2" fill="#114433" fill-opacity="0.78"/>
+  <rect id="hover-topleft" x="0" y="0" width="8" height="8" rx="2" fill="#114433" fill-opacity="0.78"/>
+  <rect id="hover-topright" x="88" y="0" width="8" height="8" rx="2" fill="#114433" fill-opacity="0.78"/>
+  <rect id="hover-left" x="0" y="8" width="8" height="48" rx="2" fill="#114433" fill-opacity="0.78"/>
+  <rect id="hover-bottom" x="8" y="56" width="80" height="8" rx="0" fill="#114433" fill-opacity="0.78"/>
+  <rect id="hover-bottomright" x="88" y="56" width="8" height="8" rx="2" fill="#114433" fill-opacity="0.78"/>
+  <rect id="hover-right" x="88" y="8" width="8" height="48" rx="2" fill="#114433" fill-opacity="0.78"/>
+  <rect id="hover-top" x="8" y="0" width="80" height="8" rx="0" fill="#114433" fill-opacity="0.78"/>
+  <rect id="hover-center" x="8" y="8" width="80" height="48" rx="0" fill="#114433" fill-opacity="0.78"/>
+  <rect id="selected-bottomleft" x="0" y="56" width="8" height="8" rx="2" fill="#003322" fill-opacity="1"/>
+  <rect id="selected-topleft" x="0" y="0" width="8" height="8" rx="2" fill="#003322" fill-opacity="1"/>
+  <rect id="selected-topright" x="88" y="0" width="8" height="8" rx="2" fill="#003322" fill-opacity="1"/>
+  <rect id="selected-left" x="0" y="8" width="8" height="48" rx="2" fill="#003322" fill-opacity="1"/>
+  <rect id="selected-bottom" x="8" y="56" width="80" height="8" rx="0" fill="#003322" fill-opacity="1"/>
+  <rect id="selected-bottomright" x="88" y="56" width="8" height="8" rx="2" fill="#003322" fill-opacity="1"/>
+  <rect id="selected-right" x="88" y="8" width="8" height="48" rx="2" fill="#003322" fill-opacity="1"/>
+  <rect id="selected-top" x="8" y="0" width="80" height="8" rx="0" fill="#003322" fill-opacity="1"/>
+  <rect id="selected-center" x="8" y="8" width="80" height="48" rx="0" fill="#003322" fill-opacity="1"/>
+  <rect id="normal-bottomleft" x="0" y="56" width="8" height="8" rx="2" fill="#001111" fill-opacity="0"/>
+  <rect id="normal-topleft" x="0" y="0" width="8" height="8" rx="2" fill="#001111" fill-opacity="0"/>
+  <rect id="normal-topright" x="88" y="0" width="8" height="8" rx="2" fill="#001111" fill-opacity="0"/>
+  <rect id="normal-left" x="0" y="8" width="8" height="48" rx="2" fill="#001111" fill-opacity="0"/>
+  <rect id="normal-bottom" x="8" y="56" width="80" height="8" rx="0" fill="#001111" fill-opacity="0"/>
+  <rect id="normal-bottomright" x="88" y="56" width="8" height="8" rx="2" fill="#001111" fill-opacity="0"/>
+  <rect id="normal-right" x="88" y="8" width="8" height="48" rx="2" fill="#001111" fill-opacity="0"/>
+  <rect id="normal-top" x="8" y="0" width="80" height="8" rx="0" fill="#001111" fill-opacity="0"/>
+  <rect id="normal-center" x="8" y="8" width="80" height="48" rx="0" fill="#001111" fill-opacity="0"/>
+  <path id="selected-marker" d="M2 10v44" stroke="#DDAA44" stroke-width="2"/>
+  <rect id="hint-tile-center" x="0" y="0" width="96" height="64" fill="none" stroke="none"/>
+</svg>

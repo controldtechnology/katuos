@@ -1,317 +1,223 @@
-// Katu OS SDDM Theme — Amazônia Dark
-// Livre. Brasileiro. Para todos.
-
+// Katu OS — SDDM responsivo. Autenticação e ações permanecem no SDDM.
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
+import QtQuick.Window 2.15
 import SddmComponents 2.0
 
 Rectangle {
     id: root
-    width: 1920
-    height: 1080
-    color: "#0d1117"
-
+    width: Screen.width
+    height: Screen.height
+    color: "#001111"
     property int sessionIndex: sessionModel.lastIndex
+    readonly property bool compact: width < 1180 || height < 760
+    readonly property int safeInset: Math.max(24, Math.min(width, height) * 0.045)
 
-    // Fundo — wallpaper Katu Amazônia
     Image {
-        id: background
         anchors.fill: parent
-        source: config.background || "background.jpg"
+        source: config.background || "background.png"
         fillMode: Image.PreserveAspectCrop
         asynchronous: true
-        cache: false
+        cache: true
     }
-
-    // Overlay escuro — mantém legibilidade
+    // Escurecimento localizado mantém a arte visível à direita e dá contraste ao login.
     Rectangle {
         anchors.fill: parent
-        color: "#0d1117"
-        opacity: 0.72
+        gradient: Gradient {
+            GradientStop { position: 0.0; color: "#e6001111" }
+            GradientStop { position: 0.43; color: "#99001111" }
+            GradientStop { position: 0.72; color: "#26001111" }
+            GradientStop { position: 1.0; color: "#18001111" }
+        }
     }
-
-    // Linha accent verde no topo
     Rectangle {
-        anchors { top: parent.top; left: parent.left; right: parent.right }
+        width: parent.width * 0.22
         height: 2
-        color: "#00c853"
-        opacity: 0.8
+        anchors.left: parent.left
+        anchors.top: parent.top
+        anchors.leftMargin: safeInset
+        anchors.topMargin: safeInset
+        color: "#DDAA44"
     }
 
-    // Logo + tagline (canto inferior esquerdo)
     Column {
-        anchors {
-            left: parent.left
-            bottom: parent.bottom
-            margins: 48
-        }
-        spacing: 6
-
+        id: identity
+        anchors.left: parent.left
+        anchors.top: parent.top
+        anchors.leftMargin: safeInset
+        anchors.topMargin: safeInset + 14
+        spacing: 10
         Image {
-            id: logoKatu
             source: "logo.png"
-            width: 110
-            height: 44
+            width: Math.min(root.width * 0.24, 250)
+            height: Math.min(root.height * 0.1, 68)
             fillMode: Image.PreserveAspectFit
+            horizontalAlignment: Image.AlignLeft
             smooth: true
-            opacity: 0.90
         }
-
         Text {
             text: "Livre. Brasileiro. Para todos."
-            font.pixelSize: 11
-            color: "#8b949e"
+            color: "#EEEEDD"
             font.family: "Noto Sans"
-            font.letterSpacing: 0.5
+            font.pixelSize: root.compact ? 13 : 16
         }
     }
 
-    // Relógio (canto superior direito)
     Column {
-        anchors {
-            right: parent.right
-            top: parent.top
-            topMargin: 48
-            rightMargin: 48
-        }
-        spacing: 2
-
+        anchors.right: parent.right
+        anchors.top: parent.top
+        anchors.rightMargin: safeInset
+        anchors.topMargin: safeInset
+        spacing: 3
         Clock {
-            id: clock
-            anchors.horizontalCenter: parent.horizontalCenter
-            timeFont.pixelSize: 42
+            anchors.right: parent.right
             timeFont.family: "Noto Sans"
+            timeFont.pixelSize: root.compact ? 24 : 32
             timeFont.weight: Font.Light
-            color: "#e6edf3"
+            color: "#EEEEDD"
         }
-
         Text {
-            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.right: parent.right
             text: Qt.formatDate(new Date(), "dddd, d 'de' MMMM")
-            font.pixelSize: 13
-            color: "#8b949e"
+            color: "#C8D3C9"
             font.family: "Noto Sans"
+            font.pixelSize: 12
         }
     }
 
-    // Painel central de login
     Rectangle {
         id: loginPanel
-        anchors.centerIn: parent
-        width: 360
-        height: 420
-        color: "#0d1117"
-        radius: 12
-        border.color: "#30363d"
+        width: Math.min(390, root.width * (root.compact ? 0.82 : 0.31))
+        height: Math.min(462, root.height - safeInset * 2)
+        anchors.left: parent.left
+        anchors.leftMargin: safeInset
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.verticalCenterOffset: root.compact ? 18 : 0
+        color: "#E6001111"
+        radius: 16
+        border.color: "#66EEEEDD"
         border.width: 1
 
-        // Linha accent no topo do painel
-        Rectangle {
-            anchors { top: parent.top; left: parent.left; right: parent.right }
-            height: 2
-            radius: 12
-            color: "#00c853"
-        }
-
-        Column {
-            anchors {
-                fill: parent
-                margins: 36
-                topMargin: 40
+        ColumnLayout {
+            anchors.fill: parent
+            anchors.margins: root.compact ? 22 : 30
+            spacing: 14
+            Image {
+                source: "logo.png"
+                Layout.alignment: Qt.AlignHCenter
+                Layout.preferredWidth: 176
+                Layout.preferredHeight: 52
+                fillMode: Image.PreserveAspectFit
             }
-            spacing: 18
-
-            // Avatar
-            Rectangle {
-                anchors.horizontalCenter: parent.horizontalCenter
-                width: 68
-                height: 68
-                radius: 34
-                color: "#161b22"
-                border.color: "#00c853"
-                border.width: 2
-
-                Text {
-                    anchors.centerIn: parent
-                    text: (userModel.currentUser.realName || userModel.currentUser.name || "U").substring(0, 1).toUpperCase()
-                    font.pixelSize: 28
-                    font.family: "Noto Sans"
-                    font.weight: Font.Medium
-                    color: "#00c853"
-                }
-            }
-
-            // Nome do usuário
             Text {
-                anchors.horizontalCenter: parent.horizontalCenter
-                text: userModel.currentUser.realName || userModel.currentUser.name || "Usuário"
-                color: "#e6edf3"
-                font.pixelSize: 15
-                font.weight: Font.Medium
+                Layout.fillWidth: true
+                text: userModel.currentUser.realName || userModel.currentUser.name || "Bem-vindo"
+                color: "#EEEEDD"
                 font.family: "Noto Sans"
+                font.pixelSize: 19
+                font.weight: Font.DemiBold
+                horizontalAlignment: Text.AlignHCenter
+                elide: Text.ElideRight
             }
-
-            // Campo de senha
+            Text {
+                Layout.fillWidth: true
+                text: "Entre para continuar"
+                color: "#C8D3C9"
+                font.family: "Noto Sans"
+                font.pixelSize: 13
+                horizontalAlignment: Text.AlignHCenter
+            }
             TextField {
                 id: passwordField
-                width: parent.width
-                height: 44
+                Layout.fillWidth: true
+                Layout.preferredHeight: 48
                 echoMode: TextInput.Password
-                placeholderText: "Digite sua senha"
+                placeholderText: "Senha"
                 focus: true
-                font.pixelSize: 14
+                color: "#EEEEDD"
                 font.family: "Noto Sans"
-
-                background: Rectangle {
-                    color: "#161b22"
-                    radius: 8
-                    border.color: passwordField.activeFocus ? "#00c853" : "#30363d"
-                    border.width: passwordField.activeFocus ? 2 : 1
-                    Behavior on border.color { ColorAnimation { duration: 150 } }
-                }
-
-                color: "#e6edf3"
+                font.pixelSize: 14
                 leftPadding: 16
                 rightPadding: 16
-
-                Keys.onReturnPressed: sddm.login(
-                    userModel.currentUser.name, passwordField.text, sessionIndex)
-                Keys.onEnterPressed: sddm.login(
-                    userModel.currentUser.name, passwordField.text, sessionIndex)
-            }
-
-            // Botão entrar
-            Button {
-                width: parent.width
-                height: 44
-                text: "Entrar"
-                font.pixelSize: 14
-                font.family: "Noto Sans"
-                font.weight: Font.Medium
-
                 background: Rectangle {
-                    color: parent.pressed ? "#00a040" : (parent.hovered ? "#00e676" : "#00c853")
+                    color: "#E6001111"
                     radius: 8
-                    Behavior on color { ColorAnimation { duration: 120 } }
+                    border.color: passwordField.activeFocus ? "#FFCC55" : "#55776666"
+                    border.width: passwordField.activeFocus ? 2 : 1
                 }
-
+                Keys.onReturnPressed: sddm.login(userModel.currentUser.name, passwordField.text, sessionIndex)
+                Keys.onEnterPressed: sddm.login(userModel.currentUser.name, passwordField.text, sessionIndex)
+            }
+            Button {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 48
+                text: "Entrar"
+                font.family: "Noto Sans"
+                font.pixelSize: 14
+                font.weight: Font.DemiBold
+                background: Rectangle {
+                    radius: 8
+                    color: parent.pressed ? "#AA7733" : (parent.hovered ? "#FFCC55" : "#DDAA44")
+                }
                 contentItem: Text {
                     text: parent.text
-                    color: "#0d1117"
+                    color: "#001111"
+                    font: parent.font
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
-                    font: parent.font
                 }
-
-                onClicked: sddm.login(
-                    userModel.currentUser.name, passwordField.text, sessionIndex)
+                onClicked: sddm.login(userModel.currentUser.name, passwordField.text, sessionIndex)
             }
-
-            // Mensagem de erro
             Text {
                 id: errorMessage
-                width: parent.width
+                Layout.fillWidth: true
                 text: ""
-                color: "#f85149"
-                font.pixelSize: 12
+                color: "#FF9C91"
                 font.family: "Noto Sans"
+                font.pixelSize: 12
                 wrapMode: Text.WordWrap
                 horizontalAlignment: Text.AlignHCenter
                 visible: text !== ""
             }
-        }
-    }
-
-    // Barra inferior — sessão + ações de sistema
-    Row {
-        anchors {
-            right: parent.right
-            bottom: parent.bottom
-            margins: 30
-        }
-        spacing: 8
-
-        ComboBox {
-            id: sessionCombo
-            width: 140
-            height: 34
-            model: sessionModel
-            currentIndex: sessionIndex
-            textRole: "name"
-            font.pixelSize: 12
-            font.family: "Noto Sans"
-            onCurrentIndexChanged: sessionIndex = currentIndex
-
-            background: Rectangle {
-                color: "#161b22"
-                radius: 6
-                border.color: "#30363d"
-                border.width: 1
+            Item { Layout.fillHeight: true }
+            RowLayout {
+                Layout.fillWidth: true
+                ComboBox {
+                    id: sessionCombo
+                    Layout.fillWidth: true
+                    model: sessionModel
+                    currentIndex: sessionIndex
+                    textRole: "name"
+                    onCurrentIndexChanged: sessionIndex = currentIndex
+                    background: Rectangle { color: "#66001111"; radius: 7; border.color: "#55776666" }
+                    contentItem: Text {
+                        leftPadding: 12
+                        text: sessionCombo.displayText
+                        color: "#EEEEDD"
+                        font.family: "Noto Sans"
+                        font.pixelSize: 12
+                        verticalAlignment: Text.AlignVCenter
+                        elide: Text.ElideRight
+                    }
+                }
+                Button {
+                    text: "↻"
+                    implicitWidth: 44; implicitHeight: 42
+                    onClicked: sddm.reboot()
+                    background: Rectangle { color: parent.hovered ? "#55776666" : "#22001111"; radius: 7; border.color: "#55776666" }
+                    contentItem: Text { text: parent.text; color: "#EEEEDD"; font.pixelSize: 18; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
+                    ToolTip.text: "Reiniciar"; ToolTip.visible: hovered
+                }
+                Button {
+                    text: "⏻"
+                    implicitWidth: 44; implicitHeight: 42
+                    onClicked: sddm.powerOff()
+                    background: Rectangle { color: parent.hovered ? "#55C85C55" : "#22001111"; radius: 7; border.color: "#55776666" }
+                    contentItem: Text { text: parent.text; color: "#EEEEDD"; font.pixelSize: 17; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
+                    ToolTip.text: "Desligar"; ToolTip.visible: hovered
+                }
             }
-            contentItem: Text {
-                leftPadding: 10
-                text: parent.displayText
-                color: "#8b949e"
-                font: parent.font
-                verticalAlignment: Text.AlignVCenter
-            }
-        }
-
-        // Reiniciar
-        Rectangle {
-            width: 34; height: 34
-            radius: 6
-            color: rebootArea.containsMouse ? "#161b22" : "transparent"
-            border.color: "#30363d"
-            border.width: 1
-            Behavior on color { ColorAnimation { duration: 120 } }
-
-            Text {
-                anchors.centerIn: parent
-                text: "↺"
-                font.pixelSize: 18
-                color: rebootArea.containsMouse ? "#e6edf3" : "#8b949e"
-            }
-
-            MouseArea {
-                id: rebootArea
-                anchors.fill: parent
-                hoverEnabled: true
-                cursorShape: Qt.PointingHandCursor
-                onClicked: sddm.reboot()
-            }
-
-            ToolTip.visible: rebootArea.containsMouse
-            ToolTip.text: "Reiniciar"
-        }
-
-        // Desligar
-        Rectangle {
-            width: 34; height: 34
-            radius: 6
-            color: powerArea.containsMouse ? "#1c0a0a" : "transparent"
-            border.color: powerArea.containsMouse ? "#f85149" : "#30363d"
-            border.width: 1
-            Behavior on color { ColorAnimation { duration: 120 } }
-
-            Text {
-                anchors.centerIn: parent
-                text: "⏻"
-                font.pixelSize: 16
-                color: powerArea.containsMouse ? "#f85149" : "#8b949e"
-            }
-
-            MouseArea {
-                id: powerArea
-                anchors.fill: parent
-                hoverEnabled: true
-                cursorShape: Qt.PointingHandCursor
-                onClicked: sddm.powerOff()
-            }
-
-            ToolTip.visible: powerArea.containsMouse
-            ToolTip.text: "Desligar"
         }
     }
 

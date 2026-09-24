@@ -1,203 +1,73 @@
-/* Katu OS — Calamares Installation Slideshow
-   Slides informativos durante a instalação — PT-BR amigável
-   Paleta: #0d1117 / #00c853 / #ffab00                        */
-
+// Katu OS — slideshow editorial. Mantém ordem, intervalo e imagens do branding.
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 
 Item {
     id: slideshow
-
-    property color katuGreen:  "#00c853"
-    property color katuAmber:  "#ffab00"
-    property color katuBg:     "#0d1117"
-    property color katuBgAlt:  "#161b22"
-    property color katuText:   "#e6edf3"
-    property color katuMuted:  "#8b949e"
-    property color katuBorder: "#30363d"
-    property color katuLink:   "#58a6ff"
-
-    // Cada slide tem: imagem de fundo + título + descrição
     property var slideData: [
-        {
-            img:   "slide-01.png",
-            titulo: "Bem-vindo ao Katu OS!",
-            desc:  "O Linux brasileiro feito para todo mundo.\nSimples, rápido e bonito — pronto para usar."
-        },
-        {
-            img:   "slide-02.png",
-            titulo: "Trabalhe com o LibreOffice",
-            desc:  "Suite de escritório completa em português.\nCompatível com Word, Excel e PowerPoint."
-        },
-        {
-            img:   "slide-03.png",
-            titulo: "Firefox e Google Chrome incluídos",
-            desc:  "Dois navegadores prontos para usar.\nNavigue com segurança e velocidade."
-        },
-        {
-            img:   "slide-04.png",
-            titulo: "Tudo em português do Brasil",
-            desc:  "Interface, teclado ABNT2 e fuso horário de São Paulo\nconfigurados automaticamente."
-        },
-        {
-            img:   "slide-05.png",
-            titulo: "Seguro e sempre atualizado",
-            desc:  "Baseado no Debian 13 — o Linux mais estável do mundo.\nAtualizações de segurança automáticas."
-        },
-        {
-            img:   "slide-06.png",
-            titulo: "Quase pronto!",
-            desc:  "O Katu OS está sendo instalado no seu computador.\nEm breve você poderá começar a usar."
-        }
+        { img: "slide-01.png", alt: "Katu OS — tecnologia brasileira feita para todos." },
+        { img: "slide-02.png", alt: "Um sistema livre para trabalhar e criar." },
+        { img: "slide-03.png", alt: "Uma experiência familiar e intuitiva." },
+        { img: "slide-04.png", alt: "Personalize o sistema do seu jeito." },
+        { img: "slide-05.png", alt: "Inspirado pelo Brasil: natureza e tecnologia." },
+        { img: "slide-06.png", alt: "Katu OS está sendo preparado." }
     ]
 
     Rectangle {
         anchors.fill: parent
-        color: katuBg
+        color: "#001111"
+    }
 
-        // Linha accent topo
-        Rectangle {
-            anchors { top: parent.top; left: parent.left; right: parent.right }
-            height: 3
-            color: katuGreen
-            z: 20
-        }
+    SwipeView {
+        id: swipeView
+        anchors.fill: parent
+        anchors.margins: Math.max(8, Math.min(parent.width, parent.height) * 0.035)
+        currentIndex: 0
+        clip: true
+        interactive: false
 
-        // Área de imagem (metade superior)
-        Item {
-            id: areaImagem
-            anchors { top: parent.top; left: parent.left; right: parent.right }
-            height: parent.height * 0.55
-
-            SwipeView {
-                id: swipeView
-                anchors.fill: parent
-                currentIndex: 0
-
-                Repeater {
-                    model: slideData
-
-                    Item {
-                        Image {
-                            anchors.fill: parent
-                            source: modelData.img
-                            fillMode: Image.PreserveAspectCrop
-                            asynchronous: true
-                            smooth: true
-
-                            Rectangle {
-                                anchors.fill: parent
-                                color: "#0d1117"
-                                opacity: 0.40
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        // Área de texto (metade inferior)
-        Rectangle {
-            id: areaTexto
-            anchors {
-                top: areaImagem.bottom
-                left: parent.left
-                right: parent.right
-                bottom: parent.bottom
-            }
-            color: katuBg
-
-            Column {
-                anchors {
-                    fill: parent
-                    margins: 36
-                    topMargin: 28
-                }
-                spacing: 12
-
-                // Número do slide
-                Text {
-                    text: (swipeView.currentIndex + 1) + " / " + slideData.length
-                    color: katuGreen
-                    font.pixelSize: 12
-                    font.family: "Noto Sans"
-                    font.letterSpacing: 1
-                }
-
-                // Título do slide
-                Text {
-                    id: tituloSlide
-                    width: parent.width
-                    text: slideData[swipeView.currentIndex] ? slideData[swipeView.currentIndex].titulo : ""
-                    color: katuText
-                    font.pixelSize: 22
-                    font.family: "Noto Sans"
-                    font.weight: Font.Bold
-                    wrapMode: Text.WordWrap
-
-                    Behavior on text {
-                        SequentialAnimation {
-                            NumberAnimation { target: tituloSlide; property: "opacity"; to: 0; duration: 150 }
-                            PropertyAction { }
-                            NumberAnimation { target: tituloSlide; property: "opacity"; to: 1; duration: 200 }
-                        }
-                    }
-                }
-
-                // Descrição
-                Text {
-                    id: descSlide
-                    width: parent.width
-                    text: slideData[swipeView.currentIndex] ? slideData[swipeView.currentIndex].desc : ""
-                    color: katuMuted
-                    font.pixelSize: 14
-                    font.family: "Noto Sans"
-                    lineHeight: 1.5
-                    wrapMode: Text.WordWrap
-
-                    Behavior on text {
-                        SequentialAnimation {
-                            NumberAnimation { target: descSlide; property: "opacity"; to: 0; duration: 150 }
-                            PropertyAction { }
-                            NumberAnimation { target: descSlide; property: "opacity"; to: 1; duration: 200 }
-                        }
-                    }
-                }
-            }
-
-            // Indicadores pill na base
-            Row {
-                anchors {
-                    bottom: parent.bottom
-                    horizontalCenter: parent.horizontalCenter
-                    bottomMargin: 20
-                }
-                spacing: 8
-
-                Repeater {
-                    model: slideData.length
-
-                    Rectangle {
-                        width:  swipeView.currentIndex === index ? 32 : 8
-                        height: 4
-                        radius: 2
-                        color:  swipeView.currentIndex === index ? katuGreen : katuBorder
-                        Behavior on width { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
-                        Behavior on color { ColorAnimation { duration: 200 } }
-                    }
+        Repeater {
+            model: slideData
+            Item {
+                Image {
+                    id: slideImage
+                    anchors.fill: parent
+                    source: modelData.img
+                    fillMode: Image.PreserveAspectFit
+                    asynchronous: true
+                    cache: true
+                    smooth: true
+                    sourceSize.width: parent.width
+                    sourceSize.height: parent.height
+                    opacity: SwipeView.isCurrentItem ? 1.0 : 0.72
+                    Behavior on opacity { NumberAnimation { duration: 220 } }
+                    Accessible.name: modelData.alt
                 }
             }
         }
     }
 
-    // Auto-avanço a cada 7 segundos
+    Row {
+        anchors.bottom: parent.bottom
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.bottomMargin: 5
+        spacing: 7
+        Repeater {
+            model: slideData.length
+            Rectangle {
+                width: swipeView.currentIndex === index ? 22 : 6
+                height: 3
+                radius: 2
+                color: swipeView.currentIndex === index ? "#DDAA44" : "#66887766"
+                Behavior on width { NumberAnimation { duration: 180 } }
+            }
+        }
+    }
+
     Timer {
         interval: 7000
         running: true
         repeat: true
-        onTriggered: {
-            var next = swipeView.currentIndex + 1
-            swipeView.currentIndex = next < swipeView.count ? next : 0
-        }
+        onTriggered: swipeView.currentIndex = (swipeView.currentIndex + 1) % slideData.length
     }
 }

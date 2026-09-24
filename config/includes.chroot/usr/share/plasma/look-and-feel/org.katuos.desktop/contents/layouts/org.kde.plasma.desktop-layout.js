@@ -3,11 +3,21 @@
 
 var panel = new Panel;
 panel.location = "bottom";
-panel.height = 48;
+panel.height = 56;
 panel.hiding = "none";
+panel.alignment = "center";
+panel.lengthMode = "fit";
+panel.floating = true;
 
 // Menu de aplicativos Katu e tarefas abertas.
-panel.addWidget("org.kde.plasma.kickoff");
+var launcherId = panel.addWidget("org.kde.plasma.kickoff");
+try {
+    var launcher = panel.widgetById(launcherId);
+    launcher.currentConfigGroup = ["General"];
+    launcher.writeConfig("icon", "katu-logo");
+} catch (e) {
+    // A falha de personalização não deve impedir a criação do launcher.
+}
 panel.addWidget("org.kde.plasma.icontasks");
 panel.addWidget("org.kde.plasma.marginsseparator");
 panel.addWidget("org.kde.plasma.systemtray");
