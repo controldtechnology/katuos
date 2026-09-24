@@ -16,39 +16,39 @@
     "wallpapers": [
         {
             "id": "katu-amazonia-4k",
-            "name": "Amazônia",
-            "description": "A natureza encontra a tecnologia.",
+            "name": "Katu Amazon",
+            "description": "Rios e relevo amazônicos em uma composição sem texto.",
             "file": "contents/images/katu-amazonia-4k.png",
             "default": true
         },
         {
             "id": "katu-onca-4k",
-            "name": "Onça",
-            "description": "Força brasileira. Liberdade para criar.",
+            "name": "Katu Jaguar",
+            "description": "Um acento gráfico inspirado na onça-pintada.",
             "file": "contents/images/katu-onca-4k.png"
         },
         {
             "id": "katu-dark-4k",
-            "name": "Katu OS Dark",
-            "description": "Tecnologia em equilíbrio.",
+            "name": "Katu Dark",
+            "description": "Uma paisagem fluvial em tons profundos.",
             "file": "contents/images/katu-dark-4k.png"
         },
         {
             "id": "katu-green-4k",
-            "name": "Verde Brasil",
-            "description": "Brasil no nosso DNA.",
+            "name": "Katu Light",
+            "description": "Versão clara, silenciosa e sem slogans.",
             "file": "contents/images/katu-green-4k.png"
         },
         {
             "id": "katu-minimal-4k",
-            "name": "Minimal",
-            "description": "Livre. Brasileiro. Para todos.",
+            "name": "Katu Minimal",
+            "description": "Versão escura com poucos elementos e área livre.",
             "file": "contents/images/katu-minimal-4k.png"
         },
         {
             "id": "katu-rio-4k",
-            "name": "Rio",
-            "description": "Conectando caminhos.",
+            "name": "Katu River",
+            "description": "Curso de rio como assinatura visual Katu.",
             "file": "contents/images/katu-rio-4k.png"
         }
     ]

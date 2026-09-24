@@ -4,15 +4,27 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
+import QtQuick.Window 2.15
 import SddmComponents 2.0
 
 Rectangle {
     id: root
-    width: 1920
-    height: 1080
-    color: "#0d1117"
+    // Follow the active display; fixed 1920x1080 roots clip login controls on VM/laptop screens.
+    width: Screen.width
+    height: Screen.height
+    property color backgroundPrimary: "#0d1117"
+    property color surfacePrimary: "#161b22"
+    property color borderDefault: "#30363d"
+    property color textPrimary: "#e6edf3"
+    property color textMuted: "#8b949e"
+    property color accentPrimary: "#00c853"
+    property color accentHover: "#00e676"
+    property color accentActive: "#00a040"
+    property color statusError: "#f85149"
+    color: backgroundPrimary
 
     property int sessionIndex: sessionModel.lastIndex
+    property int edgeInset: Math.max(24, Math.round(Math.min(width, height) * 0.04))
 
     // Fundo — wallpaper Katu Amazônia
     Image {
@@ -27,15 +39,15 @@ Rectangle {
     // Overlay escuro — mantém legibilidade
     Rectangle {
         anchors.fill: parent
-        color: "#0d1117"
-        opacity: 0.72
+        color: root.backgroundPrimary
+        opacity: 0.48
     }
 
     // Linha accent verde no topo
     Rectangle {
         anchors { top: parent.top; left: parent.left; right: parent.right }
         height: 2
-        color: "#00c853"
+        color: root.accentPrimary
         opacity: 0.8
     }
 
@@ -44,7 +56,8 @@ Rectangle {
         anchors {
             left: parent.left
             bottom: parent.bottom
-            margins: 48
+            leftMargin: root.edgeInset
+            bottomMargin: root.edgeInset
         }
         spacing: 6
 
@@ -61,7 +74,7 @@ Rectangle {
         Text {
             text: "Livre. Brasileiro. Para todos."
             font.pixelSize: 11
-            color: "#8b949e"
+            color: root.textMuted
             font.family: "Noto Sans"
             font.letterSpacing: 0.5
         }
@@ -72,8 +85,8 @@ Rectangle {
         anchors {
             right: parent.right
             top: parent.top
-            topMargin: 48
-            rightMargin: 48
+            topMargin: root.edgeInset
+            rightMargin: root.edgeInset
         }
         spacing: 2
 
@@ -83,14 +96,14 @@ Rectangle {
             timeFont.pixelSize: 42
             timeFont.family: "Noto Sans"
             timeFont.weight: Font.Light
-            color: "#e6edf3"
+            color: root.textPrimary
         }
 
         Text {
             anchors.horizontalCenter: parent.horizontalCenter
             text: Qt.formatDate(new Date(), "dddd, d 'de' MMMM")
             font.pixelSize: 13
-            color: "#8b949e"
+            color: root.textMuted
             font.family: "Noto Sans"
         }
     }
@@ -99,11 +112,11 @@ Rectangle {
     Rectangle {
         id: loginPanel
         anchors.centerIn: parent
-        width: 360
-        height: 420
-        color: "#0d1117"
+        width: Math.min(360, root.width - root.edgeInset * 2)
+        height: Math.min(420, root.height - root.edgeInset * 2)
+        color: "#eb0d1117"
         radius: 12
-        border.color: "#30363d"
+        border.color: root.borderDefault
         border.width: 1
 
         // Linha accent no topo do painel
@@ -111,7 +124,7 @@ Rectangle {
             anchors { top: parent.top; left: parent.left; right: parent.right }
             height: 2
             radius: 12
-            color: "#00c853"
+            color: root.accentPrimary
         }
 
         Column {
@@ -128,8 +141,8 @@ Rectangle {
                 width: 68
                 height: 68
                 radius: 34
-                color: "#161b22"
-                border.color: "#00c853"
+                color: root.surfacePrimary
+                border.color: root.accentPrimary
                 border.width: 2
 
                 Text {
@@ -138,7 +151,7 @@ Rectangle {
                     font.pixelSize: 28
                     font.family: "Noto Sans"
                     font.weight: Font.Medium
-                    color: "#00c853"
+                    color: root.accentPrimary
                 }
             }
 
@@ -146,7 +159,7 @@ Rectangle {
             Text {
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: userModel.currentUser.realName || userModel.currentUser.name || "Usuário"
-                color: "#e6edf3"
+                color: root.textPrimary
                 font.pixelSize: 15
                 font.weight: Font.Medium
                 font.family: "Noto Sans"
@@ -164,14 +177,14 @@ Rectangle {
                 font.family: "Noto Sans"
 
                 background: Rectangle {
-                    color: "#161b22"
+                    color: root.surfacePrimary
                     radius: 8
-                    border.color: passwordField.activeFocus ? "#00c853" : "#30363d"
+                    border.color: passwordField.activeFocus ? root.accentPrimary : root.borderDefault
                     border.width: passwordField.activeFocus ? 2 : 1
                     Behavior on border.color { ColorAnimation { duration: 150 } }
                 }
 
-                color: "#e6edf3"
+                color: root.textPrimary
                 leftPadding: 16
                 rightPadding: 16
 
@@ -191,14 +204,14 @@ Rectangle {
                 font.weight: Font.Medium
 
                 background: Rectangle {
-                    color: parent.pressed ? "#00a040" : (parent.hovered ? "#00e676" : "#00c853")
+                    color: parent.pressed ? root.accentActive : (parent.hovered ? root.accentHover : root.accentPrimary)
                     radius: 8
                     Behavior on color { ColorAnimation { duration: 120 } }
                 }
 
                 contentItem: Text {
                     text: parent.text
-                    color: "#0d1117"
+                    color: root.backgroundPrimary
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
                     font: parent.font
@@ -213,7 +226,7 @@ Rectangle {
                 id: errorMessage
                 width: parent.width
                 text: ""
-                color: "#f85149"
+                color: root.statusError
                 font.pixelSize: 12
                 font.family: "Noto Sans"
                 wrapMode: Text.WordWrap
@@ -228,7 +241,8 @@ Rectangle {
         anchors {
             right: parent.right
             bottom: parent.bottom
-            margins: 30
+            rightMargin: root.edgeInset
+            bottomMargin: root.edgeInset
         }
         spacing: 8
 
@@ -246,13 +260,13 @@ Rectangle {
             background: Rectangle {
                 color: "#161b22"
                 radius: 6
-                border.color: "#30363d"
+                border.color: root.borderDefault
                 border.width: 1
             }
             contentItem: Text {
                 leftPadding: 10
                 text: parent.displayText
-                color: "#8b949e"
+                color: root.textMuted
                 font: parent.font
                 verticalAlignment: Text.AlignVCenter
             }
@@ -262,8 +276,8 @@ Rectangle {
         Rectangle {
             width: 34; height: 34
             radius: 6
-            color: rebootArea.containsMouse ? "#161b22" : "transparent"
-            border.color: "#30363d"
+            color: rebootArea.containsMouse ? root.surfacePrimary : "transparent"
+            border.color: root.borderDefault
             border.width: 1
             Behavior on color { ColorAnimation { duration: 120 } }
 
@@ -271,7 +285,7 @@ Rectangle {
                 anchors.centerIn: parent
                 text: "↺"
                 font.pixelSize: 18
-                color: rebootArea.containsMouse ? "#e6edf3" : "#8b949e"
+                color: rebootArea.containsMouse ? root.textPrimary : root.textMuted
             }
 
             MouseArea {
@@ -291,7 +305,7 @@ Rectangle {
             width: 34; height: 34
             radius: 6
             color: powerArea.containsMouse ? "#1c0a0a" : "transparent"
-            border.color: powerArea.containsMouse ? "#f85149" : "#30363d"
+            border.color: powerArea.containsMouse ? root.statusError : root.borderDefault
             border.width: 1
             Behavior on color { ColorAnimation { duration: 120 } }
 
@@ -299,7 +313,7 @@ Rectangle {
                 anchors.centerIn: parent
                 text: "⏻"
                 font.pixelSize: 16
-                color: powerArea.containsMouse ? "#f85149" : "#8b949e"
+                color: powerArea.containsMouse ? root.statusError : root.textMuted
             }
 
             MouseArea {

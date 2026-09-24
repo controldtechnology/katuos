@@ -1,0 +1,239 @@
+﻿# Snapshot das listas declaradas de pacotes na baseline katu-os-golden-functional
+# Fonte: config/package-lists/*.list.chroot
+
+## config/package-lists/apps.list.chroot
+# Aplicativos padrão Katu OS
+
+# Navegadores
+firefox-esr
+firefox-esr-l10n-pt-br
+# Google Chrome é instalado via hook 0005-katu-chrome
+
+# Escritório LibreOffice — Suite completa em PT-BR
+libreoffice-writer
+libreoffice-calc
+libreoffice-impress
+libreoffice-draw
+libreoffice-math
+libreoffice-base
+libreoffice-l10n-pt-br
+libreoffice-help-pt-br
+libreoffice-java-common
+# Fontes para compatibilidade com Word/Excel
+fonts-liberation
+fonts-crosextra-carlito
+fonts-crosextra-caladea
+
+# Leitura de PDF
+okular
+
+# Visualizador de imagens
+gwenview
+
+# Vídeo/Áudio
+vlc
+vlc-l10n
+
+# Codecs multimídia
+gstreamer1.0-plugins-base
+gstreamer1.0-plugins-good
+gstreamer1.0-plugins-bad
+gstreamer1.0-libav
+gstreamer1.0-vaapi
+ffmpeg
+
+# Compactação
+ark
+p7zip-full
+
+# Fontes
+fonts-noto
+fonts-noto-cjk
+fonts-noto-color-emoji
+
+# Editor de texto simples
+kate
+
+# Utilitários de sistema
+htop
+gzip
+zip
+unzip
+wget
+curl
+
+# Integração GTK com KDE
+qt5ct
+kde-config-gtk-style
+
+# Impressão
+cups
+system-config-printer
+printer-driver-gutenprint
+
+# Acessibilidade
+orca
+kmag
+
+## config/package-lists/firmware.list.chroot
+# Firmware — suporte amplo a hardware
+
+# Firmware geral
+firmware-linux
+firmware-linux-free
+firmware-linux-nonfree
+
+# Wi-Fi
+firmware-iwlwifi
+firmware-realtek
+firmware-atheros
+firmware-brcm80211
+firmware-ralink
+firmware-mediatek
+
+# Áudio (Intel)
+firmware-sof-signed
+
+# GPU AMD/ATI
+firmware-amd-graphics
+
+# GPU NVIDIA (Nouveau)
+# Driver proprietário NVIDIA via katu-welcome (não incluído por padrão)
+
+# USB/HID
+firmware-misc-nonfree
+
+# Rede
+firmware-bnx2
+firmware-bnx2x
+firmware-libertas
+firmware-netxen
+firmware-qlogic
+firmware-ti-connectivity
+
+# Multimidia
+firmware-samsung
+
+## config/package-lists/katu.list.chroot
+# Pacotes próprios Katu OS
+# Estes pacotes são construídos a partir de packages/ e incluídos no build
+
+katu-branding
+katu-default-settings
+katu-welcome
+katu-release
+
+# Instalador
+calamares
+calamares-settings-debian
+katu-installer
+grub-common
+grub2-common
+grub-pc-bin
+grub-efi-amd64-bin
+efibootmgr
+os-prober
+
+# Hub de IA para desenvolvedores (§AI)
+katu-ia
+
+# Painel LAMP / XAMPP (§XAMPP)
+katu-xampp
+
+# Flatpak
+flatpak
+plasma-discover-backend-flatpak
+
+# NetworkManager
+network-manager
+network-manager-gnome
+network-manager-pptp
+network-manager-vpnc
+network-manager-openvpn
+
+# Suporte Bluetooth
+bluetooth
+bluez
+blueman
+
+# Suporte Android
+libmtp-runtime
+gvfs-backends
+
+# Firewall (§39)
+ufw
+gufw
+
+# KDE Connect (§45)
+kdeconnect
+
+# Informações do sistema KDE (§62)
+plasma-systemmonitor
+
+# Informações do sistema no terminal
+fastfetch
+
+# Live system — OBRIGATÓRIO para boot live funcionar
+live-boot
+live-boot-initramfs-tools
+live-config
+live-config-systemd
+
+# Plymouth — splash de boot
+plymouth
+plymouth-themes
+
+# Sistema
+sudo
+bash-completion
+apt-transport-https
+ca-certificates
+gnupg
+lsb-release
+dbus-user-session
+
+## config/package-lists/kde.list.chroot
+# KDE Plasma — pacotes principais
+plasma-desktop
+plasma-workspace
+plasma-nm
+plasma-pa
+plasma-systemmonitor
+plasma-disks
+plasma-browser-integration
+kwin-x11
+kwin-wayland
+kde-spectacle
+dolphin
+konsole
+kate
+kscreen
+powerdevil
+bluedevil
+kdeconnect
+kde-config-gtk-style
+kde-config-sddm
+breeze
+breeze-gtk-theme
+sddm
+sddm-theme-breeze
+
+## config/package-lists/localization.list.chroot
+# Localização — Português Brasil e multilíngue
+
+# Locale
+locales
+locales-all
+
+# Input method
+# ibus (se necessário futuramente)
+
+# Fontes com acentos
+fonts-dejavu
+fonts-dejavu-core
+fonts-dejavu-extra
+fonts-liberation
+fonts-liberation2
+fonts-noto
+fonts-noto-color-emoji
+

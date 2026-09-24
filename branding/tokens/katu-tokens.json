@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Katu OS",
+  "direction": "Brasil contemporâneo, natureza viva, tecnologia para todos",
+  "color": {
+    "background-primary": "#0d1117",
+    "surface-primary": "#161b22",
+    "surface-elevated": "#1c2128",
+    "border-default": "#30363d",
+    "border-subtle": "#21262d",
+    "border-focus": "#00c853",
+    "text-primary": "#e6edf3",
+    "text-secondary": "#b1bac4",
+    "text-muted": "#8b949e",
+    "text-inverse": "#0d1117",
+    "accent-primary": "#00c853",
+    "accent-hover": "#00e676",
+    "accent-active": "#00a040",
+    "status-success": "#3fb950",
+    "status-warning": "#ffab00",
+    "status-error": "#f85149",
+    "status-info": "#58a6ff"
+  },
+  "typography": {
+    "interface": "Noto Sans",
+    "monospace": "Noto Mono",
+    "body-size-px": 14,
+    "caption-minimum-px": 12
+  },
+  "spacing-px": [4, 8, 12, 16, 24, 32],
+  "safe-area": {
+    "minimum-px": 24,
+    "presentation-edge-ratio": 0.04
+  }
+}

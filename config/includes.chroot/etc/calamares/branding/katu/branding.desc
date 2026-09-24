@@ -23,7 +23,7 @@ strings:
 
     install:
         title:    "Instalando o Katu OS…"
-        subtitle: "Isso pode levar entre 10 e 30 minutos.\nNão desligue o computador."
+        subtitle: "O tempo varia conforme o computador.\nMantenha o computador ligado até a conclusão."
 
     finished:
         title:       "Instalação concluída!"

@@ -1,0 +1,19 @@
+﻿{
+    "KPackageStructure": "Plasma/LookAndFeel",
+    "KPlugin": {
+        "Authors": [
+            {
+                "Email": "katuos@gmail.com",
+                "Name": "Katu OS Team"
+            }
+        ],
+        "Description": "Tema oficial Katu OS — Amazônia Dark. Livre. Brasileiro. Para todos.",
+        "Description[pt_BR]": "Tema oficial Katu OS — Amazônia Dark. Livre. Brasileiro. Para todos.",
+        "Id": "org.katuos.desktop",
+        "License": "MIT",
+        "Name": "Katu OS — Amazônia Dark",
+        "Name[pt_BR]": "Katu OS — Amazônia Dark",
+        "Version": "1.0",
+        "Website": "https://katuos.com.br"
+    }
+}

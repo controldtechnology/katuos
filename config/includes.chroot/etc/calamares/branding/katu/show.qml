@@ -4,9 +4,8 @@
 
 import QtQuick 2.15
 import QtQuick.Controls 2.15
-import Calamares 1.0 as Calamares
 
-Calamares.Slideshow {
+Item {
     id: slideshow
 
     property color katuGreen:  "#00c853"
@@ -23,32 +22,32 @@ Calamares.Slideshow {
         {
             img:   "slide-01.png",
             titulo: "Bem-vindo ao Katu OS!",
-            desc:  "O Linux brasileiro feito para todo mundo.\nSimples, rápido e bonito — pronto para usar."
+            desc:  "Uma experiência brasileira para estudar, trabalhar e criar."
         },
         {
             img:   "slide-02.png",
             titulo: "Trabalhe com o LibreOffice",
-            desc:  "Suite de escritório completa em português.\nCompatível com Word, Excel e PowerPoint."
+            desc:  "Escreva textos, prepare planilhas e monte apresentações com o LibreOffice."
         },
         {
             img:   "slide-03.png",
-            titulo: "Firefox e Google Chrome incluídos",
-            desc:  "Dois navegadores prontos para usar.\nNavigue com segurança e velocidade."
+            titulo: "Navegue do seu jeito",
+            desc:  "Escolha entre Firefox e Google Chrome para acessar seus sites favoritos."
         },
         {
             img:   "slide-04.png",
             titulo: "Tudo em português do Brasil",
-            desc:  "Interface, teclado ABNT2 e fuso horário de São Paulo\nconfigurados automaticamente."
+            desc:  "Selecione seu idioma, teclado e região durante a instalação."
         },
         {
             img:   "slide-05.png",
-            titulo: "Seguro e sempre atualizado",
-            desc:  "Baseado no Debian 13 — o Linux mais estável do mundo.\nAtualizações de segurança automáticas."
+            titulo: "Uma base aberta e confiável",
+            desc:  "Conheça as opções de privacidade e atualização depois da instalação."
         },
         {
             img:   "slide-06.png",
-            titulo: "Quase pronto!",
-            desc:  "O Katu OS está sendo instalado no seu computador.\nEm breve você poderá começar a usar."
+            titulo: "Seu Katu OS está quase pronto",
+            desc:  "Acompanhe a instalação. Ao terminar, reinicie e aproveite o sistema."
         }
     ]
 
