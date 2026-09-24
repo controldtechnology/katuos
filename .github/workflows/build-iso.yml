@@ -88,28 +88,21 @@ jobs:
       - name: Clean build, preflight, final ISO validation and QEMU smoke
         run: sudo bash scripts/build.sh
 
-      - name: Upload validated candidate (not a release)
+      - name: Upload ISO and test evidence for manual review
+        if: always() && hashFiles('output/candidate-*/*.iso') != ''
         uses: actions/upload-artifact@v4
         with:
-          name: katu-os-candidate-${{ github.run_id }}
+          name: katu-os-test-candidate-${{ github.run_id }}
           path: |
             output/candidate-*/*.iso
             output/candidate-*/SHA256SUMS
             output/candidate-*/manifest.json
             output/candidate-*/*.json
+            output/candidate-*/*.log
           compression-level: 0
           retention-days: 30
 
-      - name: Upload diagnostic evidence
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: katu-build-evidence-${{ github.run_id }}
-          path: |
-            output/candidate-*/*.log
-            output/candidate-*/*.json
-          retention-days: 30
-
       - name: Release policy
+        if: always()
         run: |
-          echo 'Candidate only. Release requires scripts/release-gate.py and manual evidence for the exact SHA-256.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'This workflow artifact is a test candidate, not a production release. A failed QEMU smoke check remains a failure. Production release requires scripts/release-gate.py and manual evidence for the exact SHA-256.' >> "$GITHUB_STEP_SUMMARY"

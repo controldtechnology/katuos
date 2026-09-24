@@ -3,10 +3,18 @@ set -Eeuo pipefail
 exec > /dev/ttyS0 2>&1
 diagnose() {
     echo "KATU_QA_FAIL:${nonce:-unknown}"
+    echo '--- SDDM configuration ---'
+    for config in /etc/sddm.conf /etc/sddm.conf.d/*.conf; do
+        [ -f "$config" ] && { echo "### $config"; cat "$config"; }
+    done
+    echo '--- Available sessions ---'
+    find /usr/share/wayland-sessions /usr/share/xsessions -maxdepth 1 -type f -print 2>/dev/null || true
     systemctl status sddm --no-pager || true
     journalctl -b -u sddm -n 60 --no-pager || true
+    journalctl -b --no-pager | grep -Ei 'sddm|plasma|autologin|session' | tail -100 || true
     findmnt / || true
     pgrep -a plasmashell || true
+    loginctl list-sessions --no-legend || true
 }
 trap diagnose ERR
 grep -qw 'boot=live' /proc/cmdline
