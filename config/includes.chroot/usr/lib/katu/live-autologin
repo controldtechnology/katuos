@@ -19,7 +19,7 @@ if [ -z "$session" ]; then
 fi
 test -n "$session"
 install -d -m 755 /etc/sddm.conf.d
-cat > /etc/sddm.conf.d/10-katu-live-autologin.conf <<EOF
+cat > /etc/sddm.conf.d/zz-katu-live-autologin.conf <<EOF
 [Autologin]
 User=katu
 Session=$session

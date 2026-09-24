@@ -12,6 +12,10 @@ trap diagnose ERR
 grep -qw 'boot=live' /proc/cmdline
 nonce=$(sed -n 's/.*katu.qa=\([a-f0-9]*\).*/\1/p' /proc/cmdline)
 [[ $nonce =~ ^[a-f0-9]{32}$ ]]
+echo "KATU_QA_START:$nonce"
+id katu
+systemctl is-enabled katu-live-autologin.service
+systemctl status katu-live-autologin.service --no-pager || true
 for attempt in $(seq 1 110); do
     if systemctl is-active --quiet sddm && pgrep -u katu -x plasmashell >/dev/null; then
         uid=$(id -u katu)
