@@ -16,7 +16,10 @@ from boot_checks import require, run, sha256_file, grub_entries
 
 parser = argparse.ArgumentParser()
 parser.add_argument('iso', type=Path)
-parser.add_argument('--timeout', type=int, default=600)
+# Include cold kernel/initramfs boot time in addition to the QA service's
+# 550-second Plasma/session poll. A 600-second whole-VM limit killed QEMU before
+# the service could finish or emit its diagnostic report.
+parser.add_argument('--timeout', type=int, default=900)
 args = parser.parse_args()
 report_path = Path(str(args.iso) + '.smoke.json')
 report = {'status': 'FAIL', 'scope': 'QEMU Live kernel/initrd + ISO, firmware not covered'}
