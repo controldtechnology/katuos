@@ -23,7 +23,7 @@
 | Welcome | arte oficial em layout editorial, ações atuais preservadas | pendente | não validado |
 | Plymouth | marca, spinner e pontos oficiais | pendente | não validado |
 | Lockscreen | nenhuma mudança nesta etapa | pendente | não validado |
-| GRUB | nenhuma mudança funcional ou visual nesta etapa | pendente | não validado |
+| GRUB | logo e seleção oficiais substituem os protótipos; entradas e parâmetros intactos | pendente | não validado |
 
 ## Matriz de resolução e escala
 

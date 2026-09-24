@@ -102,6 +102,9 @@ LookAndFeelPackage=org.katuos.desktop
 SingleClick=false
 widgetStyle=Breeze
 
+[Icons]
+Theme=Katu
+
 [General]
 ColorScheme=KatuDark
 

@@ -22,7 +22,7 @@ smallestReadableFont=Noto Sans,8,-1,5,50,0,0,0,0,0
 toolBarFont=Noto Sans,10,-1,5,50,0,0,0,0,0
 
 [Icons]
-Theme=breeze-dark
+Theme=Katu
 
 [KDE]
 LookAndFeelPackage=org.katuos.desktop

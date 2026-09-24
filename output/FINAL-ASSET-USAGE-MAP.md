@@ -5,7 +5,7 @@
 ## Regras
 
 - Grupo A: 35 imagens do pacote final + duas artes selecionadas da raiz (wallpaper limpo `17_12_03` e fundo SDDM botânico `17_11_00`).
-- Grupo C: 37 imagens avulsas inadequadas a runtime (marcas antigas, duplicatas, publicidade com textos embutidos, ícones compostos ou mockups). Não serão copiadas para a ISO.
+- Grupo C: 37 imagens avulsas inadequadas a runtime (marcas antigas, duplicatas, publicidade com textos embutidos, ícones compostos ou mockups). Nenhum hash do grupo C permanece nas árvores PNG de entrada do build após a sincronização revisada.
 - Imagens originais, inclusive as bloqueadas, permanecem intactas na biblioteca master.
 
 ## Mapa por arquivo
@@ -111,8 +111,9 @@ Os caminhos atuais em `branding/source/` são arquivos históricos de protótipo
 | `wallpapers/katu-*-4k.png` | Coleção de wallpapers | `packages/katu-branding/usr/share/wallpapers/katu/contents/images/` | Coleção preservada; dois destinos foram substituídos pelas artes limpas selecionadas acima |
 | `installer/calamares/slides/slide-01.png` … `slide-06.png` | Apresentação do instalador | `installer/calamares/branding/katu/slide-*.png` | Integrado com proporção preservada; não validado no Calamares em execução |
 | `installer/live/katu-live-welcome.png` | Welcome do Calamares | `installer/calamares/branding/katu/welcome.png` | Integrado |
-| `plasma/icons/katu-*.png` | Computador, pasta pessoal, rede, mídia, lixeira e USB | `packages/katu-branding/usr/share/icons/hicolor/256x256/places/` | Integrado; escala final não inspecionada |
+| `plasma/icons/katu-*.png` | Computador, pasta pessoal, rede, mídia, lixeira e USB | `packages/katu-branding/usr/share/icons/Katu/256x256/places/` (com fallback hicolor) | Integrado ao tema Katu; escala final não inspecionada |
 | `plymouth/katu/{katu-logo-boot-light,spinner,progress-dot}.png` | Splash | `plymouth/katu/` | Integrado; script de animação preservado |
-| `grub/*`, `plasma/cursors/katu-cursor-master.png` | Boot/cursor | — | Não incorporados nesta etapa: GRUB protegido; prancha não é um tema XCursor instalável |
+| `grub/katu-grub-logo.png`, `grub/katu-selection.png` | Identidade visual do GRUB | `grub/katu/` e cópias em `config/includes.binary/boot/grub` e `config/includes.chroot/boot/grub` | Assets substituídos mantendo intactos tema, entradas, caminhos e parâmetros |
+| `plasma/cursors/katu-cursor-master.png` | Cursor | — | Não incorporado: prancha não é um tema XCursor instalável |
 
-As quatro artes de ícones de aplicativos oficiais ficam catalogadas, mas não serão associadas a lançadores enquanto não houver aplicativos Katu correspondentes instalados.
+As quatro artes de ícones de aplicativos oficiais ficam catalogadas no pacote, mas não serão associadas a lançadores enquanto não houver aplicativos Katu correspondentes instalados. Auditoria SHA-256 após a sincronização: **0/37 hashes do grupo C encontrados** em `config`, `packages`, `installer`, `sddm`, `plymouth`, `grub` ou `plasma`.
