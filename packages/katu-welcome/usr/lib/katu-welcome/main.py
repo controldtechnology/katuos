@@ -108,6 +108,32 @@ QPushButton#btn-fechar:hover {{
     color: {KATU_TEXT};
     background-color: {KATU_BG_ALT};
 }}
+QPushButton#btn-live-primary {{
+    background-color: {KATU_ACCENT};
+    border: 1px solid {KATU_ACCENT};
+    border-radius: 8px;
+    padding: 12px 20px;
+    color: {KATU_BG};
+    font-size: 14px;
+    font-weight: 600;
+}}
+QPushButton#btn-live-primary:hover {{
+    background-color: {KATU_ACCENT_HOVER};
+    border-color: {KATU_ACCENT_HOVER};
+}}
+QPushButton#btn-live-secondary {{
+    background-color: {KATU_BG_CARD};
+    border: 1px solid {KATU_BORDER_HOVER};
+    border-radius: 8px;
+    padding: 12px 20px;
+    color: {KATU_TEXT};
+    font-size: 14px;
+    font-weight: 600;
+}}
+QPushButton#btn-live-secondary:hover {{
+    background-color: {KATU_BG_ALT};
+    border-color: {KATU_ACCENT};
+}}
 QCheckBox {{
     font-size: 12px;
     color: {KATU_TEXT_MUTED};
@@ -268,12 +294,21 @@ class CardButton(QPushButton):
 
 
 class KatuWelcomeWindow(QMainWindow):
-    def __init__(self):
+    def __init__(self, live_mode=False):
         super().__init__()
+        self.live_mode = live_mode
         self.setWindowTitle("Bem-vindo ao Katu OS")
-        self.setMinimumSize(700, 600)
-        self.resize(900, 690)
+        self.setMinimumSize(720, 560)
+        self.resize(920, 660)
         self.setStyleSheet(STYLESHEET)
+
+        if self.live_mode:
+            self.setMinimumSize(680, 520)
+            self.resize(900, 600)
+            self._live_art_source = QPixmap()
+            self._live_art_label = None
+            self._build_live_window()
+            return
 
         widget_central = QWidget()
         self.setCentralWidget(widget_central)
@@ -370,6 +405,74 @@ class KatuWelcomeWindow(QMainWindow):
         layout_principal.addWidget(area_scroll, 1)
         layout_principal.addWidget(rodape)
 
+    def _build_live_window(self):
+        central = QWidget()
+        self.setCentralWidget(central)
+        layout = QVBoxLayout(central)
+        layout.setContentsMargins(20, 18, 20, 16)
+        layout.setSpacing(12)
+
+        arte = QLabel()
+        arte.setAlignment(Qt.AlignCenter)
+        arte.setMinimumHeight(380)
+        arte.setStyleSheet(
+            f"background-color: {KATU_BG_ALT}; border: 1px solid {KATU_BORDER}; "
+            "border-radius: 12px;"
+        )
+        self._live_art_source = QPixmap('/usr/share/katu/welcome/hero.png')
+        self._live_art_label = arte
+        self._update_live_art()
+        arte.setAccessibleName("Boas-vindas ao Katu OS")
+
+        actions = QHBoxLayout()
+        actions.setSpacing(12)
+
+        btn_experimentar = QPushButton("Experimentar o Katu OS")
+        btn_experimentar.setObjectName("btn-live-secondary")
+        btn_experimentar.setMinimumHeight(48)
+        btn_experimentar.setAccessibleDescription(
+            "Fechar esta tela e continuar usando o sistema Live"
+        )
+        btn_experimentar.clicked.connect(self.close)
+
+        btn_instalar = QPushButton("Instalar Katu OS")
+        btn_instalar.setObjectName("btn-live-primary")
+        btn_instalar.setMinimumHeight(48)
+        btn_instalar.setAccessibleDescription(
+            "Abrir o instalador do sistema no computador"
+        )
+        btn_instalar.clicked.connect(self._abrir_instalador)
+
+        actions.addWidget(btn_experimentar, 1)
+        actions.addWidget(btn_instalar, 1)
+
+        dica = QLabel("Você pode fechar esta janela e continuar usando o modo Live.")
+        dica.setAlignment(Qt.AlignCenter)
+        dica.setStyleSheet(f"color: {KATU_TEXT_MUTED}; font-size: 12px;")
+
+        layout.addWidget(arte, 1)
+        layout.addLayout(actions)
+        layout.addWidget(dica)
+
+    def _update_live_art(self):
+        if self._live_art_label is None or self._live_art_source.isNull():
+            return
+        available = self._live_art_label.size() - QSize(16, 16)
+        if available.width() <= 0 or available.height() <= 0:
+            return
+        self._live_art_label.setPixmap(self._live_art_source.scaled(
+            available, Qt.KeepAspectRatio, Qt.SmoothTransformation
+        ))
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        if self.live_mode:
+            self._update_live_art()
+
+    def _abrir_instalador(self):
+        subprocess.Popen(['katu-installer'])
+        self.close()
+
     def _executar_acao(self, acao):
         self.thread = AcaoThread(acao)
         self.thread.start()
@@ -412,8 +515,10 @@ def main():
     app.setApplicationVersion(KATU_VERSION)
     app.setOrganizationName("Katu OS")
 
-    window = KatuWelcomeWindow()
-    window._remover_flag_firstboot()
+    live_mode = '--live' in sys.argv[1:]
+    window = KatuWelcomeWindow(live_mode=live_mode)
+    if not live_mode:
+        window._remover_flag_firstboot()
     window.show()
 
     sys.exit(app.exec_() if QT_BACKEND == 'PyQt5' else app.exec())

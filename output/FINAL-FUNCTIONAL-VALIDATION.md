@@ -19,5 +19,6 @@
 
 - Baseline/tag preservada: `katu-os-golden-master-functional` → `5ce81b589f5448deedb75b5317609f08c8e955d0`.
 - Branch isolada: `visual/katu-premium-reconstruction`.
-- Não foram alterados scripts de build/boot, kernel, initramfs, parâmetros GRUB, Live, particionamento ou módulos do Calamares.
+- Não foram alterados scripts de build, kernel, initramfs, parâmetros GRUB, particionamento ou módulos do Calamares. O hook de autostart do Live mudou apenas para apresentar a escolha visual de boas-vindas; precisa de regressão na ISO.
 - O layout do painel e temas são configurações de apresentação e ainda necessitam ser exercitados no Plasma da imagem final.
+- A interface Live agora apresenta boas-vindas; o botão de instalação chama o wrapper existente `katu-installer`, sem modificar Calamares. Foi removido um autostart duplicado no `/etc/skel`; a inicialização dessa nova apresentação continua pendente de ISO/VM e não é declarada PASS.

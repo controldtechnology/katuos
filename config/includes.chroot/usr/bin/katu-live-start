@@ -1,7 +1,7 @@
 #!/bin/bash
 # Script executado no boot do live para configurar ambiente e iniciar instalador
 
-WALLPAPER="/usr/share/wallpapers/katu/contents/images/katu-amazonia-4k.png"
+WALLPAPER="/usr/share/wallpapers/katu/contents/images/katu-rio-4k.png"
 MARKER="$HOME/.katu-live-configured"
 
 # Aplicar wallpaper Katu OS (só na primeira vez por sessão)
@@ -12,11 +12,8 @@ if [ ! -f "$MARKER" ] && [ -f "$WALLPAPER" ]; then
     touch "$MARKER"
 fi
 
-# Iniciar o instalador se estiver no modo live
+# Apresentar a arte de boas-vindas no Live; o instalador abre por ação explícita.
 if grep -q "boot=live" /proc/cmdline 2>/dev/null; then
     sleep 2
-    # Verificar se Calamares já está rodando
-    if ! pgrep -x calamares > /dev/null; then
-        katu-installer &
-    fi
+    katu-welcome --live &
 fi

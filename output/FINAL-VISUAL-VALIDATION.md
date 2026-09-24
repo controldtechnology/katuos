@@ -10,6 +10,8 @@
 - Evidência: [00-current-iso-1024x768.png](FINAL-VISUAL-QA/00-current-iso-1024x768.png).
 - Resultado visível: wallpaper e marca aparecem, mas não há campo de senha nem botão de entrada na captura.
 - Causa encontrada no código dessa base: `sddm/katu/Main.qml` fixa `1920x1080`; em 1024x768, o conteúdo de autenticação pode ficar fora da área renderizada.
+- Captura repetida após o usuário iniciar a VM: confirmou o mesmo defeito; `user-vm-current.png` é evidência local adicional, da mesma ISO Golden Master.
+- Uma VM separada de QA mostrou “Please insert a bootable medium” porque estava sem controlador/mídia conectada. Ela foi desligada; essa tela não é evidência sobre o boot da ISO.
 
 ## Alterações visuais aguardando captura
 
@@ -20,7 +22,7 @@
 | Plasma | tema SVG Katu, esquema KatuDark derivado das artes | pendente | não validado |
 | Dolphin/Settings/notificações | herdam o esquema do KDE e partes do Plasma Style | pendente | não validado |
 | Calamares | seis pôsteres oficiais inteiros, proporção preservada | pendente | não validado |
-| Welcome | arte oficial em layout editorial, ações atuais preservadas | pendente | não validado |
+| Welcome | arte oficial; no Live, escolha entre experimentar ou abrir `katu-installer`; arte redimensiona junto com a janela | pendente | não validado; alteração recente aguarda build |
 | Plymouth | marca, spinner e pontos oficiais | pendente | não validado |
 | Lockscreen | nenhuma mudança nesta etapa | pendente | não validado |
 | GRUB | logo e seleção oficiais substituem os protótipos; entradas e parâmetros intactos | pendente | não validado |

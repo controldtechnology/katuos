@@ -1,9 +1,9 @@
 [Desktop Entry]
 Type=Application
-Name=Instalar Katu OS
-Name[pt_BR]=Instalar Katu OS
-Comment=Inicia o instalador Katu OS no modo live
-Comment[pt_BR]=Inicia o instalador Katu OS no modo live
+Name=Boas-vindas ao Katu OS
+Name[pt_BR]=Boas-vindas ao Katu OS
+Comment=Apresenta as opções de experimentar ou instalar o sistema
+Comment[pt_BR]=Apresenta as opções de experimentar ou instalar o sistema
 Exec=/usr/bin/katu-live-start
 Icon=katu-logo
 Terminal=false
