@@ -1,6 +1,6 @@
 /* Katu OS — Calamares Installation Slideshow
    Slides informativos durante a instalação — PT-BR amigável
-   Paleta: #0d1117 / #00c853 / #ffab00                        */
+   Paleta: #041F16 / #0F7B43 / #E0B146                        */
 
 import QtQuick 2.15
 import QtQuick.Controls 2.15
@@ -8,14 +8,14 @@ import QtQuick.Controls 2.15
 Item {
     id: slideshow
 
-    property color katuGreen:  "#00c853"
-    property color katuAmber:  "#ffab00"
-    property color katuBg:     "#0d1117"
-    property color katuBgAlt:  "#161b22"
-    property color katuText:   "#e6edf3"
-    property color katuMuted:  "#8b949e"
-    property color katuBorder: "#30363d"
-    property color katuLink:   "#58a6ff"
+    property color katuGreen:  "#0F7B43"
+    property color katuAmber:  "#E0B146"
+    property color katuBg:     "#041F16"
+    property color katuBgAlt:  "#063723"
+    property color katuText:   "#F4F1E2"
+    property color katuMuted:  "#C2CBBF"
+    property color katuBorder: "#326149"
+    property color katuLink:   "#F0CC6C"
 
     // Cada slide tem: imagem de fundo + título + descrição
     property var slideData: [
@@ -26,28 +26,28 @@ Item {
         },
         {
             img:   "slide-02.png",
-            titulo: "Trabalhe com o LibreOffice",
-            desc:  "Escreva textos, prepare planilhas e monte apresentações com o LibreOffice."
+            titulo: "Simples e fácil",
+            desc:  "Uma experiência clara para você começar a usar o Katu OS."
         },
         {
             img:   "slide-03.png",
-            titulo: "Navegue do seu jeito",
-            desc:  "Escolha entre Firefox e Google Chrome para acessar seus sites favoritos."
+            titulo: "Aplicativos essenciais",
+            desc:  "Encontre ferramentas para navegar, estudar, trabalhar e criar."
         },
         {
             img:   "slide-04.png",
-            titulo: "Tudo em português do Brasil",
-            desc:  "Selecione seu idioma, teclado e região durante a instalação."
+            titulo: "Seguro e atualizado",
+            desc:  "Mantenha seu sistema protegido com atualizações regulares."
         },
         {
             img:   "slide-05.png",
-            titulo: "Uma base aberta e confiável",
-            desc:  "Conheça as opções de privacidade e atualização depois da instalação."
+            titulo: "Brasil no nosso DNA",
+            desc:  "Uma identidade própria inspirada na diversidade brasileira."
         },
         {
             img:   "slide-06.png",
-            titulo: "Seu Katu OS está quase pronto",
-            desc:  "Acompanhe a instalação. Ao terminar, reinicie e aproveite o sistema."
+            titulo: "Software livre",
+            desc:  "Liberdade para conhecer, compartilhar e transformar tecnologia."
         }
     ]
 
@@ -87,8 +87,8 @@ Item {
 
                             Rectangle {
                                 anchors.fill: parent
-                                color: "#0d1117"
-                                opacity: 0.40
+                                color: katuBg
+                                opacity: 0.10
                             }
                         }
                     }

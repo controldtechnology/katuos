@@ -12,15 +12,15 @@ Rectangle {
     // Follow the active display; fixed 1920x1080 roots clip login controls on VM/laptop screens.
     width: Screen.width
     height: Screen.height
-    property color backgroundPrimary: "#0d1117"
-    property color surfacePrimary: "#161b22"
-    property color borderDefault: "#30363d"
-    property color textPrimary: "#e6edf3"
-    property color textMuted: "#8b949e"
-    property color accentPrimary: "#00c853"
-    property color accentHover: "#00e676"
-    property color accentActive: "#00a040"
-    property color statusError: "#f85149"
+    property color backgroundPrimary: "#041F16"
+    property color surfacePrimary: "#063723"
+    property color borderDefault: "#326149"
+    property color textPrimary: "#F4F1E2"
+    property color textMuted: "#C2CBBF"
+    property color accentPrimary: "#E0B146"
+    property color accentHover: "#F0CC6C"
+    property color accentActive: "#B78D2F"
+    property color statusError: "#FF6B6B"
     color: backgroundPrimary
 
     property int sessionIndex: sessionModel.lastIndex
@@ -30,7 +30,7 @@ Rectangle {
     Image {
         id: background
         anchors.fill: parent
-        source: config.background || "background.jpg"
+        source: config.background || "background.png"
         fillMode: Image.PreserveAspectCrop
         asynchronous: true
         cache: false
@@ -40,14 +40,14 @@ Rectangle {
     Rectangle {
         anchors.fill: parent
         color: root.backgroundPrimary
-        opacity: 0.48
+        opacity: 0.36
     }
 
     // Linha accent verde no topo
     Rectangle {
         anchors { top: parent.top; left: parent.left; right: parent.right }
         height: 2
-        color: root.accentPrimary
+        color: "#0F7B43"
         opacity: 0.8
     }
 
@@ -114,7 +114,7 @@ Rectangle {
         anchors.centerIn: parent
         width: Math.min(360, root.width - root.edgeInset * 2)
         height: Math.min(420, root.height - root.edgeInset * 2)
-        color: "#eb0d1117"
+        color: "#F2041F16"
         radius: 12
         border.color: root.borderDefault
         border.width: 1
@@ -124,7 +124,7 @@ Rectangle {
             anchors { top: parent.top; left: parent.left; right: parent.right }
             height: 2
             radius: 12
-            color: root.accentPrimary
+                color: root.accentPrimary
         }
 
         Column {
@@ -151,7 +151,7 @@ Rectangle {
                     font.pixelSize: 28
                     font.family: "Noto Sans"
                     font.weight: Font.Medium
-                    color: root.accentPrimary
+                    color: root.textPrimary
                 }
             }
 
@@ -258,7 +258,7 @@ Rectangle {
             onCurrentIndexChanged: sessionIndex = currentIndex
 
             background: Rectangle {
-                color: "#161b22"
+                color: root.surfacePrimary
                 radius: 6
                 border.color: root.borderDefault
                 border.width: 1

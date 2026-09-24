@@ -1,65 +1,65 @@
 /* Katu OS installer — visual styling only; Calamares workflow remains untouched. */
 QWidget {
-    background-color: #0d1117;
-    color: #e6edf3;
-    selection-background-color: #00c853;
-    selection-color: #0d1117;
+    background-color: #041F16;
+    color: #F4F1E2;
+    selection-background-color: #0F7B43;
+    selection-color: #F4F1E2;
 }
 
 QLabel { background: transparent; }
 
 QPushButton {
-    background-color: #161b22;
-    color: #e6edf3;
-    border: 1px solid #30363d;
+    background-color: #063723;
+    color: #F4F1E2;
+    border: 1px solid #326149;
     border-radius: 6px;
     min-height: 30px;
     padding: 4px 14px;
 }
-QPushButton:hover { background-color: #1c2128; border-color: #00c853; }
-QPushButton:pressed { background-color: #123b2a; }
-QPushButton:disabled { color: #737d87; border-color: #21262d; }
+QPushButton:hover { background-color: #10462B; border-color: #E0B146; }
+QPushButton:pressed { background-color: #0F7B43; }
+QPushButton:disabled { color: #9BA99C; border-color: #214A36; }
 
 QLineEdit, QComboBox, QSpinBox, QDoubleSpinBox, QDateEdit, QTimeEdit,
 QTextEdit, QPlainTextEdit, QListView, QTreeView, QTableView {
-    background-color: #161b22;
-    alternate-background-color: #1c2128;
-    color: #e6edf3;
-    border: 1px solid #30363d;
+    background-color: #063723;
+    alternate-background-color: #10462B;
+    color: #F4F1E2;
+    border: 1px solid #326149;
     border-radius: 4px;
     padding: 5px 7px;
 }
 QLineEdit:focus, QComboBox:focus, QSpinBox:focus, QDoubleSpinBox:focus,
 QDateEdit:focus, QTimeEdit:focus, QTextEdit:focus, QPlainTextEdit:focus {
-    border: 2px solid #00c853;
+    border: 2px solid #E0B146;
 }
 QListView::item:selected, QTreeView::item:selected, QTableView::item:selected {
-    background-color: #00c853;
-    color: #0d1117;
+    background-color: #0F7B43;
+    color: #F4F1E2;
 }
 
 QGroupBox {
-    border: 1px solid #30363d;
+    border: 1px solid #326149;
     border-radius: 6px;
     margin-top: 12px;
     padding: 10px;
 }
-QGroupBox::title { subcontrol-origin: margin; left: 10px; padding: 0 5px; color: #e6edf3; }
+QGroupBox::title { subcontrol-origin: margin; left: 10px; padding: 0 5px; color: #F4F1E2; }
 
 QProgressBar {
-    background-color: #161b22;
-    color: #e6edf3;
-    border: 1px solid #30363d;
+    background-color: #063723;
+    color: #F4F1E2;
+    border: 1px solid #326149;
     border-radius: 4px;
     text-align: center;
 }
-QProgressBar::chunk { background-color: #00c853; border-radius: 3px; }
+QProgressBar::chunk { background-color: #0F7B43; border-radius: 3px; }
 
-QTabWidget::pane { border: 1px solid #30363d; border-radius: 4px; }
-QTabBar::tab { background: #161b22; color: #b1bac4; padding: 7px 12px; border: 1px solid #30363d; }
-QTabBar::tab:selected { color: #e6edf3; border-bottom: 2px solid #00c853; }
-QToolTip { background-color: #1c2128; color: #e6edf3; border: 1px solid #30363d; padding: 4px; }
+QTabWidget::pane { border: 1px solid #326149; border-radius: 4px; }
+QTabBar::tab { background: #063723; color: #C2CBBF; padding: 7px 12px; border: 1px solid #326149; }
+QTabBar::tab:selected { color: #F4F1E2; border-bottom: 2px solid #E0B146; }
+QToolTip { background-color: #10462B; color: #F4F1E2; border: 1px solid #326149; padding: 4px; }
 
-#mainApp { background-color: #0d1117; }
-#sidebarApp { background-color: #0d1117; border-right: 1px solid #30363d; }
+#mainApp { background-color: #041F16; }
+#sidebarApp { background-color: #041F16; border-right: 1px solid #326149; }
 #logoApp { background-color: transparent; }
