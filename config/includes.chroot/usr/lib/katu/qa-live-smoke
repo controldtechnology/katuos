@@ -25,9 +25,12 @@ nonce=$(sed -n 's/.*katu.qa=\([a-f0-9]*\).*/\1/p' /proc/cmdline)
 echo "KATU_QA_START:$nonce"
 id katu
 grep -E '^\[(Autologin|General)\]|^(User|Session|Relogin)=' /etc/sddm.conf.d/zz-katu-live-autologin.conf || true
-for attempt in $(seq 1 110); do
+echo 'KATU_QA_LOOP_BEGIN'
+for ((attempt = 1; attempt <= 110; attempt++)); do
     if (( attempt % 10 == 0 )); then
-        echo "KATU_QA_WAIT:$attempt sddm=$(pgrep -x sddm || true) plasma=$(pgrep -u katu -x plasmashell || true)"
+        sddm_pid=$(pgrep -x sddm || true)
+        plasma_pid=$(pgrep -u katu -x plasmashell || true)
+        echo "KATU_QA_WAIT:$attempt sddm=$sddm_pid plasma=$plasma_pid"
     fi
     if pgrep -x sddm >/dev/null && pgrep -u katu -x plasmashell >/dev/null; then
         uid=$(id -u katu)
