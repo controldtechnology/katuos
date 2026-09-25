@@ -13,8 +13,9 @@ Rectangle {
     readonly property int inset: Math.max(24, Math.min(width, height) * 0.045)
 
     function authenticate() {
-        if (password.text.length > 0)
-            sddm.login(userModel.currentUser.name, password.text, sessionIndex)
+        var user = userModel.currentUser
+        if (password.text.length > 0 && user && user.name)
+            sddm.login(user.name, password.text, sessionIndex)
     }
 
     Image {
@@ -86,7 +87,9 @@ Rectangle {
             anchors.top: mark.bottom; anchors.topMargin: 12
             anchors.left: parent.left; anchors.right: parent.right
             anchors.leftMargin: 24; anchors.rightMargin: 24
-            text: userModel.currentUser.realName || userModel.currentUser.name || "Bem-vindo"
+            text: userModel.currentUser
+                  ? (userModel.currentUser.realName || userModel.currentUser.name || "Bem-vindo")
+                  : "Bem-vindo"
             color: "#f0ecdc"; font.family: "Noto Sans"
             font.pixelSize: 19; font.weight: Font.DemiBold
             horizontalAlignment: Text.AlignHCenter; elide: Text.ElideRight
@@ -147,12 +150,17 @@ Rectangle {
             font.pixelSize: 12; wrapMode: Text.WordWrap
             horizontalAlignment: Text.AlignHCenter; visible: text.length > 0
         }
-        ComboBox {
-            id: session
+        Loader {
             anchors.left: passwordBox.left; anchors.right: passwordBox.right
             anchors.bottom: parent.bottom; anchors.bottomMargin: 23
-            model: sessionModel; index: sessionIndex; arrowIcon: "angle-down.png"
-            onIndexChanged: sessionIndex = index
+            active: sessionModel.count > 1
+            sourceComponent: Component {
+                ComboBox {
+                    id: session
+                    model: sessionModel; index: sessionIndex; arrowIcon: "angle-down.png"
+                    onIndexChanged: sessionIndex = index
+                }
+            }
         }
     }
 
