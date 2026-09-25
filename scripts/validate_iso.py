@@ -76,11 +76,19 @@ try:
         run('python3', Path(__file__).with_name('validate-installer.py'), '--root', root)
         passed('INSTALLER STRUCTURE')
         for name in ['boot/grub/themes/katu/theme.txt', 'usr/share/plymouth/themes/katu/katu.plymouth',
-                     'usr/share/sddm/themes/katu/Main.qml', 'etc/calamares/branding/katu/branding.desc',
+                     'usr/share/sddm/themes/katu/Main.qml', 'usr/share/sddm/themes/katu/background.png',
+                     'usr/share/sddm/themes/katu/logo.png', 'etc/sddm.conf.d/katu.conf',
+                     'etc/calamares/branding/katu/branding.desc',
+                     'etc/calamares/branding/katu/stylesheet.qss',
                      'usr/share/applications/katu-install.desktop',
                      'usr/lib/systemd/system/katu-live-autologin.service',
                      'usr/lib/katu/live-autologin']:
             require(rooted(root, name).is_file(), f'Missing branding/installer asset: {name}')
+        require('Current=katu' in rooted(root, 'etc/sddm.conf.d/katu.conf').read_text(),
+                'Installed greeter must select the Katu SDDM theme')
+        sddm_qml = rooted(root, 'usr/share/sddm/themes/katu/Main.qml').read_text()
+        require('import QtQuick.Controls' not in sddm_qml and 'import QtQuick.Layouts' not in sddm_qml,
+                'Katu SDDM theme must use the QtQuick/SddmComponents baseline for Qt 6 compatibility')
         live_login = rooted(root, 'usr/lib/systemd/system/katu-live-autologin.service').read_text()
         require('ConditionKernelCommandLine=boot=live' in live_login,
                 'Live auto-login must not apply to the installed system')

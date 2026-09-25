@@ -1,24 +1,29 @@
-# Validação final da ISO Katu OS Premium
+# Validação da ISO candidata Katu OS Premium
 
-**Estado: EM ANDAMENTO — NÃO APROVADA PARA PRODUÇÃO.** Este relatório só poderá mudar para aprovado após testar a ISO exata da revisão atual numa VM limpa, incluindo Live, instalação, reboot, SDDM, login e desktop instalado.
+**Estado: candidata funcionalmente testada em parte; não aprovada para produção.** Não há garantia de compatibilidade universal nem aprovação visual final.
 
-| Campo | Resultado atual |
+Os resultados abaixo descrevem somente a ISO já testada do commit `48223e8`. Há correções visuais no SDDM/Calamares e uma checagem Qt 6 em andamento no worktree; elas ainda precisam de build e teste na próxima ISO.
+
+| Campo | Resultado |
 |---|---|
-| Branch | `visual/katu-premium-reconstruction` |
-| Baseline congelada | `katu-os-golden-master-functional` (`5ce81b589f5448deedb75b5317609f08c8e955d0`) |
-| Revisão atual | `04fe5b6` |
-| ISO desta revisão | Candidata gerada pelo GitHub Actions `36053210958`; não aprovada |
-| Tamanho / SHA-256 | ISO: 3.467.735.040 bytes; SHA-256 `066b2e72a38a4777cfc57f28ad87913b6f1ee7658ff844fa645a75f92bccabfc` |
-| Data de build | 2026-09-24 |
-| Boot estrutural / GRUB / SquashFS / kernel / initrd / Live / Calamares / branding / UEFI / BIOS | PASS na validação estática da ISO |
-| Smoke Live em QEMU (SDDM/Plasma/overlay) | FAIL: timeout total de 600 s venceu antes de o serviço QA completar sua espera/diagnóstico de Plasma |
-| SDDM iniciado / autologin service | PASS nos registros seriais; serviço de diagnóstico iniciou; presença da sessão Plasma permanece NÃO CONFIRMADA |
-| Instalação / boot pós-instalação | NOT RUN |
-| Calamares / instalação / boot pós-instalação | NOT RUN |
-| SDDM, login e desktop instalado | NOT RUN |
-| Resoluções / escalas | NOT AUTOMATICALLY VERIFIED |
-| Problemas confirmados na baseline | SDDM sem campos de senha/entrada em captura 1024×768 |
-| Problema na candidata local d713 | BIOS iniciou serviços mas não mostrou desktop; ver evidência visual |
-| Pendências | corrigir timeout do smoke, rebuildar, confirmar Plasma/overlay, testar VM da ISO exata, instalação limpa, screenshots |
+| Revisão | `48223e8` — `Avoid duplicate welcome in Live session` |
+| CI | [run 36129854861](https://github.com/controldtechnology/katuos/actions/runs/36129854861) |
+| Artifact | [baixar ISO candidata](https://github.com/controldtechnology/katuos/actions/runs/36129854861/artifacts/10862656663) |
+| Arquivo local | `C:\katuos\dist\manual-review-36129854861\candidate-20260925T113429Z-48223e86\katu-os-1.0.1-rc1-amd64.iso` |
+| Tamanho | 3.468.062.720 bytes |
+| SHA-256 | `f6f0fddb170e63c0c0555d0f5979946c1cf14f16c08fccc657f08ef587aa32ca` |
+| Build/estrutura/QEMU Live smoke | PASS; 11 verificações estruturais e smoke automatizado passaram. |
+| VirtualBox Live | PASS em BIOS/Legacy, VBoxSVGA, 1024×768. |
+| Calamares/instalação | PASS em disco vazio de QA de 32 GiB, BIOS/MBR. Conclusão do instalador observada. |
+| Boot pós-instalação sem ISO | PASS em BIOS/MBR. |
+| SDDM/login/desktop | PASS funcional em BIOS/MBR; tela SDDM visualmente clara/genérica. |
+| UEFI manual | NOT TESTED. |
+| Outras resoluções/escalas | NOT TESTED. |
 
-Não declarar a ISO pronta, íntegra para produção ou 100% saudável antes de concluir todos os testes pendentes.
+## Pendências visuais e de cobertura
+
+SDDM e conteúdo principal do Calamares ainda não atingem a integração visual premium pretendida. Lockscreen, Dolphin, configurações, notificações, calendário e matriz de resoluções/escalas não foram aprovados. Portanto esta candidata serve para revisão e teste, não como release de produção.
+
+## Baseline
+
+A baseline funcional tagueada `katu-os-golden-master-functional` em `5ce81b589f5448deedb75b5317609f08c8e955d0` foi mantida separada. O arquivo ISO de baseline não foi substituído.

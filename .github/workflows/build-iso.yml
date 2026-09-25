@@ -85,6 +85,11 @@ jobs:
           find scripts/ -name "*.sh" | xargs -r chmod 755
           echo "Line endings corrigidos"
 
+      - name: Verificar tema SDDM com Qt 6 do Debian Trixie
+        run: |
+          docker run --rm --volume "$GITHUB_WORKSPACE:/src:ro" debian:trixie-slim \
+            bash -ec 'apt-get update -qq && apt-get install -y --no-install-recommends sddm xvfb xauth qml6-module-qtquick-window && bash /src/scripts/test-sddm-theme.sh /src/sddm/katu'
+
       - name: Clean build, preflight, final ISO validation and QEMU smoke
         run: sudo bash scripts/build.sh
 

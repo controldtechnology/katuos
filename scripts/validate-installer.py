@@ -21,6 +21,9 @@ def config(name):
     return data
 
 settings = config('settings.conf')
+branding = config('branding/katu/branding.desc')
+assert branding.get('componentName') == 'katu'
+assert (base / 'branding/katu/stylesheet.qss').is_file(), 'Katu Calamares stylesheet is missing'
 configs = {p.stem: config('modules/' + p.name) for p in (base / 'modules').glob('*.conf')}
 steps = [m for step in settings['sequence'] for modules in step.values() for m in modules]
 requirements = configs['welcome']['requirements']
@@ -42,6 +45,13 @@ for mapping in configs['unpackfs']['unpack']:
     assert {'source', 'sourcefs', 'destination'} <= mapping.keys()
 
 if args.root:
+    deployed_brand = args.root / 'etc/calamares/branding/katu'
+    assert (deployed_brand / 'stylesheet.qss').is_file(), 'Calamares Katu stylesheet is not deployed'
+    sddm_theme = args.root / 'usr/share/sddm/themes/katu'
+    assert (sddm_theme / 'Main.qml').is_file(), 'Katu SDDM theme is not deployed'
+    sddm_config = args.root / 'etc/sddm.conf.d/katu.conf'
+    assert sddm_config.is_file(), 'Katu SDDM configuration is missing'
+    assert 'Current=katu' in sddm_config.read_text(encoding='utf-8'), 'Katu SDDM theme is not selected'
     module_dirs = list((args.root / 'usr/lib').glob('**/calamares/modules'))
     for name in set(steps):
         assert any((d / name).is_dir() for d in module_dirs), f'Module not installed: {name}'

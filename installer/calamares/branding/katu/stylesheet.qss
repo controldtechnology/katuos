@@ -1,0 +1,110 @@
+/* Katu OS installer: styling only; Calamares modules and navigation unchanged. */
+QWidget {
+    color: #EEEEDD;
+    background-color: #001111;
+    selection-background-color: #114433;
+    selection-color: #EEEEDD;
+    font-family: "Noto Sans";
+}
+
+QMainWindow, QDialog, QWidget#centralWidget {
+    background-color: #001111;
+}
+
+QLabel {
+    color: #EEEEDD;
+    background-color: transparent;
+}
+
+QPushButton {
+    color: #EEEEDD;
+    background-color: #003322;
+    border: 1px solid #114433;
+    border-radius: 7px;
+    padding: 8px 16px;
+    min-height: 22px;
+}
+
+QPushButton:hover {
+    background-color: #114433;
+    border-color: #DDAA44;
+}
+
+QPushButton:pressed, QPushButton:checked {
+    color: #001111;
+    background-color: #DDAA44;
+    border-color: #DDAA44;
+}
+
+QPushButton:disabled {
+    color: #9CAB9F;
+    background-color: #002211;
+    border-color: #003322;
+}
+
+QLineEdit, QComboBox, QSpinBox, QDoubleSpinBox, QDateTimeEdit {
+    color: #EEEEDD;
+    background-color: #002211;
+    border: 1px solid #114433;
+    border-radius: 6px;
+    padding: 6px 9px;
+    selection-background-color: #114433;
+}
+
+QLineEdit:focus, QComboBox:focus, QSpinBox:focus, QDoubleSpinBox:focus {
+    border: 2px solid #FFCC55;
+}
+
+QListView, QTreeView, QTableView {
+    color: #EEEEDD;
+    background-color: #002211;
+    alternate-background-color: #003322;
+    border: 1px solid #114433;
+    selection-background-color: #114433;
+    selection-color: #EEEEDD;
+}
+
+QAbstractItemView::item:hover {
+    background-color: #114433;
+}
+
+QProgressBar {
+    color: #EEEEDD;
+    background-color: #002211;
+    border: 1px solid #114433;
+    border-radius: 5px;
+    text-align: center;
+}
+
+QProgressBar::chunk {
+    background-color: #33CC77;
+    border-radius: 4px;
+}
+
+QScrollBar:vertical {
+    width: 10px;
+    background-color: #001111;
+    margin: 2px;
+}
+
+QScrollBar::handle:vertical {
+    min-height: 24px;
+    background-color: #114433;
+    border-radius: 4px;
+}
+
+QScrollBar::handle:vertical:hover {
+    background-color: #33CC77;
+}
+
+QToolTip {
+    color: #EEEEDD;
+    background-color: #003322;
+    border: 1px solid #114433;
+    padding: 5px;
+}
+
+QWidget#sidebarApp {
+    color: #EEEEDD;
+    background-color: #001111;
+}

@@ -1,25 +1,38 @@
-# Regressão funcional — reconstrução visual Katu OS
+# Validação funcional da candidata visual Katu OS
 
-**Estado geral:** pendente para a nova ISO. Nenhum PASS funcional da ISO reconstruída é presumido.
+**Estado: validação funcional parcial concluída; ainda não é aprovação para produção.** Os testes abaixo foram feitos na ISO exata de SHA-256 `f6f0fddb170e63c0c0555d0f5979946c1cf14f16c08fccc657f08ef587aa32ca`, build do commit `48223e8`.
 
-| Verificação | Estado | Evidência/limite |
+| Verificação | Resultado | Evidência / limite |
 |---|---|---|
-| Testes unitários do repositório | PASS | 12 testes existentes passaram nesta branch |
-| Validador de branding Calamares | PASS | `python scripts/validate-installer.py` |
-| Compilação sintática Python do Welcome | PASS | `python -m py_compile .../main.py` |
-| JSON e XML/SVG dos novos assets | PASS | parsing local de `metadata.json`, `panel-background.svg`, `viewitem.svg` |
-| Espelhos do SDDM, Calamares e layout Plasma | PASS | hashes/comparação de arquivo depois da sincronização |
-| QML SDDM e slideshow | NOT AUTOMATICALLY VERIFIED | `qmllint`/runtime Plasma e Calamares não disponíveis neste host |
-| Estrutura de boot da ISO `04fe5b6` | PASS estático | GRUB, BIOS e UEFI validados; ISO SHA-256 `066b2e72a38a4777cfc57f28ad87913b6f1ee7658ff844fa645a75f92bccabfc` |
-| Smoke Live/Plasma da ISO `04fe5b6` | FAIL/INCONCLUSIVO | QEMU encerrou aos 600 s antes do marcador de Plasma/DBus/overlay; SDDM iniciou e serviço de autologin finalizou. Limite será ampliado e a build repetida. |
-| GRUB/UEFI/BIOS/Live em VirtualBox | NOT RUN nesta branch | base dourada preservada em `5ce81b589f5448deedb75b5317609f08c8e955d0`; teste visual e de instalação da nova imagem pendentes |
-| Abrir Calamares, particionar e instalar | NOT RUN nesta branch | somente `show.qml` e assets de branding mudaram; regressão real ainda necessária |
-| Reboot, SDDM, login e desktop instalado | NOT RUN nesta branch | pendente de VM limpa com a nova ISO |
+| Build e validação estrutural da ISO | PASS | CI run `36129854861`; 11 verificações estruturais, BIOS/UEFI e QEMU Live smoke passaram. |
+| GRUB e boot da ISO | PASS | Candidata iniciou na VM separada de QA em modo BIOS/Legacy. |
+| Live e desktop Plasma | PASS | Desktop Live abriu em VirtualBox VBoxSVGA, 1024×768. |
+| Welcome no Live | PASS | Uma janela visível; correção da duplicidade confirmada visualmente. |
+| Iniciar Calamares | PASS | Instalador abriu em português brasileiro. |
+| Navegação e configuração de instalação | PASS | Localização, teclado, disco-alvo, usuário e resumo percorridos. Disco QA vazio de 32 GiB foi o único alvo. |
+| Instalação | PASS | Calamares mostrou “Katu OS 1.0 foi instalado no seu computador” e habilitou Concluído. |
+| Reinício e boot sem ISO | PASS | ISO ejetada, ordem definida para disco; sistema instalado iniciou em BIOS/MBR. |
+| SDDM e autenticação | PASS | SDDM apresentou o usuário de teste; credenciais configuradas apenas para esta VM autenticaram com sucesso. |
+| Desktop instalado | PASS | Plasma carregou wallpaper oficial e Welcome de primeiro acesso; Welcome fechou sem bloquear a sessão. |
+| Menu Katu | PASS | Launcher abriu com busca, favoritos, categorias e opções de energia. |
+| Calamares em UEFI | NOT TESTED | Validação estrutural UEFI passou, mas instalação manual foi apenas em BIOS/Legacy. |
+| Resoluções e escala ampliada | NOT TESTED | QA visual desta VM ocorreu em 1024×768; não generalizar para outras resoluções/escalas. |
+| Dolphin, Settings, notificações, lockscreen | NOT TESTED nesta instalação | Não foram percorridos individualmente após login. |
 
-## Proteção da base
+## Capturas reais
 
-- Baseline/tag preservada: `katu-os-golden-master-functional` → `5ce81b589f5448deedb75b5317609f08c8e955d0`.
-- Branch isolada: `visual/katu-premium-reconstruction`.
-- Não foram alterados scripts de build, kernel, initramfs, parâmetros GRUB, particionamento ou módulos do Calamares. O hook de autostart do Live mudou apenas para apresentar a escolha visual de boas-vindas; precisa de regressão na ISO.
-- O layout do painel e temas são configurações de apresentação e ainda necessitam ser exercitados no Plasma da imagem final.
-- A interface Live agora apresenta boas-vindas; o botão de instalação chama o wrapper existente `katu-installer`, sem modificar Calamares. As entradas global e de usuário usam o mesmo nome XDG para evitar janelas duplicadas; a inicialização dessa apresentação continua pendente de ISO/VM e não é declarada PASS.
+As capturas estão em `output/FINAL-VISUAL-QA/`:
+
+- `candidate-48223e8-boot.png`, `candidate-one-welcome.png`: boot Live e Welcome sem duplicidade.
+- `candidate-calamares-start.png`, `candidate-calamares-step.png`, `candidate-calamares-user.png`, `candidate-calamares-confirm.png`, `candidate-calamares-progress.png`: páginas do instalador, resumo e progresso.
+- `install-progress-10.png`: tela de conclusão do Calamares.
+- `installed-login-result-2.png`: desktop instalado com Welcome de primeiro acesso.
+- `installed-desktop-clean.png`: desktop sem janelas.
+- `installed-launcher.png`: menu Katu aberto.
+
+## Observações
+
+- A sessão SDDM/Plasma iniciou e autenticou, mas a tela de login apareceu clara e genérica em vez da composição Katu esperada. Esse é um defeito visual observado, não uma falha de autenticação.
+- A interface principal do Calamares mostrou slides oficiais e sidebar Katu, mas a área de conteúdo permaneceu clara/genérica. O fluxo funcional foi concluído.
+- Não foram executados testes de instalação em UEFI, escalas, múltiplas resoluções ou todas as aplicações. Não declarar esses cenários aprovados.
+- A Golden Master funcional permanece intacta na tag `katu-os-golden-master-functional` (`5ce81b589f5448deedb75b5317609f08c8e955d0`).

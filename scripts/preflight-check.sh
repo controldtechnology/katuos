@@ -8,6 +8,9 @@ done
 python3 "$ROOT/scripts/validate-installer.py"
 cmp "$ROOT/plasma/look-and-feel/org.katuos.desktop/contents/layouts/org.kde.plasma.desktop-layout.js" \
     "$ROOT/config/includes.chroot/usr/share/plasma/look-and-feel/org.katuos.desktop/contents/layouts/org.kde.plasma.desktop-layout.js"
+cmp "$ROOT/sddm/katu/Main.qml" "$ROOT/config/includes.chroot/usr/share/sddm/themes/katu/Main.qml"
+cmp "$ROOT/installer/calamares/branding/katu/stylesheet.qss" \
+    "$ROOT/config/includes.chroot/etc/calamares/branding/katu/stylesheet.qss"
 python3 - "$ROOT" "$@" <<'PY'
 import sys, tempfile
 from pathlib import Path
