@@ -2,13 +2,13 @@
 # Run the actual Katu greeter with Debian Trixie's Qt 6 SDDM under Xvfb.
 set -Eeuo pipefail
 THEME=${1:?usage: test-sddm-theme.sh THEME-DIRECTORY}
-command -v sddm-greeter >/dev/null
+GREETER=$(command -v sddm-greeter-qt6 || command -v sddm-greeter)
 command -v xvfb-run >/dev/null
 LOG=$(mktemp)
 trap 'rm -f "$LOG"' EXIT
 set +e
 timeout --foreground 15s xvfb-run -a env QT_QUICK_BACKEND=software \
-    sddm-greeter --test-mode --theme "$THEME" >"$LOG" 2>&1
+    "$GREETER" --test-mode --theme "$THEME" >"$LOG" 2>&1
 status=$?
 set -e
 cat "$LOG"
