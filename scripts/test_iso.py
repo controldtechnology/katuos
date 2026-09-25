@@ -45,7 +45,14 @@ try:
                    '-serial', 'file:' + str(serial), '-nic', 'user,model=e1000',
                    '-cdrom', str(args.iso.resolve()), '-kernel', str(work / 'vmlinuz'),
                    '-initrd', str(work / 'initrd'), '-append',
-                   ' '.join(boot_params + ['console=tty0', 'console=ttyS0,115200', f'katu.qa={nonce}'])]
+                   # Keep systemd from spawning a second interactive shell on
+                   # the same serial port used by the smoke service. The
+                   # serial getty otherwise races SDDM/Qt terminal queries and
+                   # can consume the QA service's output before it reports the
+                   # Live desktop marker.
+                   ' '.join(boot_params + ['console=tty0', 'console=ttyS0,115200',
+                                           'systemd.mask=serial-getty@ttyS0.service',
+                                           f'katu.qa={nonce}'])]
         with stderr.open('w') as error_log:
             process = subprocess.Popen(command, stdout=error_log, stderr=error_log)
             deadline = time.monotonic() + args.timeout
