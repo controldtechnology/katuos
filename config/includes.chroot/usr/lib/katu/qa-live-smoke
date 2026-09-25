@@ -24,7 +24,10 @@ nonce=$(sed -n 's/.*katu.qa=\([a-f0-9]*\).*/\1/p' /proc/cmdline)
 [[ $nonce =~ ^[a-f0-9]{32}$ ]]
 echo "KATU_QA_START:$nonce"
 id katu
+set -x
+echo KATU_QA_CONFIG_READ_BEGIN
 grep -E '^\[(Autologin|General)\]|^(User|Session|Relogin)=' /etc/sddm.conf.d/zz-katu-live-autologin.conf || true
+echo KATU_QA_CONFIG_READ_END
 echo 'KATU_QA_LOOP_BEGIN'
 for ((attempt = 1; attempt <= 110; attempt++)); do
     if (( attempt % 10 == 0 )); then
