@@ -25,3 +25,16 @@ User=katu
 Session=$session
 Relogin=false
 EOF
+
+# No Live, o welcome editorial é aberto uma única vez pelo katu-live-start.
+# Desativar apenas para este usuário a entrada de first boot do desktop; ela
+# continua habilitada no sistema instalado, onde o usuário novo vem de /etc/skel.
+welcome_dir=/home/katu/.config/autostart
+install -d -o katu -g katu -m 755 "$welcome_dir"
+cat > "$welcome_dir/katu-welcome-firstboot.desktop" <<'EOF'
+[Desktop Entry]
+Type=Application
+Name=Katu Welcome (First Boot)
+Hidden=true
+EOF
+chown katu:katu "$welcome_dir/katu-welcome-firstboot.desktop"
