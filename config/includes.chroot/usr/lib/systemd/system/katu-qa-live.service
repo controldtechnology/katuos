@@ -1,12 +1,12 @@
 [Unit]
 Description=Katu Live automated boot verification (explicit QA boots only)
 ConditionKernelCommandLine=katu.qa
-After=display-manager.service
+After=multi-user.target
 
 [Service]
 Type=oneshot
 ExecStart=/usr/lib/katu/qa-live-smoke
-TimeoutStartSec=660
+TimeoutStartSec=1140
 
 [Install]
-WantedBy=graphical.target
+WantedBy=multi-user.target

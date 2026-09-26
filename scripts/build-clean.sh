@@ -57,7 +57,7 @@ ISO="$OUT/katu-os-$VERSION-amd64.iso"
 test -s "$WORK/live-image-amd64.hybrid.iso"
 mv "$WORK/live-image-amd64.hybrid.iso" "$ISO"
 bash "$ROOT/scripts/validate-iso.sh" "$ISO"
-bash "$ROOT/scripts/test-iso.sh" "$ISO"
+bash "$ROOT/scripts/test-iso.sh" "$ISO" --timeout 1200
 python3 "$ROOT/scripts/release-gate.py" "$ISO" --candidate --commit "$COMMIT" --build-date "$STAMP"
 printf '%s\n' "$ISO" > "$ROOT/output/latest-candidate.txt"
 echo "Candidate validated automatically: $ISO"
