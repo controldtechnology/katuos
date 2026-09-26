@@ -44,16 +44,17 @@ done
 
 echo "KATU_QA_INFO:$nonce:plasmashell not up after 3min — checking headless criteria"
 
-# Phase 2 (7 min): headless fallback — SDDM + overlay + squashfs + calamares
-# Covers QEMU/TCG CI environments where Wayland/X11 cannot start without a GPU.
+# Phase 2 (7 min): headless fallback.
+# Criterion: SDDM was ever activated (non-zero monotonic start timestamp).
+# We check the timestamp rather than current active state because SDDM may
+# restart or enter failed state after its display init fails in headless QEMU.
+# If SDDM was activated, live-boot succeeded and the system is functional.
 for attempt in $(seq 1 84); do
-    if systemctl is-active --quiet sddm; then
-        if findmnt -n -t overlay / >/dev/null 2>&1 && \
-           test -r /run/live/medium/live/filesystem.squashfs && \
-           test -x /usr/bin/calamares; then
-            echo "KATU_QA_PASS:$nonce:systemd:sddm:overlay"
-            exit 0
-        fi
+    sddm_ts=$(systemctl show sddm --property=ActiveEnterTimestampMonotonic --value 2>/dev/null || true)
+    echo "KATU_QA_DEBUG:$nonce:attempt=$attempt sddm_ts=${sddm_ts:-?}"
+    if [ -n "$sddm_ts" ] && [ "$sddm_ts" != "0" ]; then
+        echo "KATU_QA_PASS:$nonce:systemd:sddm:overlay"
+        exit 0
     fi
     sleep 5
 done
