@@ -1,7 +1,7 @@
 #!/bin/bash
 # Script executado no boot do live para configurar ambiente e iniciar instalador
 
-WALLPAPER="/usr/share/wallpapers/katu/contents/images/katu-amazonia-4k.png"
+WALLPAPER="/usr/share/wallpapers/katu/contents/images/katu-brand-full-4k.png"
 MARKER="$HOME/.katu-live-configured"
 
 # Aplicar wallpaper Katu OS (só na primeira vez por sessão)

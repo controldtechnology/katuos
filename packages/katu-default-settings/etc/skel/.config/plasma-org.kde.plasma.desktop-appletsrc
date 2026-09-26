@@ -97,8 +97,8 @@ x=1550
 y=340
 
 [Containments][1][Wallpaper][org.kde.image][General]
-Image=/usr/share/wallpapers/katu/contents/images/katu-amazonia-4k.png
-PreviewImage=/usr/share/wallpapers/katu/contents/images/katu-amazonia-4k.png
+Image=/usr/share/wallpapers/katu/contents/images/katu-brand-full-4k.png
+PreviewImage=/usr/share/wallpapers/katu/contents/images/katu-brand-full-4k.png
 SlidePaths=/usr/share/wallpapers/katu/contents/images/
 
 [Containments][1][Configuration][General]
