@@ -24,7 +24,7 @@ echo "KATU_QA_START:$nonce"
 id katu
 systemctl is-enabled katu-live-autologin.service
 systemctl status katu-live-autologin.service --no-pager || true
-for attempt in $(seq 1 110); do
+for attempt in $(seq 1 180); do
     if systemctl is-active --quiet sddm && pgrep -u katu -x plasmashell >/dev/null; then
         uid=$(id -u katu)
         if runuser -u katu -- env XDG_RUNTIME_DIR="/run/user/$uid" \

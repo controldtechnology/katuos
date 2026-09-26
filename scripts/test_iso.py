@@ -37,7 +37,8 @@ try:
         nonce = secrets.token_hex(16)
         serial = Path(str(args.iso) + '.serial.log')
         stderr = Path(str(args.iso) + '.qemu.log')
-        command = ['qemu-system-x86_64', '-machine', 'q35', '-accel', 'tcg', '-m', '4096', '-smp', '2',
+        accel = 'kvm' if Path('/dev/kvm').exists() else 'tcg'
+        command = ['qemu-system-x86_64', '-machine', 'q35', '-accel', accel, '-m', '4096', '-smp', '2',
                    '-display', 'none', '-vga', 'std', '-no-reboot', '-monitor', 'none',
                    '-serial', 'file:' + str(serial), '-nic', 'user,model=e1000',
                    '-cdrom', str(args.iso.resolve()), '-kernel', str(work / 'vmlinuz'),

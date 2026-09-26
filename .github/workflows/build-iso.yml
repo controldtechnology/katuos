@@ -44,7 +44,7 @@ jobs:
             debootstrap squashfs-tools xorriso isolinux \
             syslinux-common syslinux-efi dpkg-dev apt-utils rsync \
             gzip xz-utils wget curl ca-certificates gnupg dos2unix \
-            python3-pyqt5 python3-pip python3-yaml initramfs-tools-core zstd lz4 cpio mtools grub-common qemu-system-x86
+            python3-pyqt5 python3-pip python3-yaml initramfs-tools-core zstd lz4 cpio mtools grub-common qemu-system-x86 qemu-kvm
 
           # Instalar live-build e debian-archive-keyring do Debian Trixie
           # (Ubuntu 2021 keyring nao tem a chave Trixie 762F67A0B2C39DE4)
@@ -84,6 +84,15 @@ jobs:
           find config/hooks/ -name "*.chroot" -o -name "*.binary" | xargs -r chmod 755
           find scripts/ -name "*.sh" | xargs -r chmod 755
           echo "Line endings corrigidos"
+
+      # ── 5. Habilitar KVM para smoke test mais rapido ──────────────────
+      - name: Habilitar KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' \
+            | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+          ls -la /dev/kvm && echo "KVM disponivel" || echo "KVM indisponivel — TCG fallback"
 
       - name: Clean build, preflight, final ISO validation and QEMU smoke
         run: sudo bash scripts/build.sh
