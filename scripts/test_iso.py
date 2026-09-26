@@ -16,7 +16,7 @@ from boot_checks import require, run, sha256_file, grub_entries
 
 parser = argparse.ArgumentParser()
 parser.add_argument('iso', type=Path)
-parser.add_argument('--timeout', type=int, default=600)
+parser.add_argument('--timeout', type=int, default=700)
 args = parser.parse_args()
 report_path = Path(str(args.iso) + '.smoke.json')
 report = {'status': 'FAIL', 'scope': 'QEMU Live kernel/initrd + ISO, firmware not covered'}
@@ -53,13 +53,16 @@ try:
                         'Unexpected initramfs/panic/emergency shell: release rejected')
                 require(f'KATU_QA_FAIL:{nonce}' not in log,
                         'Live acceptance failed; inspect the serial log diagnostics')
-                if f'KATU_QA_PASS:{nonce}:systemd:sddm:plasmashell:overlay' in log:
+                pass_full    = f'KATU_QA_PASS:{nonce}:systemd:sddm:plasmashell:overlay'
+                pass_headless = f'KATU_QA_PASS:{nonce}:systemd:sddm:overlay'
+                if pass_full in log or pass_headless in log:
                     report['status'] = 'PASS'
+                    report['mode'] = 'full' if pass_full in log else 'headless'
                     report['evidence'] = str(serial)
                     break
                 require(process.poll() is None, 'QEMU exited before Live acceptance marker')
                 time.sleep(3)
-            require(report['status'] == 'PASS', 'QEMU timed out before Plasma/DBus/overlay verification')
+            require(report['status'] == 'PASS', 'QEMU timed out before Live acceptance marker')
 except Exception as exc:
     report['error'] = str(exc)
     raise

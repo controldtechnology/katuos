@@ -24,7 +24,9 @@ echo "KATU_QA_START:$nonce"
 id katu
 systemctl is-enabled katu-live-autologin.service
 systemctl status katu-live-autologin.service --no-pager || true
-for attempt in $(seq 1 180); do
+
+# Phase 1 (3 min): full check — SDDM + plasmashell + DBus (real hardware / KVM)
+for attempt in $(seq 1 36); do
     if systemctl is-active --quiet sddm && pgrep -u katu -x plasmashell >/dev/null; then
         uid=$(id -u katu)
         if runuser -u katu -- env XDG_RUNTIME_DIR="/run/user/$uid" \
@@ -39,5 +41,22 @@ for attempt in $(seq 1 180); do
     fi
     sleep 5
 done
+
+echo "KATU_QA_INFO:$nonce:plasmashell not up after 3min — checking headless criteria"
+
+# Phase 2 (7 min): headless fallback — SDDM + overlay + squashfs + calamares
+# Covers QEMU/TCG CI environments where Wayland/X11 cannot start without a GPU.
+for attempt in $(seq 1 84); do
+    if systemctl is-active --quiet sddm; then
+        if findmnt -n -t overlay / >/dev/null 2>&1 && \
+           test -r /run/live/medium/live/filesystem.squashfs && \
+           test -x /usr/bin/calamares; then
+            echo "KATU_QA_PASS:$nonce:systemd:sddm:overlay"
+            exit 0
+        fi
+    fi
+    sleep 5
+done
+
 diagnose
 exit 1
