@@ -230,10 +230,17 @@ process(img("17_41_29"), CAL / "icon.png", (96, 96))
 # Welcome background (right panel of Bem-vindo step)
 process(img("17_12_03"), CAL / "welcome.png", (1024, 576))
 
-# 6 installation slides from the final-assets pack
-for i in range(1, 7):
-    fname = f"slide-{i:02d}.png"
-    copy(pack("installer", "calamares", "slides", fname), CAL / fname)
+# 6 installation slides — generated from real Katu photorealistic images
+SLIDE_SOURCES = [
+    img("17_12_03"),                     # 01 jaguar+Amazon sunset
+    img("16_55_58"),                     # 02 hero KATU OS text
+    img("18_02_16"),                     # 03 globe+cursor browser
+    img("17_48_29"),                     # 04 circular backup+jaguar
+    site("brasil-onca-horizonte.png"),   # 05 panorama Brasil
+    img("17_26_25"),                     # 06 river Amazon
+]
+for i, src in enumerate(SLIDE_SOURCES, 1):
+    process(src, CAL / f"slide-{i:02d}.png", (1280, 720), mode="RGB")
 
 # ─────────────────────────────────────────────────────────────────────────────
 # 8. LIVE WELCOME IMAGE  + branding assets
