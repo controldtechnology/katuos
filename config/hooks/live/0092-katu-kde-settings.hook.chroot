@@ -106,7 +106,7 @@ smallestReadableFont=Noto Sans,8,-1,5,50,0,0,0,0,0
 toolBarFont=Noto Sans,10,-1,5,50,0,0,0,0,0
 
 [Icons]
-Theme=breeze-dark
+Theme=katu
 
 [KDE]
 LookAndFeelPackage=org.katuos.desktop
@@ -142,5 +142,13 @@ EOF
 
 # Tornar katu-live-start executável
 chmod +x /usr/bin/katu-live-start 2>/dev/null || true
+
+# Atualizar cache do tema de ícones katu para que GTK e KDE reconheçam
+if [ -d /usr/share/icons/katu ]; then
+    gtk-update-icon-cache -f -t /usr/share/icons/katu 2>/dev/null || true
+fi
+if [ -d /usr/share/icons/hicolor ]; then
+    gtk-update-icon-cache -f -t /usr/share/icons/hicolor 2>/dev/null || true
+fi
 
 echo ">>> [Katu Hook] Configurações KDE aplicadas."
