@@ -1,0 +1,7 @@
+[Unit]
+Description=Katu OS Update Checker
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 -c "import subprocess; r = subprocess.run(['apt-get', 'update', '-qq'], capture_output=True, timeout=60); subprocess.run(['notify-send', '-a', 'Katu Update', '-i', 'system-software-update', 'Verificação concluída', 'Abra o Katu Update para ver atualizações disponíveis'], capture_output=True)"

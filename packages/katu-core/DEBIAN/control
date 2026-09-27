@@ -1,0 +1,13 @@
+Package: katu-core
+Version: 1.0.1
+Architecture: all
+Maintainer: Katu OS Team <katuos@gmail.com>
+Depends: python3 (>= 3.10), python3-requests, katu-release
+Recommends: python3-dbus, libnotify-bin, python3-secretstorage
+Priority: required
+Section: misc
+Description: Katu OS Core Library
+ Shared Python library used by all Katu OS applications.
+ Provides: system information, configuration management,
+ desktop notifications, action registry, package management
+ integration, secure secret storage and shared UI kit.

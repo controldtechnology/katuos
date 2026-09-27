@@ -1,0 +1,15 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Katu Update
+Name[pt_BR]=Katu Update
+GenericName=Gerenciador de Atualizações
+GenericName[pt_BR]=Gerenciador de Atualizações
+Comment=Mantenha o Katu OS atualizado
+Comment[pt_BR]=Mantenha o Katu OS atualizado
+Exec=katu-update
+Icon=katu-logo
+Terminal=false
+Categories=System;
+Keywords=atualizar;update;atualizações;sistema;apt;flatpak;
+StartupNotify=true

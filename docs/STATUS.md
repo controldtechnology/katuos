@@ -1,6 +1,19 @@
 # STATUS — KATU OS
 
-Atualizado: 2026-09-22
+Atualizado: 2026-09-27
+
+## Estado atual do projeto — registro de continuidade
+
+- Branch de trabalho: `visual/katu-brand-identity`
+- ISO baseline preservada: `dist/smoke-diag-36261032057/.../katu-os-1.0.1-rc1-amd64.iso` (SHA256: `327b2d376abd738e1f49643ba8b7cd59e8b4cfe15d4e76af63adf95df5df7142`, 3.25 GB)
+- **ECOSSISTEMA IMPLEMENTADO:** 18 componentes criados/atualizados — ver `docs/KATU-ECOSYSTEM-REPORT.md` para detalhe completo
+- katu-core (biblioteca base), katu-central, katu-ai (BYOK), katu-store, katu-update, katu-drivers, katu-connect, katu-backup, katu-webapps, katu-help, katu-diagnostic, katu-feedback implementados
+- katu-welcome evoluído para 9 passos com live mode detection
+- Integração KDE: categoria "Katu OS" no menu, autostart welcome, atalho Meta+Shift+A para Katu AI
+- Segurança: 11/11 testes passando (`bash scripts/test-security.sh`)
+- **Próximo passo:** rodar `sudo bash scripts/build-clean.sh` em ambiente Linux para gerar `katu-os-1.0.1-ecosystem-amd64.iso` e testar o flow completo
+
+O material abaixo deste registro contém status e roadmap históricos; usar este bloco como estado vigente.
 
 ## Situação atual — build concluído e boot live aprovado no VirtualBox
 

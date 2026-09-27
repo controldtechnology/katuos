@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Katu Diagnostic
+Name[pt_BR]=Katu Diagnostic
+GenericName=Diagnóstico do Sistema
+GenericName[pt_BR]=Diagnóstico do Sistema
+Exec=katu-diagnostic
+Icon=katu-logo
+Terminal=false
+Categories=System;
+StartupNotify=true

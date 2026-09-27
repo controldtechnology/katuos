@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Katu Feedback
+Name[pt_BR]=Katu Feedback
+GenericName=Enviar Feedback
+GenericName[pt_BR]=Enviar Feedback
+Exec=katu-feedback
+Icon=katu-logo
+Terminal=false
+Categories=System;
+StartupNotify=true

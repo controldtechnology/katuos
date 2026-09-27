@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Katu Backup
+Name[pt_BR]=Katu Backup
+GenericName=Backup e Restauração
+GenericName[pt_BR]=Backup e Restauração
+Exec=katu-backup
+Icon=katu-logo
+Terminal=false
+Categories=System;
+StartupNotify=true

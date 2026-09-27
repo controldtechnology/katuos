@@ -1,0 +1,16 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Katu AI
+Name[pt_BR]=Katu AI
+GenericName=Assistente de IA
+GenericName[pt_BR]=Assistente de IA
+Comment=Assistente de inteligência artificial do Katu OS
+Comment[pt_BR]=Assistente de inteligência artificial do Katu OS
+Exec=katu-ai
+Icon=katu-logo
+Terminal=false
+Categories=Utility;ArtificialIntelligence;
+Keywords=ia;ai;assistente;claude;gpt;gemini;ollama;chat;katu;
+StartupNotify=true
+X-KDE-StartupNotify=true

@@ -1,0 +1,34 @@
+#!/bin/bash
+# Hook: Verificação de segurança — garante que nenhuma chave de API ou credencial
+# foi acidentalmente incluída nos pacotes Katu OS
+set -e
+
+echo "[KATU SECURITY] Varrendo arquivos em busca de credenciais..."
+
+FOUND=0
+SCAN_DIRS="/usr/lib/katu-ai /usr/lib/katu-ia /usr/lib/katu-central /usr/lib/katu-store /usr/lib/katu-core"
+
+for dir in $SCAN_DIRS; do
+    [ -d "$dir" ] || continue
+    # Patterns that indicate hardcoded secrets
+    if grep -rE "(sk-[A-Za-z0-9]{20,}|AKIA[A-Z0-9]{16}|AIza[A-Za-z0-9_-]{35}|[Aa][Pp][Ii]_?[Kk][Ee][Yy]\s*=\s*['\"][^'\"]{8,})" \
+        --include="*.py" --include="*.json" --include="*.conf" \
+        "$dir" 2>/dev/null; then
+        echo "[KATU SECURITY] ERRO: Credencial encontrada em $dir"
+        FOUND=1
+    fi
+done
+
+# Check .desktop files for embedded keys
+if grep -rE "(sk-[A-Za-z0-9]{20,}|API_KEY|SECRET)" \
+    /usr/share/applications/katu-*.desktop 2>/dev/null; then
+    echo "[KATU SECURITY] ERRO: Credencial encontrada em arquivo .desktop"
+    FOUND=1
+fi
+
+if [ "$FOUND" -eq 1 ]; then
+    echo "[KATU SECURITY] FALHA: Credenciais encontradas no build. Abortando."
+    exit 1
+fi
+
+echo "[KATU SECURITY] OK: Nenhuma credencial hardcoded encontrada."

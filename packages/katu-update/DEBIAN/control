@@ -1,0 +1,11 @@
+Package: katu-update
+Version: 1.0.1
+Architecture: all
+Maintainer: Katu OS Team <katuos@gmail.com>
+Depends: python3 (>= 3.10), python3-pyqt5 | python3-pyside6, katu-core
+Priority: optional
+Section: misc
+Description: Katu Update — System Updates
+ Graphical update manager for Katu OS. Check and install
+ APT and Flatpak updates without using the terminal.
+ Never reboots automatically without user confirmation.

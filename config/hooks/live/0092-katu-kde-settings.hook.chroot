@@ -27,6 +27,9 @@ Show Dashboard=Meta+D,Meta+D,Mostrar área de trabalho
 activate task manager entry 1=Meta+1,Meta+1,Ativar entrada 1 da barra de tarefas
 activate task manager entry 2=Meta+2,Meta+2,Ativar entrada 2 da barra de tarefas
 activate task manager entry 3=Meta+3,Meta+3,Ativar entrada 3 da barra de tarefas
+
+[katu-ai.desktop]
+_launch=Meta+Shift+A,none,Katu AI
 EOF
 
 # Plasma notifications — PT-BR
@@ -129,6 +132,17 @@ Terminal=false
 X-GNOME-Autostart-enabled=true
 EOF
 
+# Autostart: Katu Welcome — exibe apenas no primeiro boot (app verifica flag)
+cat > "${SKEL_CONFIG}/autostart/katu-welcome.desktop" << 'EOF'
+[Desktop Entry]
+Type=Application
+Name=Katu Welcome
+Exec=/usr/bin/katu-welcome
+Terminal=false
+X-GNOME-Autostart-enabled=true
+X-KDE-autostart-after=panel
+EOF
+
 # Permissão para Calamares rodar via polkit sem senha no live
 mkdir -p /etc/polkit-1/rules.d
 cat > /etc/polkit-1/rules.d/49-katu-calamares.rules << 'EOF'
@@ -142,6 +156,20 @@ EOF
 
 # Tornar katu-live-start executável
 chmod +x /usr/bin/katu-live-start 2>/dev/null || true
+
+# Adicionar categoria X-Katu a todos os .desktop files dos apps Katu
+# Isso faz eles aparecerem no submenu "Katu OS" do menu de aplicativos
+for df in /usr/share/applications/katu-*.desktop; do
+    [ -f "$df" ] || continue
+    if ! grep -q "^Categories=" "$df"; then
+        echo "Categories=X-Katu;" >> "$df"
+    elif ! grep -q "X-Katu" "$df"; then
+        sed -i 's/^Categories=\(.*\)/Categories=\1X-Katu;/' "$df"
+    fi
+done
+
+# Atualizar cache de menus
+update-desktop-database /usr/share/applications 2>/dev/null || true
 
 # Atualizar cache do tema de ícones katu para que GTK e KDE reconheçam
 if [ -d /usr/share/icons/katu ]; then

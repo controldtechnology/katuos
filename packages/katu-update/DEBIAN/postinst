@@ -1,0 +1,11 @@
+#!/bin/bash
+set -e
+chmod 755 /usr/bin/katu-update
+
+# Enable update check timer for all existing users (systemd --user)
+systemctl daemon-reload 2>/dev/null || true
+for uid in $(awk -F: '$3 >= 1000 && $3 < 65534 {print $3}' /etc/passwd); do
+    systemctl --machine="${uid}@.host" --user enable --now katu-update-check.timer 2>/dev/null || true
+done
+
+exit 0

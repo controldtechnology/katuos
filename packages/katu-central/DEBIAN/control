@@ -1,0 +1,12 @@
+Package: katu-central
+Version: 1.0.1
+Architecture: all
+Maintainer: Katu OS Team <katuos@gmail.com>
+Depends: python3 (>= 3.10), python3-pyqt5 | python3-pyside6, katu-core, katu-release
+Priority: optional
+Section: misc
+Description: Katu Central — Control Panel
+ Main control panel for Katu OS. Provides a dashboard with real
+ system status and quick access to all Katu applications:
+ updates, drivers, store, AI, security, backup, devices,
+ diagnostics and help.

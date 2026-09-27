@@ -1,0 +1,15 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Katu Store
+Name[pt_BR]=Katu Store
+GenericName=Loja de Aplicativos
+GenericName[pt_BR]=Loja de Aplicativos
+Comment=Instale aplicativos no Katu OS
+Comment[pt_BR]=Instale aplicativos no Katu OS
+Exec=katu-store
+Icon=katu-logo
+Terminal=false
+Categories=System;PackageManager;
+Keywords=loja;apps;aplicativos;instalar;store;flatpak;apt;
+StartupNotify=true

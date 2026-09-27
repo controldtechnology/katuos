@@ -1,0 +1,11 @@
+[Unit]
+Description=Katu OS Update Checker Timer
+Requires=network-online.target
+
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=24h
+Persistent=false
+
+[Install]
+WantedBy=timers.target

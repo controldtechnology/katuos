@@ -1,0 +1,14 @@
+Package: katu-ai
+Version: 1.0.1
+Architecture: all
+Maintainer: Katu OS Team <katuos@gmail.com>
+Depends: python3 (>= 3.10), python3-pyqt5 | python3-pyside6, katu-core, katu-release
+Priority: optional
+Section: misc
+Description: Katu AI — AI Assistant for all users
+ AI assistant application for Katu OS end users.
+ Supports multiple providers: OpenAI (ChatGPT), Claude (Anthropic),
+ Google Gemini, and local models via Ollama. Uses BYOK (Bring Your
+ Own Key) — no keys are bundled or hardcoded. Keys stored securely
+ in user home directory (permission 600). Action Registry prevents
+ arbitrary command execution from AI responses.

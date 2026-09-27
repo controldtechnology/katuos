@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Katu Drivers
+Name[pt_BR]=Katu Drivers
+GenericName=Gerenciador de Drivers
+GenericName[pt_BR]=Gerenciador de Drivers
+Exec=katu-drivers
+Icon=katu-logo
+Terminal=false
+Categories=System;HardwareSettings;
+StartupNotify=true

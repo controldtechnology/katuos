@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Katu Connect
+Name[pt_BR]=Katu Connect
+GenericName=Conectar Dispositivos
+GenericName[pt_BR]=Conectar Dispositivos
+Exec=katu-connect
+Icon=katu-logo
+Terminal=false
+Categories=Network;
+StartupNotify=true

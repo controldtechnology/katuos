@@ -1,0 +1,11 @@
+Package: katu-store
+Version: 1.0.1
+Architecture: all
+Maintainer: Katu OS Team <katuos@gmail.com>
+Depends: python3 (>= 3.10), python3-pyqt5 | python3-pyside6, katu-core, flatpak
+Priority: optional
+Section: misc
+Description: Katu Store — App Store
+ Graphical app store for Katu OS. Install software without
+ using the terminal. Supports APT, Flatpak and web apps.
+ Includes Brasil section with government and financial services.

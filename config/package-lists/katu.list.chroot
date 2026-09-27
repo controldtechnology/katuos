@@ -1,10 +1,26 @@
 # Pacotes próprios Katu OS
 # Estes pacotes são construídos a partir de packages/ e incluídos no build
 
+katu-release
 katu-branding
 katu-default-settings
+
+# Biblioteca base — deve ser instalada antes de qualquer app Katu
+katu-core
+
+# Apps do ecossistema Katu OS
 katu-welcome
-katu-release
+katu-central
+katu-ai
+katu-store
+katu-update
+katu-drivers
+katu-connect
+katu-backup
+katu-webapps
+katu-help
+katu-diagnostic
+katu-feedback
 
 # Instalador
 calamares

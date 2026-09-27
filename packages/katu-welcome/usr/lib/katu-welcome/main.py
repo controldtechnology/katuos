@@ -1,371 +1,514 @@
 #!/usr/bin/env python3
 """
-Katu OS Welcome Application
-Bem-vindo ao Katu OS — Livre. Brasileiro. Para todos.
+Katu OS Welcome — Onboarding para novos usuários
+Executado automaticamente no primeiro login.
 """
-
-import sys
-import os
-import subprocess
+import sys, os, subprocess
+from pathlib import Path
 
 try:
-    from PyQt5.QtWidgets import (
-        QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
-        QLabel, QPushButton, QCheckBox, QScrollArea, QFrame, QGridLayout,
-        QSizePolicy
-    )
-    from PyQt5.QtCore import Qt, QSize, QThread, pyqtSignal
-    from PyQt5.QtGui import QPixmap, QFont, QColor, QPalette, QIcon
-    QT_BACKEND = 'PyQt5'
+    from PyQt5.QtWidgets import *
+    from PyQt5.QtCore import Qt, QThread, pyqtSignal, QTimer, QSize
+    from PyQt5.QtGui import *
+    QT = 'PyQt5'
 except ImportError:
-    try:
-        from PySide6.QtWidgets import (
-            QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
-            QLabel, QPushButton, QCheckBox, QScrollArea, QFrame, QGridLayout,
-            QSizePolicy
-        )
-        from PySide6.QtCore import Qt, QSize, QThread, Signal as pyqtSignal
-        from PySide6.QtGui import QPixmap, QFont, QColor, QPalette, QIcon
-        QT_BACKEND = 'PySide6'
-    except ImportError:
-        print("Erro: PyQt5 ou PySide6 não encontrado.")
-        sys.exit(1)
+    from PySide6.QtWidgets import *
+    from PySide6.QtCore import Qt, QThread, Signal as pyqtSignal, QTimer, QSize
+    from PySide6.QtGui import *
+    QT = 'PySide6'
 
-# === Paleta Amazônia Dark ===
-KATU_VERSION       = "1.0"
-KATU_BG            = "#0d1117"
-KATU_BG_ALT        = "#161b22"
-KATU_BG_CARD       = "#1c2128"
-KATU_BORDER        = "#30363d"
-KATU_BORDER_HOVER  = "#484f58"
-KATU_ACCENT        = "#00c853"
-KATU_ACCENT_HOVER  = "#00e676"
-KATU_ACCENT_PRESSED= "#00a040"
-KATU_AMBER         = "#ffab00"
-KATU_TEXT          = "#e6edf3"
-KATU_TEXT_MUTED    = "#8b949e"
-KATU_NEGATIVE      = "#f85149"
-KATU_LINK          = "#58a6ff"
+sys.path.insert(0, '/usr/lib/python3/dist-packages')
+try:
+    from katu_core import ui, system
+    from katu_core.config import KatuConfig, is_first_boot, mark_first_boot_done, is_live_session
+    CORE = True
+except ImportError:
+    CORE = False
+    class _FakeUI:
+        STYLESHEET = ""; BG = "#0d1117"; SURFACE = "#161b22"; CARD = "#1c2128"
+        BORDER = "#30363d"; ACCENT = "#00c853"; ACCENT_H = "#00e676"; TEXT = "#e6edf3"
+        MUTED = "#8b949e"; ERROR = "#f85149"; AMBER = "#ffab00"; SUCCESS = "#3fb950"
+        TEXT_INV = "#0d1117"
+    ui = _FakeUI()
+    def is_first_boot(a): return True
+    def mark_first_boot_done(a): pass
+    def is_live_session(): return False
+    class system:
+        @staticmethod
+        def get_katu_version(): return "1.0"
+        @staticmethod
+        def get_network_status(): return {"connected": False}
+        @staticmethod
+        def get_pending_updates(): return -1
 
-STYLESHEET = f"""
-QMainWindow {{
-    background-color: {KATU_BG};
-}}
-QWidget {{
-    background-color: {KATU_BG};
-    color: {KATU_TEXT};
-    font-family: 'Noto Sans', 'Liberation Sans', sans-serif;
-}}
-QScrollArea, QScrollArea > QWidget > QWidget {{
-    background-color: transparent;
-    border: none;
-}}
-QLabel#titulo {{
-    font-size: 26px;
-    font-weight: bold;
-    color: {KATU_TEXT};
-    letter-spacing: -0.5px;
-}}
-QLabel#subtitulo {{
-    font-size: 13px;
-    color: {KATU_ACCENT};
-    letter-spacing: 0.3px;
-}}
-QLabel#versao {{
-    font-size: 11px;
-    color: {KATU_TEXT_MUTED};
-}}
-QFrame#separator {{
-    background-color: {KATU_BORDER};
-    max-height: 1px;
-}}
-QPushButton#btn-fechar {{
-    background-color: transparent;
-    border: 1px solid {KATU_BORDER};
-    border-radius: 6px;
-    padding: 8px 20px;
-    color: {KATU_TEXT_MUTED};
-    font-size: 12px;
-}}
-QPushButton#btn-fechar:hover {{
-    border-color: {KATU_ACCENT};
-    color: {KATU_TEXT};
-    background-color: {KATU_BG_ALT};
-}}
-QCheckBox {{
-    font-size: 12px;
-    color: {KATU_TEXT_MUTED};
-    spacing: 8px;
-}}
-QCheckBox::indicator {{
-    width: 16px;
-    height: 16px;
-    border-radius: 4px;
-    border: 1px solid {KATU_BORDER};
-    background: {KATU_BG_ALT};
-}}
-QCheckBox::indicator:checked {{
-    background-color: {KATU_ACCENT};
-    border-color: {KATU_ACCENT};
-}}
-QCheckBox::indicator:hover {{
-    border-color: {KATU_ACCENT};
-}}
-"""
-
-CARDS = [
-    {
-        "titulo": "Atualizar sistema",
-        "descricao": "Instalar todas as atualizações disponíveis",
-        "icone": "system-software-update",
-        "cor_accent": KATU_ACCENT,
-        "acao": "update",
-    },
-    {
-        "titulo": "Instalar aplicativos",
-        "descricao": "Abrir a loja de aplicativos Discover",
-        "icone": "plasmadiscover",
-        "cor_accent": KATU_LINK,
-        "acao": "discover",
-    },
-    {
-        "titulo": "Habilitar Flathub",
-        "descricao": "Adicionar repositório com mais de 2.000 apps",
-        "icone": "flatpak",
-        "cor_accent": KATU_AMBER,
-        "acao": "flathub",
-    },
-    {
-        "titulo": "Drivers de hardware",
-        "descricao": "Verificar e instalar drivers necessários",
-        "icone": "preferences-devices",
-        "cor_accent": KATU_ACCENT,
-        "acao": "drivers",
-    },
-    {
-        "titulo": "Configurar aparência",
-        "descricao": "Personalizar cores, tema e wallpaper",
-        "icone": "preferences-desktop-theme",
-        "cor_accent": KATU_AMBER,
-        "acao": "aparencia",
-    },
-    {
-        "titulo": "Configurações do sistema",
-        "descricao": "Ajustar som, rede, usuários e mais",
-        "icone": "systemsettings",
-        "cor_accent": KATU_LINK,
-        "acao": "configuracoes",
-    },
-    {
-        "titulo": "Documentação",
-        "descricao": "Guias, tutoriais e suporte Katu OS",
-        "icone": "help-contents",
-        "cor_accent": KATU_TEXT_MUTED,
-        "acao": "docs",
-    },
-    {
-        "titulo": "Sobre o Katu OS",
-        "descricao": "Versão, licença, créditos e sistema",
-        "icone": "help-about",
-        "cor_accent": KATU_TEXT_MUTED,
-        "acao": "sobre",
-    },
-]
+FLAG_FILE = Path.home() / ".config" / "katu" / "welcome" / ".first-boot-done"
+LIVE_FLAG = Path("/run/live/active")
 
 
-class AcaoThread(QThread):
-    concluido = pyqtSignal(str, bool)
-
-    def __init__(self, acao):
-        super().__init__()
-        self.acao = acao
-
-    def run(self):
-        try:
-            if self.acao == "update":
-                subprocess.Popen([
-                    'pkexec', 'bash', '-c',
-                    'apt-get update && apt-get upgrade -y'
-                ])
-            elif self.acao == "discover":
-                subprocess.Popen(['plasma-discover'])
-            elif self.acao == "flathub":
-                subprocess.Popen([
-                    'pkexec', 'flatpak', 'remote-add', '--if-not-exists',
-                    'flathub', 'https://dl.flathub.org/repo/flathub.flatpakrepo'
-                ])
-            elif self.acao == "drivers":
-                subprocess.Popen(['systemsettings', 'kcm_device_automounter'])
-            elif self.acao == "aparencia":
-                subprocess.Popen(['systemsettings', 'kcm_lookandfeel'])
-            elif self.acao == "configuracoes":
-                subprocess.Popen(['systemsettings'])
-            elif self.acao == "docs":
-                subprocess.Popen(['xdg-open', 'https://katuos.com.br/docs'])
-            elif self.acao == "sobre":
-                subprocess.Popen(['systemsettings', 'kcm_about-distro'])
-            self.concluido.emit(self.acao, True)
-        except Exception as e:
-            print(f"Erro ao executar ação '{self.acao}': {e}")
-            self.concluido.emit(self.acao, False)
+def is_live():
+    return LIVE_FLAG.exists() or (CORE and is_live_session())
 
 
-class CardButton(QPushButton):
-    def __init__(self, titulo, descricao, cor_accent, parent=None):
+def check_first_boot():
+    return not FLAG_FILE.exists()
+
+
+def mark_done():
+    FLAG_FILE.parent.mkdir(parents=True, exist_ok=True)
+    FLAG_FILE.touch()
+
+
+# ── Passo base ────────────────────────────────────────────────────────────────
+class Step(QWidget):
+    next_requested = pyqtSignal()
+    back_requested = pyqtSignal()
+
+    def __init__(self, title, icon, parent=None):
         super().__init__(parent)
-        self._cor_accent = cor_accent
-        self._normal_style = (
-            f"QPushButton {{ background-color: {KATU_BG_CARD}; "
-            f"border: 1px solid {KATU_BORDER}; border-radius: 10px; "
-            f"padding: 16px; text-align: left; color: {KATU_TEXT}; "
-            f"min-height: 76px; }}"
-            f"QPushButton:hover {{ background-color: {KATU_BG_ALT}; "
-            f"border-color: {cor_accent}; }}"
-            f"QPushButton:pressed {{ background-color: {KATU_BG}; }}"
+        self._title = title
+        self._icon  = icon
+
+    def build(self, content_widget):
+        lay = QVBoxLayout(self)
+        lay.setContentsMargins(40, 20, 40, 20)
+        lay.setSpacing(16)
+        h = QHBoxLayout()
+        ico = QLabel(self._icon)
+        ico.setStyleSheet("font-size:40px;")
+        h.addWidget(ico)
+        lbl = QLabel(self._title)
+        lbl.setStyleSheet(f"font-size:22px; font-weight:bold; color:{ui.TEXT};")
+        h.addWidget(lbl, 1)
+        lay.addLayout(h)
+        sep = QFrame()
+        sep.setFrameShape(QFrame.HLine)
+        sep.setStyleSheet(f"color:{ui.BORDER};")
+        lay.addWidget(sep)
+        lay.addWidget(content_widget, 1)
+        return lay
+
+
+# ── Passo 1: Boas-vindas ──────────────────────────────────────────────────────
+class WelcomeStep(Step):
+    def __init__(self, parent=None):
+        super().__init__("Bem-vindo ao Katu OS!", "🐆", parent)
+        content = QWidget()
+        lay = QVBoxLayout(content)
+        lay.setAlignment(Qt.AlignCenter)
+        lay.setSpacing(12)
+        ver = system.get_katu_version() if CORE else "1.0"
+        t = QLabel(f"Katu OS {ver}")
+        t.setAlignment(Qt.AlignCenter)
+        t.setStyleSheet(f"font-size:28px; font-weight:bold; color:{ui.ACCENT};")
+        sub = QLabel("Livre. Brasileiro. Para todos.")
+        sub.setAlignment(Qt.AlignCenter)
+        sub.setStyleSheet(f"font-size:16px; color:{ui.TEXT};")
+        desc = QLabel(
+            "Este assistente vai guiar você pelas configurações iniciais.\n"
+            "Você pode pular qualquer etapa e configurar depois."
         )
-        self.setStyleSheet(self._normal_style)
-
-        layout = QVBoxLayout(self)
-        layout.setContentsMargins(4, 2, 4, 2)
-        layout.setSpacing(4)
-
-        lbl_titulo = QLabel(f"<b>{titulo}</b>")
-        lbl_titulo.setStyleSheet(f"color: {KATU_TEXT}; font-size: 13px; background: transparent;")
-
-        lbl_desc = QLabel(descricao)
-        lbl_desc.setStyleSheet(f"color: {KATU_TEXT_MUTED}; font-size: 11px; background: transparent;")
-        lbl_desc.setWordWrap(True)
-
-        layout.addWidget(lbl_titulo)
-        layout.addWidget(lbl_desc)
+        desc.setAlignment(Qt.AlignCenter)
+        desc.setWordWrap(True)
+        desc.setStyleSheet(f"color:{ui.MUTED}; font-size:13px;")
+        lay.addWidget(t)
+        lay.addWidget(sub)
+        lay.addSpacing(8)
+        lay.addWidget(desc)
+        self.build(content)
 
 
-class KatuWelcomeWindow(QMainWindow):
+# ── Passo 2: Internet ─────────────────────────────────────────────────────────
+class InternetStep(Step):
+    def __init__(self, parent=None):
+        super().__init__("Conectar à Internet", "🌐", parent)
+        content = QWidget()
+        lay = QVBoxLayout(content)
+        lay.setSpacing(12)
+        self._status_lbl = QLabel("Verificando conexão...")
+        self._status_lbl.setStyleSheet(f"font-size:14px; color:{ui.MUTED};")
+        lay.addWidget(self._status_lbl)
+        btn = QPushButton("Abrir configurações de rede")
+        btn.setObjectName("primary")
+        btn.setFixedHeight(40)
+        btn.clicked.connect(lambda: subprocess.Popen(["plasma-nm"]))
+        lay.addWidget(btn)
+        lay.addStretch()
+        self.build(content)
+        QTimer.singleShot(500, self._check_net)
+
+    def _check_net(self):
+        if CORE:
+            try:
+                net = system.get_network_status()
+                if net.get("connected"):
+                    kind = "Wi-Fi" if net.get("wifi") else "Ethernet"
+                    self._status_lbl.setText(f"✓ Conectado via {kind}")
+                    self._status_lbl.setStyleSheet(f"font-size:14px; color:{ui.SUCCESS};")
+                else:
+                    self._status_lbl.setText("✗ Sem conexão com a internet")
+                    self._status_lbl.setStyleSheet(f"font-size:14px; color:{ui.MUTED};")
+            except Exception:
+                pass
+
+
+# ── Passo 3: Atualizações ─────────────────────────────────────────────────────
+class UpdatesStep(Step):
+    def __init__(self, parent=None):
+        super().__init__("Atualizações do Sistema", "🔄", parent)
+        content = QWidget()
+        lay = QVBoxLayout(content)
+        lay.setSpacing(12)
+        desc = QLabel("Mantenha o Katu OS atualizado para ter as últimas correções de segurança.")
+        desc.setWordWrap(True)
+        desc.setStyleSheet(f"color:{ui.TEXT};")
+        lay.addWidget(desc)
+        btn = QPushButton("Abrir Katu Update")
+        btn.setObjectName("primary")
+        btn.setFixedHeight(40)
+        btn.clicked.connect(lambda: subprocess.Popen(["katu-update"]))
+        skip = QPushButton("Atualizar depois")
+        skip.setFixedHeight(36)
+        skip.clicked.connect(self.next_requested.emit)
+        lay.addWidget(btn)
+        lay.addWidget(skip)
+        lay.addStretch()
+        self.build(content)
+
+
+# ── Passo 4: Drivers ──────────────────────────────────────────────────────────
+class DriversStep(Step):
+    def __init__(self, parent=None):
+        super().__init__("Drivers de Hardware", "🖥️", parent)
+        content = QWidget()
+        lay = QVBoxLayout(content)
+        lay.setSpacing(12)
+        desc = QLabel("O Katu Drivers verifica se seu hardware está corretamente configurado.")
+        desc.setWordWrap(True)
+        desc.setStyleSheet(f"color:{ui.TEXT};")
+        lay.addWidget(desc)
+        btn = QPushButton("Verificar drivers")
+        btn.setObjectName("primary")
+        btn.setFixedHeight(40)
+        btn.clicked.connect(lambda: subprocess.Popen(["katu-drivers"]))
+        skip = QPushButton("Verificar depois")
+        skip.setFixedHeight(36)
+        skip.clicked.connect(self.next_requested.emit)
+        lay.addWidget(btn)
+        lay.addWidget(skip)
+        lay.addStretch()
+        self.build(content)
+
+
+# ── Passo 5: Aparência ────────────────────────────────────────────────────────
+class AppearanceStep(Step):
+    def __init__(self, parent=None):
+        super().__init__("Personalizar Aparência", "🎨", parent)
+        content = QWidget()
+        lay = QVBoxLayout(content)
+        lay.setSpacing(12)
+        desc = QLabel("Personalize o Katu OS do jeito que você gosta.")
+        desc.setStyleSheet(f"color:{ui.TEXT};")
+        lay.addWidget(desc)
+        items = [
+            ("Configurações de aparência", "systemsettings5 --args kcm_lookandfeel"),
+            ("Papel de parede",            "systemsettings5 --args kcm_desktoptheme"),
+        ]
+        for label, cmd in items:
+            btn = QPushButton(label)
+            btn.setFixedHeight(38)
+            btn.clicked.connect(lambda _, c=cmd: subprocess.Popen(c.split()))
+            lay.addWidget(btn)
+        lay.addStretch()
+        self.build(content)
+
+
+# ── Passo 6: IA ───────────────────────────────────────────────────────────────
+class AIStep(Step):
+    def __init__(self, parent=None):
+        super().__init__("Inteligência Artificial", "🤖", parent)
+        content = QWidget()
+        lay = QVBoxLayout(content)
+        lay.setSpacing(12)
+        desc = QLabel(
+            "O Katu AI é seu assistente pessoal. Converse, faça perguntas,\n"
+            "peça ajuda — tudo em português."
+        )
+        desc.setWordWrap(True)
+        desc.setStyleSheet(f"color:{ui.TEXT};")
+        lay.addWidget(desc)
+        note = QLabel(
+            "Para usar IA em nuvem, você precisará de uma chave de API própria.\n"
+            "Também é possível usar IA localmente, sem internet."
+        )
+        note.setWordWrap(True)
+        note.setStyleSheet(f"color:{ui.MUTED}; font-size:12px;")
+        lay.addWidget(note)
+        btn = QPushButton("Abrir Katu AI")
+        btn.setObjectName("primary")
+        btn.setFixedHeight(40)
+        btn.clicked.connect(lambda: subprocess.Popen(["katu-ai"]))
+        skip = QPushButton("Configurar depois")
+        skip.setFixedHeight(36)
+        skip.clicked.connect(self.next_requested.emit)
+        lay.addWidget(btn)
+        lay.addWidget(skip)
+        lay.addStretch()
+        self.build(content)
+
+
+# ── Passo 7: Aplicativos ──────────────────────────────────────────────────────
+class AppsStep(Step):
+    def __init__(self, parent=None):
+        super().__init__("Instalar Aplicativos", "📦", parent)
+        content = QWidget()
+        lay = QVBoxLayout(content)
+        lay.setSpacing(12)
+        desc = QLabel("Encontre e instale aplicativos na Katu Store — sem precisar de terminal.")
+        desc.setWordWrap(True)
+        desc.setStyleSheet(f"color:{ui.TEXT};")
+        lay.addWidget(desc)
+        btn = QPushButton("Abrir Katu Store")
+        btn.setObjectName("primary")
+        btn.setFixedHeight(40)
+        btn.clicked.connect(lambda: subprocess.Popen(["katu-store"]))
+        skip = QPushButton("Instalar depois")
+        skip.setFixedHeight(36)
+        skip.clicked.connect(self.next_requested.emit)
+        lay.addWidget(btn)
+        lay.addWidget(skip)
+        lay.addStretch()
+        self.build(content)
+
+
+# ── Passo 8: Backup ───────────────────────────────────────────────────────────
+class BackupStep(Step):
+    def __init__(self, parent=None):
+        super().__init__("Backup dos seus Arquivos", "☁️", parent)
+        content = QWidget()
+        lay = QVBoxLayout(content)
+        lay.setSpacing(12)
+        desc = QLabel("Proteja seus arquivos com o Katu Backup.")
+        desc.setStyleSheet(f"color:{ui.TEXT};")
+        lay.addWidget(desc)
+        btn = QPushButton("Configurar Backup")
+        btn.setObjectName("primary")
+        btn.setFixedHeight(40)
+        btn.clicked.connect(lambda: subprocess.Popen(["katu-backup"]))
+        skip = QPushButton("Configurar depois")
+        skip.setFixedHeight(36)
+        skip.clicked.connect(self.next_requested.emit)
+        lay.addWidget(btn)
+        lay.addWidget(skip)
+        lay.addStretch()
+        self.build(content)
+
+
+# ── Passo 9: Pronto ───────────────────────────────────────────────────────────
+class ReadyStep(Step):
+    def __init__(self, parent=None):
+        super().__init__("Tudo pronto!", "✅", parent)
+        content = QWidget()
+        lay = QVBoxLayout(content)
+        lay.setAlignment(Qt.AlignCenter)
+        lay.setSpacing(12)
+        t = QLabel("O Katu OS está configurado e pronto para usar.")
+        t.setAlignment(Qt.AlignCenter)
+        t.setWordWrap(True)
+        t.setStyleSheet(f"font-size:15px; color:{ui.TEXT};")
+        links = [
+            ("🐆 Katu Central",    "katu-central"),
+            ("🤖 Katu AI",         "katu-ai"),
+            ("📦 Katu Store",      "katu-store"),
+        ]
+        lay.addWidget(t)
+        for label, cmd in links:
+            btn = QPushButton(label)
+            btn.setFixedHeight(38)
+            btn.clicked.connect(lambda _, c=cmd: subprocess.Popen([c]))
+            lay.addWidget(btn)
+        lay.addStretch()
+        self.build(content)
+
+
+# ── Live Mode Page ────────────────────────────────────────────────────────────
+class LiveModeWidget(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Katu OS — Modo Live")
+        self.setMinimumSize(560, 380)
+        self.resize(620, 420)
+        root = QWidget()
+        root.setObjectName("root")
+        self.setCentralWidget(root)
+        lay = QVBoxLayout(root)
+        lay.setContentsMargins(40, 40, 40, 40)
+        lay.setAlignment(Qt.AlignCenter)
+        lay.setSpacing(16)
+        ico = QLabel("🐆")
+        ico.setAlignment(Qt.AlignCenter)
+        ico.setStyleSheet("font-size:48px;")
+        title = QLabel("Você está experimentando o Katu OS")
+        title.setAlignment(Qt.AlignCenter)
+        title.setStyleSheet(f"font-size:20px; font-weight:bold; color:{ui.TEXT};")
+        sub = QLabel(
+            "Este é o modo Live. Nada será salvo nesta sessão.\n"
+            "Se gostar, instale o Katu OS no seu computador!"
+        )
+        sub.setAlignment(Qt.AlignCenter)
+        sub.setWordWrap(True)
+        sub.setStyleSheet(f"color:{ui.MUTED};")
+        btn = QPushButton("INSTALAR KATU OS")
+        btn.setObjectName("primary")
+        btn.setFixedHeight(48)
+        btn.setMinimumWidth(200)
+        btn.clicked.connect(lambda: subprocess.Popen(["calamares"]))
+        close_btn = QPushButton("Continuar experimentando")
+        close_btn.setFixedHeight(36)
+        close_btn.clicked.connect(self.close)
+        lay.addWidget(ico)
+        lay.addWidget(title)
+        lay.addWidget(sub)
+        lay.addSpacing(12)
+        lay.addWidget(btn, alignment=Qt.AlignCenter)
+        lay.addWidget(close_btn, alignment=Qt.AlignCenter)
+
+
+# ── Main Welcome Window ───────────────────────────────────────────────────────
+class KatuWelcome(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Bem-vindo ao Katu OS")
-        self.setMinimumSize(720, 580)
-        self.resize(820, 620)
-        self.setStyleSheet(STYLESHEET)
+        self.setMinimumSize(640, 520)
+        self.resize(720, 580)
+        self.setWindowIcon(QIcon("/usr/share/icons/hicolor/256x256/apps/katu-welcome.png"))
+        self._step = 0
+        self._steps = [
+            WelcomeStep,
+            InternetStep,
+            UpdatesStep,
+            DriversStep,
+            AppearanceStep,
+            AIStep,
+            AppsStep,
+            BackupStep,
+            ReadyStep,
+        ]
+        self._build_ui()
+        self._show_step(0)
 
-        widget_central = QWidget()
-        self.setCentralWidget(widget_central)
-        layout_principal = QVBoxLayout(widget_central)
-        layout_principal.setContentsMargins(40, 32, 40, 24)
-        layout_principal.setSpacing(20)
+    def _build_ui(self):
+        root = QWidget()
+        root.setObjectName("root")
+        self.setCentralWidget(root)
+        lay = QVBoxLayout(root)
+        lay.setContentsMargins(0, 0, 0, 0)
+        lay.setSpacing(0)
 
-        # Cabeçalho
-        cabecalho = QWidget()
-        layout_cabecalho = QVBoxLayout(cabecalho)
-        layout_cabecalho.setSpacing(4)
-        layout_cabecalho.setContentsMargins(0, 0, 0, 0)
+        # Progress dots
+        prog = QWidget()
+        prog.setFixedHeight(48)
+        prog.setStyleSheet(f"background:{ui.SURFACE}; border-bottom:1px solid {ui.BORDER};")
+        prog_lay = QHBoxLayout(prog)
+        prog_lay.setAlignment(Qt.AlignCenter)
+        prog_lay.setSpacing(8)
+        self._dots = []
+        for i in range(len(self._steps)):
+            dot = QLabel("●")
+            dot.setFixedSize(16, 16)
+            dot.setAlignment(Qt.AlignCenter)
+            dot.setStyleSheet(f"color:{ui.BORDER};")
+            self._dots.append(dot)
+            prog_lay.addWidget(dot)
+        lay.addWidget(prog)
 
-        titulo = QLabel("Bem-vindo ao Katu OS")
-        titulo.setObjectName("titulo")
+        # Step stack
+        self._stack = QStackedWidget()
+        lay.addWidget(self._stack, 1)
 
-        subtitulo = QLabel("Livre. Brasileiro. Para todos.")
-        subtitulo.setObjectName("subtitulo")
+        # Build all steps
+        for StepClass in self._steps:
+            step = StepClass()
+            step.next_requested.connect(self._next)
+            step.back_requested.connect(self._back)
+            self._stack.addWidget(step)
 
-        versao = QLabel(f"Versão {KATU_VERSION} · Baseado em Debian 13 Trixie · KDE Plasma")
-        versao.setObjectName("versao")
+        # Navigation bar
+        nav = QWidget()
+        nav.setFixedHeight(60)
+        nav.setStyleSheet(f"background:{ui.SURFACE}; border-top:1px solid {ui.BORDER};")
+        nav_lay = QHBoxLayout(nav)
+        nav_lay.setContentsMargins(24, 8, 24, 8)
+        nav_lay.setSpacing(12)
 
-        layout_cabecalho.addWidget(titulo)
-        layout_cabecalho.addWidget(subtitulo)
-        layout_cabecalho.addWidget(versao)
+        self._back_btn = QPushButton("← Anterior")
+        self._back_btn.setFixedHeight(40)
+        self._back_btn.setEnabled(False)
+        self._back_btn.clicked.connect(self._back)
 
-        # Separador
-        sep = QFrame()
-        sep.setObjectName("separator")
-        sep.setFrameShape(QFrame.HLine)
+        self._no_show = QCheckBox("Não mostrar novamente")
+        self._no_show.setStyleSheet(f"color:{ui.MUTED}; font-size:12px;")
 
-        # Grade de cards
-        area_scroll = QScrollArea()
-        area_scroll.setWidgetResizable(True)
-        area_scroll.setFrameShape(QFrame.NoFrame)
+        self._next_btn = QPushButton("Próximo →")
+        self._next_btn.setObjectName("primary")
+        self._next_btn.setFixedHeight(40)
+        self._next_btn.clicked.connect(self._next)
 
-        widget_grade = QWidget()
-        grade = QGridLayout(widget_grade)
-        grade.setSpacing(10)
-        grade.setContentsMargins(0, 0, 0, 0)
+        nav_lay.addWidget(self._back_btn)
+        nav_lay.addWidget(self._no_show, 1)
+        nav_lay.addWidget(self._next_btn)
+        lay.addWidget(nav)
 
-        for i, card in enumerate(CARDS):
-            btn = CardButton(card['titulo'], card['descricao'], card['cor_accent'])
-            acao = card['acao']
-            btn.clicked.connect(lambda checked, a=acao: self._executar_acao(a))
-            grade.addWidget(btn, i // 2, i % 2)
+    def _show_step(self, idx):
+        self._step = idx
+        self._stack.setCurrentIndex(idx)
+        self._back_btn.setEnabled(idx > 0)
+        is_last = idx == len(self._steps) - 1
+        self._next_btn.setText("Concluir" if is_last else "Próximo →")
+        for i, dot in enumerate(self._dots):
+            if i < idx:
+                dot.setStyleSheet(f"color:{ui.SUCCESS};")
+            elif i == idx:
+                dot.setStyleSheet(f"color:{ui.ACCENT}; font-size:14px;")
+            else:
+                dot.setStyleSheet(f"color:{ui.BORDER};")
 
-        area_scroll.setWidget(widget_grade)
-
-        # Rodapé
-        rodape = QWidget()
-        layout_rodape = QHBoxLayout(rodape)
-        layout_rodape.setContentsMargins(0, 0, 0, 0)
-
-        self.chk_abrir = QCheckBox("Abrir automaticamente no início da sessão")
-        self.chk_abrir.setChecked(self._obter_autostart())
-        self.chk_abrir.stateChanged.connect(self._toggle_autostart)
-
-        btn_fechar = QPushButton("Fechar")
-        btn_fechar.setObjectName("btn-fechar")
-        btn_fechar.clicked.connect(self.close)
-
-        layout_rodape.addWidget(self.chk_abrir)
-        layout_rodape.addStretch()
-        layout_rodape.addWidget(btn_fechar)
-
-        layout_principal.addWidget(cabecalho)
-        layout_principal.addWidget(sep)
-        layout_principal.addWidget(area_scroll, 1)
-        layout_principal.addWidget(rodape)
-
-    def _executar_acao(self, acao):
-        self.thread = AcaoThread(acao)
-        self.thread.start()
-
-    def _obter_autostart(self):
-        autostart = os.path.expanduser('~/.config/autostart/katu-welcome.desktop')
-        return os.path.exists(autostart)
-
-    def _remover_flag_firstboot(self):
-        try:
-            if os.path.exists('/etc/katu-firstboot'):
-                os.remove('/etc/katu-firstboot')
-        except PermissionError:
-            pass  # sem sudo não é possível — não é crítico
-
-    def _toggle_autostart(self, estado):
-        autostart_dir  = os.path.expanduser('~/.config/autostart')
-        autostart_file = os.path.join(autostart_dir, 'katu-welcome.desktop')
-
-        if estado:
-            os.makedirs(autostart_dir, exist_ok=True)
-            with open(autostart_file, 'w') as f:
-                f.write(
-                    "[Desktop Entry]\n"
-                    "Type=Application\n"
-                    "Name=Katu Welcome\n"
-                    "Exec=katu-welcome\n"
-                    "Hidden=false\n"
-                    "NoDisplay=false\n"
-                    "X-GNOME-Autostart-enabled=true\n"
-                )
+    def _next(self):
+        if self._step < len(self._steps) - 1:
+            self._show_step(self._step + 1)
         else:
-            if os.path.exists(autostart_file):
-                os.remove(autostart_file)
+            self._finish()
+
+    def _back(self):
+        if self._step > 0:
+            self._show_step(self._step - 1)
+
+    def _finish(self):
+        if self._no_show.isChecked():
+            mark_done()
+        self.close()
 
 
 def main():
+    # Check if running in Live mode
+    if is_live():
+        app = QApplication(sys.argv)
+        app.setApplicationName("Katu OS Live")
+        if CORE:
+            app.setStyleSheet(ui.STYLESHEET)
+        win = LiveModeWidget()
+        win.show()
+        sys.exit(app.exec_() if QT == 'PyQt5' else app.exec())
+        return
+
+    # Normal first-boot
     app = QApplication(sys.argv)
     app.setApplicationName("Katu Welcome")
-    app.setApplicationVersion(KATU_VERSION)
-    app.setOrganizationName("Katu OS")
-
-    window = KatuWelcomeWindow()
-    window._remover_flag_firstboot()
-    window.show()
-
-    sys.exit(app.exec_() if QT_BACKEND == 'PyQt5' else app.exec())
+    if CORE:
+        app.setStyleSheet(ui.STYLESHEET)
+    win = KatuWelcome()
+    win.show()
+    sys.exit(app.exec_() if QT == 'PyQt5' else app.exec())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

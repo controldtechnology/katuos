@@ -1,0 +1,4 @@
+#!/bin/bash
+set -e
+chmod 755 /usr/bin/katu-webapps
+exit 0

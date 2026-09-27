@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Katu Web Apps
+Name[pt_BR]=Katu Web Apps
+GenericName=Gerenciador de Web Apps
+GenericName[pt_BR]=Gerenciador de Web Apps
+Exec=katu-webapps
+Icon=katu-logo
+Terminal=false
+Categories=Network;WebApplication;
+StartupNotify=true

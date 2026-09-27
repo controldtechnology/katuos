@@ -1,0 +1,12 @@
+<!DOCTYPE Menu PUBLIC "-//freedesktop//DTD Menu 1.0//EN"
+    "http://www.freedesktop.org/standards/menu-spec/1.0/menu.dtd">
+<Menu>
+  <Name>Applications</Name>
+  <Menu>
+    <Name>Katu OS</Name>
+    <Directory>katu.directory</Directory>
+    <Include>
+      <Category>X-Katu</Category>
+    </Include>
+  </Menu>
+</Menu>

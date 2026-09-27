@@ -1,0 +1,16 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Katu Central
+Name[pt_BR]=Katu Central
+GenericName=Painel de Controle
+GenericName[pt_BR]=Painel de Controle
+Comment=Painel central de gerenciamento do Katu OS
+Comment[pt_BR]=Painel central de gerenciamento do Katu OS
+Exec=katu-central
+Icon=katu-logo
+Terminal=false
+Categories=System;Settings;
+Keywords=sistema;controle;configurações;katu;central;
+StartupNotify=true
+X-KDE-StartupNotify=true
