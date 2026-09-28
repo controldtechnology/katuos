@@ -51,6 +51,8 @@ class CheckThread(QThread):
         try:
             self.progress.emit("Atualizando índices autenticados...")
             backend.run(['pkexec', backend.HELPER, 'refresh'], timeout=900)
+            if backend.channel() not in ('stable', 'beta'):
+                raise backend.UpdateError('Repositório Katu ainda não configurado. Conclua o bootstrap de confiança.')
             plan = backend.make_plan(self.selected)
             plan['optional'] = backend.optional_apps()
             flat = backend.flatpak_plan()
@@ -80,6 +82,8 @@ class UpgradeThread(QThread):
                         self.progress.emit({'validating': 'Validando...', 'downloading': 'Baixando pacotes autenticados...',
                                             'installing': 'Instalando; não desligue o computador.',
                                             'verifying': 'Validando versões instaladas...'}.get(phase, phase))
+                        if 'percent' in state:
+                            self.progress.emit(f"{state.get('current', '')} — {state['percent']:.0f}%")
                         if phase in ('complete', 'failed'):
                             if not state.get('ok'):
                                 raise backend.UpdateError(state.get('error', 'Falha na atualização.'))

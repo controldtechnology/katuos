@@ -28,6 +28,17 @@ def build(name, output):
     with tempfile.TemporaryDirectory(prefix='katu-package-') as temp:
         stage = Path(temp) / name
         shutil.copytree(source, stage)
+        # Adopt the current image assets without changing the installed appearance.
+        assets = {
+            'katu-icons': ['usr/share/icons/katu', 'usr/share/icons/hicolor'],
+            'katu-wallpapers': ['usr/share/wallpapers/katu'],
+            'katu-theme': ['usr/share/color-schemes', 'usr/share/plasma/look-and-feel/org.katuos.desktop'],
+            'katu-branding': ['usr/share/katu/branding', 'usr/share/pixmaps'],
+        }
+        for relative in assets.get(name, []):
+            existing = ROOT / 'config/includes.chroot' / relative
+            if existing.exists():
+                shutil.copytree(existing, stage / relative, dirs_exist_ok=True)
         # All configuration files use dpkg conffile semantics, including existing settings.
         configs = sorted('/' + p.relative_to(stage).as_posix() for p in (stage / 'etc').rglob('*') if p.is_file()) if (stage / 'etc').exists() else []
         if configs:
@@ -47,7 +58,7 @@ def build(name, output):
                 path.chmod(0o755)
                 continue
             raw = path.read_bytes()
-            executable = raw.startswith(b'#!') or path.parent == stage / 'usr/bin'
+            executable = raw.lstrip(b'\xef\xbb\xbf').startswith(b'#!') or path.parent == stage / 'usr/bin'
             if b'\0' not in raw[:4096]:
                 try:
                     normalized = raw.decode('utf-8-sig').replace('\r\n', '\n')

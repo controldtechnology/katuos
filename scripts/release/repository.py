@@ -55,6 +55,7 @@ def publish(channel, debs, root, evidence):
         generations = root / 'generations'
         generations.mkdir(exist_ok=True)
         stage = Path(tempfile.mkdtemp(prefix='release-', dir=generations))
+        stage.chmod(0o755)
         if current.exists():
             shutil.copytree(current, stage, dirs_exist_ok=True)
         pool = stage / 'pool/main'

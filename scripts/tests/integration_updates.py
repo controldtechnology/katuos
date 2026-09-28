@@ -143,5 +143,56 @@ class AptIntegration(unittest.TestCase):
         self.source.write_text(source)
 
 
+    def test_09_actual_updater_self_upgrade(self):
+        original = ROOT / 'output/packages/katu-update_1.1.0_all.deb'
+        self.publish(original)
+        self.install('katu-update=1.1.0')
+        stage = self.work / 'updater-next'
+        command('dpkg-deb', '-R', str(original), str(stage))
+        control = stage / 'DEBIAN/control'
+        control.write_text(control.read_text().replace('Version: 1.1.0', 'Version: 1.1.1'))
+        newer = self.work / 'katu-update_1.1.1_all.deb'
+        command('dpkg-deb', '--build', '--root-owner-group', str(stage), str(newer))
+        self.publish(newer)
+        plan = backend.make_plan(['katu-update'])
+        command('/usr/lib/katu-update/helper', 'apply', plan['digest'], 'katu-update')
+        backend.verify_versions(plan)
+        status = json.loads(Path('/var/lib/katu-update/status.json').read_text())
+        self.assertTrue(status['ok'])
+        self.assertEqual(status['phase'], 'complete')
+        self.assertTrue(Path('/var/lib/katu-update/history.jsonl').read_text())
+
+    def test_10_broken_dependency_rejected(self):
+        self.publish(self.package('katu-broken', '1.0.0', 'katu-missing (>= 9.0.0)'))
+        with self.assertRaises(Exception):
+            backend.make_plan(['katu-broken'])
+
+    def test_11_plan_change_rejected(self):
+        plan = backend.make_plan(['katu-example'])
+        self.publish(self.package('katu-example', '1.2.0'))
+        result = command('/usr/lib/katu-update/helper', 'apply', plan['digest'], 'katu-example', ok=False)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertEqual(command('dpkg-query', '-W', '-f=${Version}', 'katu-example').stdout, '1.0.0')
+
+    def test_12_theme_and_hold(self):
+        self.publish(self.package('katu-theme', '1.0.0'))
+        self.install('katu-theme')
+        self.publish(self.package('katu-theme', '1.1.0'))
+        command('apt-mark', 'hold', 'katu-theme')
+        with self.assertRaisesRegex(backend.UpdateError, 'retido'):
+            backend.make_plan(['katu-theme'])
+        self.assertNotIn('katu-theme', [p['name'] for p in backend.make_plan()['packages']])
+        command('apt-mark', 'unhold', 'katu-theme')
+        plan = backend.make_plan(['katu-theme'])
+        self.assertEqual([p['name'] for p in plan['packages']], ['katu-theme'])
+
+    def test_13_unreviewed_beta_cannot_promote(self):
+        deb = self.package('katu-unreviewed', '1.0.0')
+        evidence = self.work / 'approval.json'
+        evidence.write_text(json.dumps({repository.sha(deb): dict.fromkeys(repository.GATES, True)}))
+        with self.assertRaisesRegex(ValueError, 'exact beta'):
+            repository.publish('stable', [deb], self.repo, evidence)
+
+
 if __name__ == '__main__':
     unittest.main(verbosity=2)

@@ -18,7 +18,7 @@ jobs:
       - name: Install test and packaging tools
         run: |
           apt-get update
-          apt-get install -y python3 python3-apt python3-pyqt5 dpkg-dev apt-utils gnupg lintian git
+          apt-get install -y python3 python3-apt python3-pyqt5 python3-requests pkexec systemd libnotify-bin lsb-release dpkg-dev apt-utils gnupg lintian git
       - name: Unit tests
         run: python3 -m unittest discover -s scripts/tests -p test_continuous_update.py -v
       - name: Build each component independently
@@ -30,9 +30,15 @@ jobs:
         env:
           KATU_DISPOSABLE_TEST: '1'
         run: python3 scripts/tests/integration_updates.py
+      - name: Existing Qt interface smoke test
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: python3 scripts/tests/smoke_update_ui.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: katu-component-candidates
-          path: output/packages/*.deb
+          path: |
+            output/packages/*.deb
+            output/update-ui.png
       # Production signing is intentionally separate: no signing key in test jobs.

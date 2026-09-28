@@ -54,6 +54,8 @@ def make_plan(selected=None):
         if pkg._pkg.selected_state == apt_pkg.SELSTATE_HOLD:
             raise UpdateError('Pacote retido pelo administrador: ' + name)
         pkg.mark_install(auto_fix=True, auto_inst=True, from_user=False)
+    if cache.broken_count:
+        raise UpdateError('Não foi possível resolver as dependências deste plano.')
     changes = []
     for pkg in cache.get_changes():
         if pkg.marked_delete:
@@ -73,13 +75,15 @@ def make_plan(selected=None):
         record = candidate.record
         changes.append(dict(name=pkg.name, installed=pkg.installed.version if pkg.installed else '',
                             version=candidate.version, size=candidate.size,
+                            sha256=candidate.sha256,
+                            automatic=pkg.is_auto_installed or (not pkg.is_installed and pkg.name not in selected),
                             installed_size=candidate.installed_size,
                             origin='Katu' if katu_origins else 'Sistema',
                             category=record.get('X-Katu-Category', 'Segurança' if candidate.is_security_update else 'Sistema'),
                             notes=record.get('X-Katu-Notes', candidate.summary),
                             critical=pkg.name.startswith(CRITICAL)))
     changes.sort(key=lambda item: item['name'])
-    identity = [{k: p[k] for k in ('name', 'installed', 'version', 'size')} for p in changes]
+    identity = [{k: p[k] for k in ('name', 'installed', 'version', 'size', 'sha256')} for p in changes]
     digest = hashlib.sha256(json.dumps(identity, sort_keys=True).encode()).hexdigest()
     return dict(packages=changes, digest=digest, selected=sorted(selected),
                 download=sum(p['size'] for p in changes),

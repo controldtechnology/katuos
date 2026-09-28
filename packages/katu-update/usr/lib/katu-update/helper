@@ -5,11 +5,12 @@ import json
 import os
 from pathlib import Path
 import signal
+import select
 import subprocess
 import sys
 import time
 sys.path.insert(0, '/usr/lib/katu-update')
-from backend import STATE, HELPER, UNIT, UpdateError, make_plan, preflight, run, verify_versions
+from backend import STATE, HELPER, UNIT, SAFE_NAME, UpdateError, make_plan, preflight, run, verify_versions
 
 
 def write_json(name, value):
@@ -32,6 +33,36 @@ def refresh():
     except Exception:
         write_json('check.json', dict(ok=False, time=time.time(), error='Falha ao atualizar índices autenticados.'))
         raise
+
+
+def apt_phase(args, record, cancellation=None):
+    """Only numeric progress and validated package names reach persistent status."""
+    process = subprocess.Popen(args + ['-o', 'APT::Status-Fd=1'], stdout=subprocess.PIPE,
+                               stderr=subprocess.DEVNULL, env={**os.environ, 'LC_ALL': 'C', 'DEBIAN_FRONTEND': 'noninteractive'})
+    os.set_blocking(process.stdout.fileno(), False)
+    pending = b''
+    while process.poll() is None:
+        if cancellation and cancellation():
+            process.terminate()
+            process.wait()
+            raise UpdateError('Download cancelado. Nenhum pacote foi instalado.')
+        readable, _, _ = select.select([process.stdout], [], [], 0.5)
+        if not readable:
+            continue
+        pending += os.read(process.stdout.fileno(), 65536)
+        lines = pending.split(b'\n')
+        pending = lines.pop()
+        for raw in lines:
+            parts = raw.decode('utf-8', errors='replace').split(':')
+            if len(parts) >= 3 and parts[0] in ('dlstatus', 'pmstatus'):
+                try:
+                    record['percent'] = max(0, min(100, float(parts[2])))
+                    record['current'] = parts[1] if SAFE_NAME.fullmatch(parts[1]) else ''
+                    write_json('status.json', record)
+                except ValueError:
+                    pass
+    if process.returncode:
+        raise UpdateError('Falha do APT durante ' + record['phase'] + '. Verifique rede, assinatura, espaço e estado do dpkg.')
 
 
 def transaction(digest, selected):
@@ -62,23 +93,17 @@ def transaction(digest, selected):
                 '-o', 'Dpkg::Options::=--force-confold']
         record['phase'] = 'downloading'
         write_json('status.json', record)
-        process = subprocess.Popen(base + ['--download-only', 'install'] + specs,
-                                   stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        while process.poll() is None:
-            if cancelled:
-                process.terminate()
-                process.wait()
-                raise UpdateError('Download cancelado. Nenhum pacote foi instalado.')
-            time.sleep(0.5)
-        if process.returncode:
-            raise UpdateError('Download/autenticação falhou. Nenhum pacote foi instalado.')
+        apt_phase(base + ['--download-only', 'install'] + specs, record, lambda: cancelled)
         if cancelled:
             raise UpdateError('Download cancelado.')
         if make_plan(selected)['digest'] != digest:
             raise UpdateError('O plano mudou durante o download. Verifique novamente.')
         record['phase'] = 'installing'
         write_json('status.json', record)
-        run(base + ['--no-download', 'install'] + specs, timeout=None)
+        apt_phase(base + ['--no-download', 'install'] + specs, record)
+        automatic = [p['name'] for p in plan['packages'] if p['automatic']]
+        if automatic:
+            run(['/usr/bin/apt-mark', 'auto'] + automatic)
         record['phase'] = 'verifying'
         write_json('status.json', record)
         verify_versions(plan)
