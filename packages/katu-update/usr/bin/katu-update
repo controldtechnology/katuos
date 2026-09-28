@@ -1,2 +1,11 @@
 #!/bin/bash
-exec python3 /usr/lib/katu-update/main.py "$@"
+export PYTHONPATH="/usr/lib/python3/dist-packages:${PYTHONPATH:-}"
+export QT_QPA_PLATFORMTHEME=kde
+LOG="/tmp/katu-update.log"
+python3 "/usr/lib/katu-update/main.py" "$@" 2>"$LOG"
+ret=$?
+if [ $ret -ne 0 ]; then
+    ERRMSG=$(tail -5 "$LOG" 2>/dev/null | head -c 400)
+    kdialog --error "Erro ao iniciar katu-update.\n\n${ERRMSG:-Erro desconhecido}\n\nLog completo: $LOG" 2>/dev/null ||     zenity --error --text="Erro ao iniciar katu-update. Log: $LOG" 2>/dev/null || true
+fi
+exit $ret

@@ -18,7 +18,13 @@ bash "$ROOT/scripts/preflight-check.sh"
 python3 -m unittest discover -s "$ROOT/scripts/tests" -v
 mkdir -p "$WORK/packages"
 for package in "$ROOT"/packages/*; do
-    find "$package/DEBIAN" -type f \( -name postinst -o -name preinst -o -name postrm -o -name prerm \) -exec chmod 755 {} +
+    # Garantir permissões corretas e LF em todos os scripts/binários
+    find "$package/DEBIAN" -type f \( -name postinst -o -name preinst -o -name postrm -o -name prerm \) \
+        -exec chmod 755 {} + -exec sed -i 's/\r//' {} +
+    find "$package/usr/bin" -type f -exec chmod 755 {} + 2>/dev/null || true
+    find "$package/usr/bin" -type f -exec sed -i 's/\r//' {} + 2>/dev/null || true
+    find "$package" -type f -name "*.py" -exec sed -i 's/\r//' {} + 2>/dev/null || true
+    find "$package" -type f -name "*.sh" -exec sed -i 's/\r//' {} + 2>/dev/null || true
     dpkg-deb --build --root-owner-group "$package" "$WORK/packages/$(basename "$package").deb"
 done
 (cd "$WORK/packages"; dpkg-scanpackages . /dev/null > Packages; gzip -k Packages)
@@ -36,7 +42,9 @@ done
 rsync -a "$ROOT/installer/calamares/" "$WORK/config/includes.chroot/etc/calamares/"
 mkdir -p "$WORK/config/archives"
 printf 'deb [trusted=yes] file://%s/packages ./\n' "$WORK" > "$WORK/config/archives/katu-local.list.chroot"
-find "$WORK/config/hooks" -type f -name '*.hook.*' -exec chmod 755 {} +
+find "$WORK/config/hooks" -type f -name '*.hook.*' -exec chmod 755 {} + -exec sed -i 's/\r//' {} +
+find "$WORK/config/includes.chroot/usr/bin" -type f -exec chmod 755 {} + 2>/dev/null || true
+find "$WORK/config/includes.chroot/usr/lib/katu" -type f -exec chmod 755 {} + 2>/dev/null || true
 chmod 755 "$WORK/config/includes.chroot/usr/lib/katu/qa-live-smoke"
 cd "$WORK"
 lb config --distribution "$LB_DISTRIBUTION" --architecture "$LB_ARCHITECTURE" \

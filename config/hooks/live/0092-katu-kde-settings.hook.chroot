@@ -171,6 +171,22 @@ done
 # Atualizar cache de menus
 update-desktop-database /usr/share/applications 2>/dev/null || true
 
+# Garantir permissão de execução em todos os binários Katu
+for bin in /usr/bin/katu-*; do
+    [ -f "$bin" ] && chmod 755 "$bin" || true
+done
+
+# Pré-marcar desktop .desktop files como confiáveis (KDE 5.24+ exige confiança)
+# O atributo metadata::trusted é lido pelo KDE via GIO
+SKEL_DESKTOP="/etc/skel/Área de Trabalho"
+if [ -d "$SKEL_DESKTOP" ]; then
+    for df in "$SKEL_DESKTOP"/*.desktop; do
+        [ -f "$df" ] || continue
+        chmod 755 "$df"
+        gio set "$df" metadata::trusted true 2>/dev/null || true
+    done
+fi
+
 # Atualizar cache do tema de ícones katu para que GTK e KDE reconheçam
 if [ -d /usr/share/icons/katu ]; then
     gtk-update-icon-cache -f -t /usr/share/icons/katu 2>/dev/null || true

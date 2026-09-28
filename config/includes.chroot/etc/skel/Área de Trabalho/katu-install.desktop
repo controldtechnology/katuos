@@ -9,4 +9,5 @@ Exec=katu-installer
 Icon=katu-logo
 Terminal=false
 Categories=System;
+StartupNotify=true
 X-Desktop-File-Install-Version=0.26
