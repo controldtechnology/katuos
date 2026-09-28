@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Katu Update
+Exec=systemctl --user start katu-update-check.timer
+Icon=system-software-update
+NoDisplay=true
+X-KDE-autostart-phase=2

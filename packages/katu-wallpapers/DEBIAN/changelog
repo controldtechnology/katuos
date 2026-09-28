@@ -1,0 +1,5 @@
+katu-wallpapers (1.1.0) beta; urgency=medium
+
+  * Package existing desktop assets independently; preserve user preferences.
+
+ -- Katu OS Team <katuos@gmail.com>  Mon, 28 Sep 2026 12:00:00 -0300

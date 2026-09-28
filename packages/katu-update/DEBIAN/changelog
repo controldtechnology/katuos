@@ -1,5 +1,6 @@
-katu-update (1.0.1) stable; urgency=low
+katu-update (1.1.0) beta; urgency=medium
 
-  * Initial release.
+  * Evolve existing updater with authenticated APT plans and detached transactions.
+  * Add history, native notifications, safe cancellation and version validation.
 
- -- Katu OS Team <katuos@gmail.com>  Sat, 27 Sep 2026 00:00:00 -0300
+ -- Katu OS Team <katuos@gmail.com>  Mon, 28 Sep 2026 12:00:00 -0300

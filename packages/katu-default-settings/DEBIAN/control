@@ -1,5 +1,5 @@
 Package: katu-default-settings
-Version: 1.0
+Version: 1.0.2
 Architecture: all
 Maintainer: Katu OS Team <katuos@gmail.com>
 Depends: katu-branding, plasma-desktop, sddm

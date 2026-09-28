@@ -1,0 +1,9 @@
+Package: katu-desktop-defaults
+Version: 1.1.0
+Architecture: all
+Maintainer: Katu OS Team <katuos@gmail.com>
+Section: misc
+Priority: optional
+Depends: katu-default-settings
+Description: Katu desktop defaults compatibility metapackage
+ Katu OS independently updatable component.

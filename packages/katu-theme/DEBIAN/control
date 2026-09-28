@@ -1,0 +1,11 @@
+Package: katu-theme
+Version: 1.1.0
+Architecture: all
+Maintainer: Katu OS Team <katuos@gmail.com>
+Section: misc
+Priority: optional
+Breaks: katu-branding (<< 1.1.0)
+Replaces: katu-branding (<< 1.1.0)
+X-Katu-Category: Visual
+Description: Katu Plasma themes
+ Katu OS independently updatable component.

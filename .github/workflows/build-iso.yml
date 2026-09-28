@@ -1,8 +1,6 @@
 name: Build Katu OS ISO
 
 on:
-  push:
-    branches: [master, main]
   workflow_dispatch:
 
 jobs:

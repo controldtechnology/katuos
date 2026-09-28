@@ -5,6 +5,9 @@ Mantenha seu sistema atualizado sem usar o terminal.
 """
 import sys, os, subprocess
 from pathlib import Path
+import json, time
+sys.path.insert(0, '/usr/lib/katu-update')
+import backend
 
 try:
     from PyQt5.QtWidgets import *
@@ -20,7 +23,6 @@ except ImportError:
 sys.path.insert(0, '/usr/lib/python3/dist-packages')
 try:
     from katu_core import ui, notifications
-    from katu_core.packages import apt_update, apt_upgrade, apt_list_upgradable, flatpak_list_upgradable
     CORE = True
 except ImportError:
     CORE = False
@@ -29,10 +31,6 @@ except ImportError:
         BORDER = "#30363d"; ACCENT = "#00c853"; TEXT = "#e6edf3"; MUTED = "#8b949e"
         ERROR = "#f85149"; AMBER = "#ffab00"; SUCCESS = "#3fb950"; TEXT_INV = "#0d1117"
     ui = _FakeUI()
-    def apt_update(cb=None): return False
-    def apt_upgrade(cb=None): return False
-    def apt_list_upgradable(): return []
-    def flatpak_list_upgradable(): return []
     class notifications:
         @staticmethod
         def notify_success(a, b=""): pass
@@ -41,45 +39,68 @@ except ImportError:
 
 
 class CheckThread(QThread):
-    progress  = pyqtSignal(str)
-    done      = pyqtSignal(list, list)  # apt_updates, flatpak_updates
+    progress = pyqtSignal(str)
+    done = pyqtSignal(dict, list)
+    failed = pyqtSignal(str)
+
+    def __init__(self, selected=None):
+        super().__init__()
+        self.selected = selected
 
     def run(self):
-        self.progress.emit("Atualizando lista de pacotes...")
-        apt_update(lambda l: self.progress.emit(l[:80]))
-        self.progress.emit("Verificando atualizações APT...")
-        apt_pkgs = apt_list_upgradable()
-        self.progress.emit("Verificando atualizações Flatpak...")
-        flat_pkgs = flatpak_list_upgradable()
-        self.done.emit(apt_pkgs, flat_pkgs)
+        try:
+            self.progress.emit("Atualizando índices autenticados...")
+            backend.run(['pkexec', backend.HELPER, 'refresh'], timeout=900)
+            plan = backend.make_plan(self.selected)
+            plan['optional'] = backend.optional_apps()
+            flat = backend.flatpak_plan()
+            self.done.emit(plan, flat)
+        except Exception as exc:
+            self.failed.emit(str(exc))
 
 
 class UpgradeThread(QThread):
     progress = pyqtSignal(str)
-    done     = pyqtSignal(bool)
+    done = pyqtSignal(bool)
 
-    def __init__(self, upgrade_flatpak=False):
+    def __init__(self, plan, flat):
         super().__init__()
-        self._flat = upgrade_flatpak
+        self.plan, self.flat = plan, flat
 
     def run(self):
-        ok = True
-        self.progress.emit("Instalando atualizações APT...")
-        if not apt_upgrade(lambda l: self.progress.emit(l[:80])):
-            ok = False
-        if self._flat:
-            self.progress.emit("Atualizando Flatpak...")
-            try:
-                p = subprocess.Popen(
-                    ["flatpak", "update", "--noninteractive"],
-                    stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True
-                )
-                for line in p.stdout:
-                    self.progress.emit(line.rstrip()[:80])
-                p.wait()
-            except Exception:
-                pass
-        self.done.emit(ok)
+        try:
+            if self.plan['packages']:
+                backend.preflight(self.plan)
+                backend.run(['pkexec', backend.HELPER, 'start', self.plan['digest']] + self.plan['selected'])
+                started = time.time()
+                while True:
+                    state = backend.read_state()
+                    if state.get('id') == self.plan['digest'] and state.get('started', 0) >= started - 10:
+                        phase = state.get('phase', '')
+                        self.progress.emit({'validating': 'Validando...', 'downloading': 'Baixando pacotes autenticados...',
+                                            'installing': 'Instalando; não desligue o computador.',
+                                            'verifying': 'Validando versões instaladas...'}.get(phase, phase))
+                        if phase in ('complete', 'failed'):
+                            if not state.get('ok'):
+                                raise backend.UpdateError(state.get('error', 'Falha na atualização.'))
+                            break
+                    active = subprocess.run(['systemctl', 'is-active', '--quiet', backend.UNIT]).returncode == 0
+                    if not active and time.time() - started > 10:
+                        raise backend.UpdateError('Transação interrompida. Consulte o histórico e verifique o dpkg.')
+                    time.sleep(1)
+            for scope in ('user', 'system'):
+                refs = [item['ref'] for item in self.flat if item['scope'] == scope]
+                if refs:
+                    self.progress.emit('Atualizando Flatpak (' + scope + ')...')
+                    backend.run(['flatpak', 'update', '--' + scope, '--noninteractive'] + refs, timeout=None)
+            if self.flat:
+                remaining = {(p['scope'], p['ref']) for p in backend.flatpak_plan()}
+                if any((p['scope'], p['ref']) in remaining for p in self.flat):
+                    raise backend.UpdateError('Flatpak ainda possui atualizações pendentes; verifique novamente.')
+            self.done.emit(True)
+        except Exception as exc:
+            self.progress.emit(str(exc))
+            self.done.emit(False)
 
 
 class KatuUpdate(QMainWindow):
@@ -91,6 +112,8 @@ class KatuUpdate(QMainWindow):
         self.setWindowIcon(QIcon("/usr/share/icons/hicolor/256x256/apps/katu-logo.png"))
         self._apt_pkgs  = []
         self._flat_pkgs = []
+        self._plan = {}
+        self._busy = False
         self._build_ui()
         QTimer.singleShot(500, self._check)
 
@@ -163,6 +186,16 @@ class KatuUpdate(QMainWindow):
         self._update_btn.setEnabled(False)
         self._update_btn.clicked.connect(self._update_all)
 
+        self._history_btn = QPushButton("HISTÓRICO")
+        self._history_btn.clicked.connect(self._show_history)
+        self._apps_btn = QPushButton("APPS OFICIAIS")
+        self._apps_btn.clicked.connect(self._offer_app)
+        self._cancel_btn = QPushButton("CANCELAR DOWNLOAD")
+        self._cancel_btn.setEnabled(False)
+        self._cancel_btn.clicked.connect(self._cancel_download)
+        btn_row.addWidget(self._history_btn)
+        btn_row.addWidget(self._apps_btn)
+        btn_row.addWidget(self._cancel_btn)
         btn_row.addWidget(self._check_btn)
         btn_row.addWidget(self._update_btn)
         lay.addLayout(btn_row)
@@ -173,7 +206,10 @@ class KatuUpdate(QMainWindow):
         self._last_check.setAlignment(Qt.AlignCenter)
         lay.addWidget(self._last_check)
 
-    def _check(self):
+    def _check(self, selected=None):
+        if isinstance(selected, bool):
+            selected = None
+        self._busy = True
         self._check_btn.setEnabled(False)
         self._update_btn.setEnabled(False)
         self._list.setVisible(False)
@@ -181,9 +217,10 @@ class KatuUpdate(QMainWindow):
         self._log.clear()
         self._status_icon.setText("⟳")
         self._status_text.setText("Verificando atualizações...")
-        t = CheckThread()
+        t = CheckThread(selected)
         t.progress.connect(self._log_line)
         t.done.connect(self._on_check_done)
+        t.failed.connect(self._on_check_failed)
         t.start()
         self._check_thread = t
 
@@ -191,12 +228,15 @@ class KatuUpdate(QMainWindow):
         self._log.appendPlainText(line)
         self._log.verticalScrollBar().setValue(self._log.verticalScrollBar().maximum())
 
-    def _on_check_done(self, apt_pkgs, flat_pkgs):
+    def _on_check_done(self, plan, flat_pkgs):
+        self._busy = False
+        self._plan = plan
+        apt_pkgs = plan["packages"]
         from datetime import datetime
         self._apt_pkgs  = apt_pkgs
         self._flat_pkgs = flat_pkgs
         total = len(apt_pkgs) + len(flat_pkgs)
-        self._last_check.setText(f"Última verificação: {datetime.now().strftime('%d/%m/%Y %H:%M')}")
+        self._last_check.setText(f"Última verificação: {datetime.now().strftime('%d/%m/%Y %H:%M')} | Canal: {backend.channel()}")
         self._check_btn.setEnabled(True)
         self._log.setVisible(False)
 
@@ -210,7 +250,7 @@ class KatuUpdate(QMainWindow):
         else:
             self._status_icon.setText("⚠")
             self._status_icon.setStyleSheet(f"font-size:24px; color:{ui.AMBER};")
-            seg_count = sum(1 for p, v, s in apt_pkgs if "security" in s.lower())
+            seg_count = sum(1 for p in apt_pkgs if p["category"] == "Segurança")
             self._status_text.setText(f"{total} atualizações disponíveis")
             self._subtitle.setText(
                 f"APT: {len(apt_pkgs)} | Flatpak: {len(flat_pkgs)}"
@@ -218,11 +258,11 @@ class KatuUpdate(QMainWindow):
             )
             self._list.clear()
             self._list.setVisible(True)
-            for name, ver, src in apt_pkgs:
-                icon = "🔒" if "security" in src.lower() else "📦"
-                self._list.addItem(f"{icon} {name}  {ver}  (APT)")
-            for name, ver, src in flat_pkgs:
-                self._list.addItem(f"🔷 {name}  {ver}  (Flatpak)")
+            for package in apt_pkgs:
+                self._list.addItem(f"{package['name']}  {package['installed'] or 'Novo'} → {package['version']}  ({package['origin']})\n{package['category']}: {package['notes']}")
+            for package in flat_pkgs:
+                self._list.addItem(f"{package['ref']}  {package['version']}  (Flatpak / {package['scope']})")
+            self._subtitle.setText(self._subtitle.text() + f" | Download APT: {plan['download'] / 1048576:.1f} MB")
             self._update_btn.setEnabled(True)
 
     def _update_all(self):
@@ -239,24 +279,87 @@ class KatuUpdate(QMainWindow):
         self._log.setVisible(True)
         self._log.clear()
         self._status_text.setText("Instalando atualizações...")
-        t = UpgradeThread(upgrade_flatpak=bool(self._flat_pkgs))
+        self._busy = True
+        self._cancel_btn.setEnabled(bool(self._apt_pkgs))
+        t = UpgradeThread(self._plan, self._flat_pkgs)
         t.progress.connect(self._log_line)
         t.done.connect(self._on_upgrade_done)
         t.start()
         self._upgrade_thread = t
 
     def _on_upgrade_done(self, ok):
+        self._busy = False
+        self._cancel_btn.setEnabled(False)
         self._check_btn.setEnabled(True)
         if ok:
             self._status_icon.setText("✓")
             self._status_icon.setStyleSheet(f"font-size:24px; color:{ui.SUCCESS};")
-            self._status_text.setText("Atualizações instaladas com sucesso!")
+            self._status_text.setText("Atualizações instaladas e validadas.")
+            if backend.read_state().get('reboot') or Path('/run/reboot-required').exists():
+                reply = QMessageBox.question(self, 'Reinicialização necessária',
+                    'É necessário reiniciar para concluir. Reiniciar agora?', QMessageBox.Yes | QMessageBox.No)
+                if reply == QMessageBox.Yes:
+                    subprocess.Popen(['systemctl', 'reboot'])
             if CORE:
                 notifications.notify_success("Katu Update", "Sistema atualizado com sucesso.")
         else:
             self._status_text.setText("Algumas atualizações não puderam ser instaladas.")
             if CORE:
                 notifications.notify_error("Katu Update", "Falha em algumas atualizações.")
+
+    def _on_check_failed(self, message):
+        self._busy = False
+        self._check_btn.setEnabled(True)
+        self._update_btn.setEnabled(False)
+        self._status_icon.setText("⚠")
+        self._status_text.setText("Não foi possível verificar as atualizações.")
+        self._subtitle.setText("Verifique a conexão e a configuração do repositório.")
+        self._log_line(message)
+
+    def _show_history(self):
+        entries = backend.history()
+        lines = []
+        for entry in reversed(entries):
+            stamp = time.strftime('%d/%m/%Y %H:%M', time.localtime(entry.get('started', 0)))
+            lines.append(stamp + (' — Concluído' if entry.get('ok') else ' — Falha/interrupção'))
+            lines.extend(p['name'] + ' ' + p['version'] for p in entry.get('packages', []))
+            if entry.get('error'):
+                lines.append(entry['error'])
+        current = backend.read_state()
+        if current.get('phase') not in (None, 'complete', 'failed'):
+            lines.insert(0, 'Última transação: ' + current['phase'] + '. Confira se o serviço está ativo antes de reparar.')
+        dialog = QMessageBox(self)
+        dialog.setWindowTitle('Histórico do Katu Update')
+        dialog.setText('Operações APT registradas pelo sistema')
+        dialog.setDetailedText('\n'.join(lines) or 'Nenhuma operação registrada.')
+        dialog.exec()
+
+    def _offer_app(self):
+        if self._busy:
+            return
+        apps = self._plan.get('optional', [])
+        if not apps:
+            QMessageBox.information(self, 'Apps oficiais', 'Nenhum componente opcional novo disponível na última verificação.')
+            return
+        name, accepted = QInputDialog.getItem(self, 'Apps oficiais', 'Escolha um componente para revisar e instalar:', apps, 0, False)
+        if accepted:
+            self._check([name])
+
+    def _cancel_download(self):
+        if backend.read_state().get('phase') != 'downloading':
+            self._log_line('Cancelamento disponível somente durante o download.')
+            return
+        try:
+            backend.run(['pkexec', backend.HELPER, 'cancel'])
+        except Exception as exc:
+            self._log_line(str(exc))
+
+    def closeEvent(self, event):
+        if self._busy:
+            QMessageBox.information(self, 'Operação em andamento', 'Aguarde a conclusão da operação.')
+            event.ignore()
+        else:
+            event.accept()
 
 
 def main():

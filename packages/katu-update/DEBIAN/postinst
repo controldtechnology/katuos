@@ -1,11 +1,10 @@
-#!/bin/bash
+#!/bin/sh
 set -e
-chmod 755 /usr/bin/katu-update
-
-# Enable update check timer for all existing users (systemd --user)
-systemctl daemon-reload 2>/dev/null || true
-for uid in $(awk -F: '$3 >= 1000 && $3 < 65534 {print $3}' /etc/passwd); do
-    systemctl --machine="${uid}@.host" --user enable --now katu-update-check.timer 2>/dev/null || true
-done
-
-exit 0
+if [ "$1" = configure ]; then
+    /usr/bin/python3 -I /usr/lib/katu-update/migrate.py
+    if [ -d /run/systemd/system ]; then
+        systemctl daemon-reload
+        systemctl enable --now katu-update-check.timer
+        systemctl --global enable katu-update-check.timer
+    fi
+fi

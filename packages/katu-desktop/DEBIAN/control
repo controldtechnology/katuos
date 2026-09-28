@@ -1,0 +1,10 @@
+Package: katu-desktop
+Version: 1.1.0
+Architecture: all
+Maintainer: Katu OS Team <katuos@gmail.com>
+Section: misc
+Priority: optional
+Depends: katu-core, katu-update (>= 1.1.0)
+Recommends: katu-central, katu-ai, katu-store, katu-welcome, katu-drivers, katu-connect, katu-backup, katu-webapps, katu-help, katu-diagnostic, katu-feedback, katu-branding, katu-theme, katu-icons, katu-wallpapers, katu-desktop-defaults
+Description: Katu official desktop component set
+ Katu OS independently updatable component.

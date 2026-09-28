@@ -1,8 +1,8 @@
 Package: katu-branding
-Version: 1.0
+Version: 1.1.0
 Architecture: all
 Maintainer: Katu OS Team <katuos@gmail.com>
-Depends: katu-release, plasma-desktop
+Depends: katu-release, plasma-desktop, katu-icons (>= 1.1.0), katu-theme (>= 1.1.0), katu-wallpapers (>= 1.1.0)
 Recommends: katu-default-settings
 Priority: optional
 Section: misc

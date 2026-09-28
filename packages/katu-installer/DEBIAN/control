@@ -1,5 +1,5 @@
 Package: katu-installer
-Version: 1.0
+Version: 1.0.2
 Architecture: all
 Maintainer: Katu OS Team <katuos@gmail.com>
 Depends: calamares, pkexec, kdialog, katu-release

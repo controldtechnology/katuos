@@ -1,3 +1,9 @@
+katu-release (1.0.2) beta; urgency=medium
+
+  * Normalize component version and package ownership for continuous updates.
+
+ -- Katu OS Team <katuos@gmail.com>  Mon, 28 Sep 2026 12:00:00 -0300
+
 katu-release (1.0-1) stable; urgency=low
 
   * Initial release of Katu OS 1.0.

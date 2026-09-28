@@ -1,0 +1,12 @@
+[Unit]
+Description=Refresh authenticated package indexes for Katu Update
+Wants=network-online.target
+After=network-online.target
+ConditionPathExists=/etc/apt/sources.list.d/katu.sources
+
+[Service]
+Type=oneshot
+ExecStart=/usr/lib/katu-update/helper refresh
+Nice=10
+IOSchedulingClass=idle
+TimeoutStartSec=15min

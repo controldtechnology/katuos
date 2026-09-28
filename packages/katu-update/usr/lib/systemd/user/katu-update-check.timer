@@ -1,11 +1,9 @@
 [Unit]
-Description=Katu OS Update Checker Timer
-Requires=network-online.target
+Description=Katu Update session notification timer
 
 [Timer]
-OnBootSec=5min
-OnUnitActiveSec=24h
-Persistent=false
+OnStartupSec=7min
+OnUnitActiveSec=1h
 
 [Install]
 WantedBy=timers.target
