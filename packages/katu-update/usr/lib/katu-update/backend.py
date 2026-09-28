@@ -19,6 +19,10 @@ class UpdateError(RuntimeError):
     pass
 
 
+def user_error(exc):
+    return str(exc) if isinstance(exc, UpdateError) else 'Operação indisponível. Verifique conexão, permissões e estado do gerenciador de pacotes.'
+
+
 def run(args, timeout=120):
     result = subprocess.run(args, capture_output=True, text=True, timeout=timeout,
                             env={**os.environ, 'LC_ALL': 'C'})
@@ -56,6 +60,12 @@ def make_plan(selected=None):
         pkg.mark_install(auto_fix=True, auto_inst=True, from_user=False)
     if cache.broken_count:
         raise UpdateError('Não foi possível resolver as dependências deste plano.')
+    for name in selected:
+        pkg = cache[name]
+        if not pkg.is_installed and not pkg.marked_install:
+            raise UpdateError('Não foi possível instalar o componente solicitado: ' + name)
+        if pkg.is_installed and pkg.is_upgradable and not pkg.marked_upgrade:
+            raise UpdateError('A atualização foi retida pelo resolvedor: ' + name)
     changes = []
     for pkg in cache.get_changes():
         if pkg.marked_delete:

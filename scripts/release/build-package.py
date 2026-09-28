@@ -48,6 +48,7 @@ def build(name, output):
             raise ValueError('Changelog does not match package version')
         doc = stage / 'usr/share/doc' / name
         doc.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(ROOT / 'LICENSE', doc / 'copyright')
         with (doc / 'changelog.Debian.gz').open('wb') as stream:
             with gzip.GzipFile(fileobj=stream, mode='wb', mtime=0) as gz:
                 gz.write(changelog.read_bytes().replace(b'\r\n', b'\n'))

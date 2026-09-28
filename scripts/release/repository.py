@@ -35,7 +35,7 @@ def publish(channel, debs, root, evidence):
         raise ValueError('Use the full signing fingerprint')
     gnupg = Path(os.environ['GNUPGHOME']).resolve()
     root = root.resolve()
-    if gnupg == root or root in gnupg.parents:
+    if gnupg == root or root in gnupg.parents or gnupg in root.parents:
         raise ValueError('Signing key must not be inside repository storage')
     root.mkdir(parents=True, exist_ok=True)
     with (root / '.publish.lock').open('w') as lock:
@@ -98,6 +98,11 @@ def publish(channel, debs, root, evidence):
                 subprocess.run(['gpg', '--batch', '--yes', '--local-user', key, '--digest-algo', 'SHA256',
                                 '--output', str(suite_dir / filename)] + flags + [str(suite_dir / 'Release')], check=True)
         (stage / 'katu-archive-keyring.asc').write_bytes(run(['gpg', '--armor', '--export', key]))
+        with tempfile.TemporaryDirectory(prefix='katu-verify-') as verification:
+            keyring = Path(verification) / 'public.gpg'
+            keyring.write_bytes(run(['gpg', '--export', key]))
+            for suite in ('stable', 'beta'):
+                subprocess.run(['gpgv', '--keyring', str(keyring), str(stage / 'dists' / suite / 'InRelease')], check=True)
         (stage / 'ledger.json').write_text(json.dumps(records, indent=2))
         link = root / '.public-next'
         link.unlink(missing_ok=True)

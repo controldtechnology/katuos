@@ -4,6 +4,7 @@ Baseline Git: `3d4521f588d60b397e3125ba33164613825582d1`.
 Antes da intervenção não havia alterações rastreadas; `.claude/`, `dist/`,
 `worktrees/` e `--help` eram não rastreados e não pertencem à intervenção.
 ISO preservada: `dist/run-36410706498/candidate-20260928T103901Z-3d4521f5/katu-os-1.0.1-rc1-amd64.iso`.
+SHA-256 medido: `5078d379640ae4743fe03d78642fde34b040095c36353c7aa30ebd3ee9fb6cda`.
 
 ## Implementação encontrada
 

@@ -18,14 +18,8 @@ bash "$ROOT/scripts/preflight-check.sh"
 python3 -m unittest discover -s "$ROOT/scripts/tests" -v
 mkdir -p "$WORK/packages"
 for package in "$ROOT"/packages/*; do
-    # Garantir permissões corretas e LF em todos os scripts/binários
-    find "$package/DEBIAN" -type f \( -name postinst -o -name preinst -o -name postrm -o -name prerm \) \
-        -exec chmod 755 {} + -exec sed -i 's/\r//' {} +
-    find "$package/usr/bin" -type f -exec chmod 755 {} + 2>/dev/null || true
-    find "$package/usr/bin" -type f -exec sed -i 's/\r//' {} + 2>/dev/null || true
-    find "$package" -type f -name "*.py" -exec sed -i 's/\r//' {} + 2>/dev/null || true
-    find "$package" -type f -name "*.sh" -exec sed -i 's/\r//' {} + 2>/dev/null || true
-    dpkg-deb --build --root-owner-group "$package" "$WORK/packages/$(basename "$package").deb"
+    # Installation snapshots use the same component artifacts as continuous releases.
+    python3 "$ROOT/scripts/release/build-package.py" "$(basename "$package")" --output "$WORK/packages"
 done
 (cd "$WORK/packages"; dpkg-scanpackages . /dev/null > Packages; gzip -k Packages)
 rsync -a "$ROOT/config/" "$WORK/config/"

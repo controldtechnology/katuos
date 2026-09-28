@@ -109,7 +109,7 @@ def transaction(digest, selected):
         verify_versions(plan)
         record.update(ok=True, phase='complete', reboot=Path('/run/reboot-required').exists() or plan['critical'])
     except Exception as exc:
-        record.update(ok=False, phase='failed', error=str(exc) if isinstance(exc, UpdateError) else 'Transação interrompida ou indisponível; consulte o journal.')
+        record.update(ok=False, failed_phase=record['phase'], error_type=type(exc).__name__, phase='failed', error=str(exc) if isinstance(exc, UpdateError) else 'Transação interrompida ou indisponível; consulte o journal.')
     finally:
         record['finished'] = time.time()
         write_json('status.json', record)

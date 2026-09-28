@@ -1,54 +1,17 @@
 # Katu OS APT Repository
 
-Repositório APT oficial para pacotes customizados do Katu OS.
+Destino oficial: https://repo.katuos.com.br, suites stable e beta.
 
-## Estrutura
+Consulte [configuração e bootstrap](../docs/updates/REPOSITORY.md),
+[assinatura](../docs/updates/SIGNING.md) e
+[processo de release](../docs/updates/RELEASE-PROCESS.md).
 
-```
-repository/
-├── dists/
-│   └── katu/
-│       ├── Release
-│       └── main/
-│           └── binary-amd64/
-│               ├── Packages
-│               └── Packages.gz
-├── pool/
-│   └── main/
-│       ├── katu-release_1.0_all.deb
-│       ├── katu-branding_1.0_all.deb
-│       ├── katu-default-settings_1.0_all.deb
-│       └── katu-welcome_1.0_all.deb
-└── setup-repo.sh
+`setup-repo.sh` é um ponto de entrada compatível para o publicador autenticado:
+
+```sh
+bash repository/setup-repo.sh publish beta output/packages/katu-ai_1.1.0_all.deb --root /srv/katu-release
 ```
 
-## Gerar o Repositório (Linux)
-
-```bash
-bash repository/setup-repo.sh
-```
-
-O script:
-1. Compila os 4 pacotes `.deb` de `packages/`
-2. Copia para `repository/pool/main/`
-3. Gera `Packages` e `Release` com dpkg-scanpackages
-4. Gera índice comprimido `.gz`
-
-## Usar o Repositório Localmente
-
-```bash
-echo "deb [trusted=yes] file:///caminho/para/katuos/repository katu main" \
-  | sudo tee /etc/apt/sources.list.d/katu-local.list
-
-sudo apt update
-sudo apt install katu-welcome
-```
-
-## Repositório Futuro
-
-O repositório público será hospedado em `repo.katuos.com.br`.
-
-Linha sources.list futura:
-```
-deb [signed-by=/etc/apt/keyrings/katuos.gpg] https://repo.katuos.com.br katu main
-```
+Exige GNUPGHOME privado e KATU_SIGNING_KEY configurados. O host de assinatura
+não é o servidor web. Somente a geração pública deve ser hospedada.
+Nunca usar trusted=yes ou desabilitar validação de assinatura no cliente.

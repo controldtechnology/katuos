@@ -4,6 +4,7 @@
 katu-release
 katu-branding
 katu-default-settings
+katu-desktop
 
 # Biblioteca base — deve ser instalada antes de qualquer app Katu
 katu-core

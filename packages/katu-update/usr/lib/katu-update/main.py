@@ -58,7 +58,7 @@ class CheckThread(QThread):
             flat = backend.flatpak_plan()
             self.done.emit(plan, flat)
         except Exception as exc:
-            self.failed.emit(str(exc))
+            self.failed.emit(backend.user_error(exc))
 
 
 class UpgradeThread(QThread):
@@ -103,7 +103,7 @@ class UpgradeThread(QThread):
                     raise backend.UpdateError('Flatpak ainda possui atualizações pendentes; verifique novamente.')
             self.done.emit(True)
         except Exception as exc:
-            self.progress.emit(str(exc))
+            self.progress.emit(backend.user_error(exc))
             self.done.emit(False)
 
 
@@ -299,10 +299,16 @@ class KatuUpdate(QMainWindow):
             self._status_icon.setText("✓")
             self._status_icon.setStyleSheet(f"font-size:24px; color:{ui.SUCCESS};")
             self._status_text.setText("Atualizações instaladas e validadas.")
-            if backend.read_state().get('reboot') or Path('/run/reboot-required').exists():
-                reply = QMessageBox.question(self, 'Reinicialização necessária',
-                    'É necessário reiniciar para concluir. Reiniciar agora?', QMessageBox.Yes | QMessageBox.No)
-                if reply == QMessageBox.Yes:
+            state = backend.read_state()
+            if (self._apt_pkgs and state.get('id') == self._plan.get('digest') and state.get('reboot')) or Path('/run/reboot-required').exists():
+                dialog = QMessageBox(self)
+                dialog.setWindowTitle('Reinicialização necessária')
+                dialog.setText('Atualização concluída. É necessário reiniciar para concluir.')
+                restart = dialog.addButton('REINICIAR', QMessageBox.AcceptRole)
+                later = dialog.addButton('MAIS TARDE', QMessageBox.RejectRole)
+                dialog.setDefaultButton(later)
+                dialog.exec()
+                if dialog.clickedButton() == restart:
                     subprocess.Popen(['systemctl', 'reboot'])
             if CORE:
                 notifications.notify_success("Katu Update", "Sistema atualizado com sucesso.")
@@ -356,7 +362,7 @@ class KatuUpdate(QMainWindow):
         try:
             backend.run(['pkexec', backend.HELPER, 'cancel'])
         except Exception as exc:
-            self._log_line(str(exc))
+            self._log_line(backend.user_error(exc))
 
     def closeEvent(self, event):
         if self._busy:
