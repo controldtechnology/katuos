@@ -26,11 +26,17 @@ sem dpkg-deb/apt-ftparchive. O subdomínio `repo.katuos.com.br` foi criado pelo
 Plesk (ID 3731), raiz web `/var/www/vhosts/katuos.com.br/site1/public`; use
 `/var/www/vhosts/katuos.com.br/site1` como área privada de gerações. A zona pública usa
 Cloudflare; o registro A `repo` → `186.209.113.132` já resolve com proxy
-desativado. HTTPS ainda serve um certificado com nome incorreto. A emissão Let's
-Encrypt via API CLI e a criação de chave temporária foram recusadas pela permissão
-desta conta; emitir pelo painel com usuário autorizado ou obter acesso Plesk admin.
-Build/signing precisam ocorrer em host Debian separado. Não publicar antes de HTTPS válido e chave
-de produção protegida. Não apontar para o httpdocs do site atual.
+desativado. Em 29/09/2026, HTTPS valida corretamente e a geração publicada entrega
+metadata/pacotes. O domínio raiz sem caminho retorna 403 porque não há listagem de
+diretório; os caminhos APT diretos respondem 200. A emissão Let's Encrypt pela API
+CLI e a criação de chave temporária foram recusadas pela permissão desta conta; o
+usuário instalou o certificado pelo painel. A chave de produção e o fingerprint
+estão documentados em [SIGNING.md](SIGNING.md). O beta público contém
+`katu-update 1.1.1`; stable está vazio. Assinaturas, hashes, downloads HTTPS e gzip
+foram verificados localmente. A validação por `apt-get update` e numa instalação
+Katu OS continua pendente. O Plesk não tem `apt-ftparchive`/`dpkg-deb`; o Windows
+desta estação não conseguiu habilitar WSL. Usar host Debian separado para próximos
+builds e releases. Não apontar para o httpdocs do site atual.
 
 Deploy: `scripts/release/deploy-repository.sh PUBLIC_GENERATION`. Configurar
 KATU_DEPLOY_HOST (alias SSH), KATU_DEPLOY_ROOT, KATU_SSH_PORT e KATU_VERIFY_KEYRING.

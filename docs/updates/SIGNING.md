@@ -20,4 +20,12 @@ Para rotação, distribuir primeiro o novo material público por pacote autentic
 com a chave antiga e planejar sobreposição. Revogar após migração dos clientes.
 Se a chave antiga for comprometida, tratar como incidente e reprovisionar confiança.
 
-Nenhuma chave de produção foi criada ou publicada durante os testes iniciais.
+Chave de produção criada em 29/09/2026 para o repositório Katu: RSA 4096, uso de
+assinatura, validade de dois anos, fingerprint
+`402A0557D31BF7402008FB27B658038D520736AC`. A chave pública versionada em
+`config/katu-archive-keyring.asc` corresponde a esse fingerprint. A chave privada
+permanece na estação local em `%APPDATA%\KatuOS\release-signing\gnupg`, com ACL
+restrita ao usuário e SYSTEM; sua passphrase aleatória está cifrada pelo DPAPI do
+usuário e há uma cópia privada exportada cifrada pelo próprio GPG no mesmo diretório.
+Nenhum material privado foi transferido ao Plesk, Git ou CI. Mantenha backup cifrado
+fora desta estação antes de depender da chave para releases de longo prazo.

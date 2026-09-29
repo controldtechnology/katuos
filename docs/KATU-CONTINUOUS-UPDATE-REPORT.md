@@ -3,9 +3,8 @@
 Data da auditoria: 29/09/2026. Branch de trabalho: feat/continuous-update-20260928.
 Branch publicada: `feat/continuous-update-20260928`.
 
-**Estado: infraestrutura de código e testes preparada; produção e aceitação em
-máquina instalada ainda não concluídas.** Não anunciar atualização contínua em
-produção antes de concluir os itens abaixo e revisar o CI final.
+**Estado: beta assinada publicada; stable e aceitação em máquina instalada ainda
+não concluídos.** A beta está disponível para bootstrap e homologação controlada.
 
 Atualizador auditado: GUI Katu Update existente em Python/Qt, evoluída no pacote
 existente; backend APT python-apt, Flatpak nativo, Polkit e systemd timer.
@@ -14,12 +13,13 @@ Localização e baseline: [auditoria](KATU-UPDATE-AUDIT.md).
 | Área | Resultado atual |
 |---|---|
 | Arquitetura | Implementada; [documentada](updates/ARCHITECTURE.md) |
-| Repositório | Gerador assinado preparado; vhost Plesk criado; DNS público ainda não resolve |
-| Assinatura | GPG/apt-secure exercitados com chave descartável; chave de produção ausente |
-| Stable/Beta | Geração e gate de promoção preparados; nenhum canal de produção publicado |
+| Repositório | `https://repo.katuos.com.br`; DNS/TLS ativos; geração publicada no Plesk por symlink atômico |
+| Assinatura | Chave GPG de produção criada; fingerprint `402A0557D31BF7402008FB27B658038D520736AC`; privada local cifrada, nunca enviada ao servidor |
+| Stable/Beta | stable assinado e vazio; beta assinado publica `katu-update 1.1.1` |
 | Componentes | Apps existentes já eram pacotes; assets separados em katu-icons, katu-theme, katu-wallpapers |
 | Metapacote | katu-desktop preparado, com Recommends opcionais |
 | Update incremental | Exercitado em APT de Debian descartável: somente katu-ai; central permaneceu na versão anterior |
+| Repositório público | InRelease de ambos canais, hashes SHA256, gzip e download do `.deb` verificados por HTTPS; `apt-get update` real pendente |
 | Dependências | Exercitadas com upgrade katu-core; APT inclui as dependências necessárias |
 | Novo aplicativo | Exercitado via metapacote em ambiente descartável |
 | Assinatura inválida/corrupção/offline | Rejeitados em testes APT descartáveis |
@@ -39,25 +39,27 @@ Limitações bloqueantes de produção:
 
 1. O subdomínio `repo.katuos.com.br` foi criado no Plesk (ID 3731), com raiz web
    `/var/www/vhosts/katuos.com.br/site1/public` e armazenamento privado em `site1`.
-   O A `repo` → `186.209.113.132` já resolve pelo Cloudflare (DNS-only). HTTPS
-   ainda apresenta certificado de nome incorreto. A conta Plesk recusou tanto a
-   emissão LE via CLI quanto a criação de uma chave API temporária (permissão negada).
-   A emissão precisa ser feita no painel por uma conta com essa permissão ou por
-   administrador Plesk. Sem TLS válido e chave de assinatura de produção, nada foi publicado.
+   Em 29/09/2026, o A `repo` → `186.209.113.132` resolve pelo Cloudflare
+   (DNS-only). HTTPS validado. Os canais stable/beta e o `.deb` respondem via HTTPS;
+   o site raiz sem caminho retorna 403 por não haver índice/listagem. A conta Plesk
+   recusou emissão LE pela API CLI e criação de chave API temporária; o certificado
+   foi instalado pelo usuário.
 2. Não havia VM Katu OS registrada no usuário local, e WSL não está instalado.
    Executar homologação com Katu OS instalado conforme updates/TESTING.md.
-3. Nenhuma chave de assinatura de produção foi provisionada. Criar/recuperar a
-   chave fora do Git, ISO, CI e raiz pública; distribuir fingerprint por canal
-   independente.
+3. A chave de produção foi gerada em 29/09/2026 e validada com `gpgv`; fingerprint
+   `402A0557D31BF7402008FB27B658038D520736AC`. A passphrase aleatória está cifrada
+   pelo DPAPI e a chave privada permanece em AppData com ACL restrita. Publicar o
+   fingerprint por canal independente e manter backup cifrado fora desta estação.
 4. A transferência de arquivos antes pertencentes a katu-branding e hooks de
    branding precisa de upgrade e remoção testados no Katu OS.
-5. A execução CI 36563783648 passou: lintian, testes unitários, 14 integrações
+5. A execução CI 36566750249 passou: lintian, testes unitários, 14 integrações
    APT autenticadas (incluindo autoatualização) e smoke test Qt. CI Debian não
    atesta reboot, KDE/Polkit/systemd PID 1 nem hardware.
 
-Próximos passos: emitir e validar TLS com conta Plesk autorizada; obter chave de assinatura por processo protegido;
-homologar bootstrap de confiança
-em instalação existente; obter chave por processo protegido; executar a matriz beta
-no Katu OS instalado; anexar evidências por SHA-256; só então publicar beta, promover
-stable e testar a notificação/atualização real. Nenhum pacote foi publicado no site;
-nenhuma chave de produção foi criada.
+Próximos passos: validar o repositório com `apt-get update` num Debian/Katu OS;
+homologar o bootstrap beta e o upgrade de `katu-update` numa máquina instalada;
+preservar um backup cifrado da chave fora desta estação; testar recuperação/remoção;
+executar a matriz de stable antes de promover qualquer pacote. O beta público contém
+somente o candidato `katu-update 1.1.1` (SHA-256
+`f23bd098d4206dd5aacccd14ee06e5d0d1cf960f05254e8d74dd02848e843141`); stable não
+contém pacotes.
