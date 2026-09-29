@@ -1,3 +1,9 @@
+katu-update (1.1.1) beta; urgency=medium
+
+  * Install staged archives through APT's normal archive resolver for correct repository path handling.
+
+ -- Katu OS Team <katuos@gmail.com>  Tue, 29 Sep 2026 09:00:00 -0300
+
 katu-update (1.1.0) beta; urgency=medium
 
   * Evolve existing updater with authenticated APT plans and detached transactions.

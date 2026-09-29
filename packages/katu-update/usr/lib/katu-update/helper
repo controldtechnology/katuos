@@ -118,7 +118,9 @@ def transaction(digest, selected):
             raise UpdateError('O plano mudou durante o download. Verifique novamente.')
         record['phase'] = 'installing'
         write_json('status.json', record)
-        apt_phase(base + ['--no-download', 'install'] + specs, record)
+        # Let APT resolve the already staged archives normally. --no-download
+        # breaks repositories whose Packages index uses relative Filename paths.
+        apt_phase(base + ['install'] + specs, record)
         automatic = [p['name'] for p in plan['packages'] if p['automatic']]
         if automatic:
             run(['/usr/bin/apt-mark', 'auto'] + automatic)
