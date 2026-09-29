@@ -29,6 +29,7 @@ on:
           - katu-icons
           - katu-installer
           - katu-release
+          - katu-repo-config
           - katu-store
           - katu-theme
           - katu-update

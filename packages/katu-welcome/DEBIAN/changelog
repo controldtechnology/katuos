@@ -1,3 +1,10 @@
+katu-welcome (1.0.3) stable; urgency=medium
+
+  * Use the shared katu-icons package for the application icon.
+  * Avoid duplicate ownership of the hicolor welcome icon.
+
+ -- Katu OS Team <katuos@gmail.com>  Tue, 29 Sep 2026 18:30:00 -0300
+
 katu-welcome (1.0.2) beta; urgency=medium
 
   * Normalize component version and package ownership for continuous updates.
