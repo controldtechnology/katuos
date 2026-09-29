@@ -6,7 +6,38 @@ on:
       - 'scripts/release/**'
       - 'scripts/tests/*update*'
       - '.github/workflows/continuous-update.yml'
-  workflow_dispatch:
+workflow_dispatch:
+  inputs:
+    package:
+      description: Component package to build in a manual run
+      type: choice
+      options:
+        - katu-ai
+        - katu-backup
+        - katu-branding
+        - katu-central
+        - katu-connect
+        - katu-core
+        - katu-default-settings
+        - katu-desktop
+        - katu-desktop-defaults
+        - katu-diagnostic
+        - katu-drivers
+        - katu-feedback
+        - katu-help
+        - katu-ia
+        - katu-icons
+        - katu-installer
+        - katu-release
+        - katu-store
+        - katu-theme
+        - katu-update
+        - katu-wallpapers
+        - katu-webapps
+        - katu-welcome
+        - katu-xampp
+      default: katu-update
+      required: true
 permissions:
   contents: read
 jobs:
@@ -25,8 +56,14 @@ jobs:
         run: python3 -m unittest discover -s scripts/tests -p test_continuous_update.py -v
       - name: Select changed packages
         id: changed
+        env:
+          PACKAGE_INPUT: ${{ inputs.package }}
         run: |
-          packages=$(python3 scripts/release/changed-packages.py --event "$GITHUB_EVENT_PATH")
+          if [ "$GITHUB_EVENT_NAME" = workflow_dispatch ]; then
+            packages="$PACKAGE_INPUT"
+          else
+            packages=$(python3 scripts/release/changed-packages.py --event "$GITHUB_EVENT_PATH")
+          fi
           printf '%s\n' "$packages" > "$RUNNER_TEMP/katu-packages"
           cat "$RUNNER_TEMP/katu-packages"
       - name: Build changed components independently
