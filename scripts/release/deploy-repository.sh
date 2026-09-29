@@ -18,5 +18,5 @@ if find -L "$1" -type f \( -name '*.key' -o -name '*private*' -o -name '*secret*
 fi
 ssh -p "$PORT" -o StrictHostKeyChecking=yes "$KATU_DEPLOY_HOST" "mkdir -p '$KATU_DEPLOY_ROOT/generations/$STAMP'"
 rsync -rtL --delay-updates -e "ssh -p $PORT -o StrictHostKeyChecking=yes" "$1/" "$KATU_DEPLOY_HOST:$KATU_DEPLOY_ROOT/generations/$STAMP/"
-ssh -p "$PORT" -o StrictHostKeyChecking=yes "$KATU_DEPLOY_HOST" "cd '$KATU_DEPLOY_ROOT' && ln -s 'generations/$STAMP' '.public-$STAMP' && mv -Tf '.public-$STAMP' public"
+ssh -p "$PORT" -o StrictHostKeyChecking=yes "$KATU_DEPLOY_HOST" "cd '$KATU_DEPLOY_ROOT' && ln -s 'generations/$STAMP' '.public-$STAMP' && if [ -d public ] && [ ! -L public ]; then mv public '.bootstrap-public-$STAMP'; fi && if ! mv -Tf '.public-$STAMP' public; then [ ! -d '.bootstrap-public-$STAMP' ] || mv '.bootstrap-public-$STAMP' public; exit 1; fi"
 echo 'Public generation deployed. Verify HTTPS InRelease before announcing the release.'

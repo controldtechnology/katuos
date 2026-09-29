@@ -1,7 +1,7 @@
 # KATU OS — CONTINUOUS UPDATE
 
 Data da auditoria: 29/09/2026. Branch de trabalho: feat/continuous-update-20260928.
-Branch publicada: `feat/continuous-update-20260928` (HEAD `2224709`).
+Branch publicada: `feat/continuous-update-20260928`.
 
 **Estado: infraestrutura de código e testes preparada; produção e aceitação em
 máquina instalada ainda não concluídas.** Não anunciar atualização contínua em
@@ -37,8 +37,9 @@ boot, base, kernel e instalador permanecem sob mecanismos da distribuição.
 
 Limitações bloqueantes de produção:
 
-1. O subdomínio `repo.katuos.com.br` foi criado no Plesk (ID 3731), com raiz
-   `/var/www/vhosts/katuos.com.br/site1`. A zona pública usa nameservers Cloudflare;
+1. O subdomínio `repo.katuos.com.br` foi criado no Plesk (ID 3731), com raiz web
+   `/var/www/vhosts/katuos.com.br/site1/public` e armazenamento privado em `site1`.
+   A zona pública usa nameservers Cloudflare;
    o registro A precisa ser criado lá (`repo` → `186.209.113.132`, proxy DNS-only).
    Depois, emitir/validar TLS no Plesk. Sem DNS autoritativo e TLS, nada foi publicado.
 2. Não havia VM Katu OS registrada no usuário local, e WSL não está instalado.

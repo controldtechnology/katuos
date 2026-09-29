@@ -53,7 +53,7 @@ Windows, Python 3.13 disponível em Laragon, WSL ausente. VirtualBox não listou
 VMs neste usuário. Não equivale a teste num Katu OS instalado.
 SSH do servidor Plesk funciona sob CageFS; não há CLI administrativa nem
 `dpkg-deb`/`reprepro` no PATH. A API XML autenticada do Plesk permitiu criar
-`repo.katuos.com.br` (ID 3731; raiz `site1`). Nameservers públicos são Cloudflare,
+`repo.katuos.com.br` (ID 3731; raiz web `site1/public`, armazenamento em `site1`). Nameservers públicos são Cloudflare,
 portanto mudanças na zona do Plesk não publicam DNS. Banco de dados não é necessário.
 Credenciais não fazem parte deste relatório.
 

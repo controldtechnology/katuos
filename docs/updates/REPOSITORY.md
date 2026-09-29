@@ -23,7 +23,8 @@ do pool e não reutiliza um nome/versão com bytes diferentes. Metadata expira a
 
 Servidor observado em 29/09/2026: conta Plesk em CageFS, sem CLI administrativa,
 sem dpkg-deb/apt-ftparchive. O subdomínio `repo.katuos.com.br` foi criado pelo
-Plesk (ID 3731), raiz `/var/www/vhosts/katuos.com.br/site1`. A zona pública usa
+Plesk (ID 3731), raiz web `/var/www/vhosts/katuos.com.br/site1/public`; use
+`/var/www/vhosts/katuos.com.br/site1` como área privada de gerações. A zona pública usa
 Cloudflare e ainda não tem resolução para `repo`; adicionar um registro A
 `repo` → `186.209.113.132` com proxy desativado (DNS-only), depois emitir TLS.
 Build/signing precisam ocorrer em host Debian separado. Não publicar antes de
