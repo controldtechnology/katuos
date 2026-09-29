@@ -23,6 +23,21 @@ class FailureTests(unittest.TestCase):
             with self.assertRaises(backend.UpdateError):
                 backend.run(['apt-get', 'update'])
 
+    def test_low_battery_blocks_critical_update(self):
+        with tempfile.TemporaryDirectory() as directory:
+            battery = Path(directory)
+            (battery / 'type').write_text('Battery')
+            (battery / 'capacity').write_text('10')
+            (battery / 'status').write_text('Discharging')
+            with patch.object(backend.shutil, 'disk_usage', return_value=types.SimpleNamespace(free=10**12)), patch.object(backend, 'Path') as paths:
+                paths.return_value.glob.return_value = [battery]
+                with self.assertRaisesRegex(backend.UpdateError, 'energia'):
+                    backend.preflight(dict(download=1024, disk=0, critical=True))
+
+    def test_unexpected_errors_do_not_leak_credentials(self):
+        message = backend.user_error(RuntimeError('https://user:secret@example.invalid'))
+        self.assertNotIn('secret', message)
+
     def test_version_must_be_verified(self):
         with patch.object(backend, 'run', return_value='installed\t1.0.0'):
             with self.assertRaisesRegex(backend.UpdateError, 'Validação'):

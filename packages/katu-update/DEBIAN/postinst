@@ -2,7 +2,7 @@
 set -e
 if [ "$1" = configure ]; then
     /usr/bin/python3 -I /usr/lib/katu-update/migrate.py
-    if [ -d /run/systemd/system ]; then
+    if systemctl show-environment >/dev/null 2>&1; then
         systemctl daemon-reload
         systemctl enable --now katu-update-check.timer
         systemctl --global enable katu-update-check.timer

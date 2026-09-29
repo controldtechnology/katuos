@@ -49,7 +49,7 @@ def configure(url, channel, key, fingerprint, root):
     put(keydir / 'katu-archive-keyring.asc', raw)
     put(sources / 'katu.sources', f'Types: deb\nURIs: {url.rstrip("/")}\nSuites: {channel}\nComponents: main\nArchitectures: amd64\nSigned-By: /etc/apt/keyrings/katu-archive-keyring.asc\nCheck-Valid-Until: yes\n'.encode())
     blocked = 'beta' if channel == 'stable' else 'stable'
-    put(preferences / 'katu-channels', f'Package: *\nPin: release o=Katu OS,n={blocked}\nPin-Priority: -1\n'.encode())
+    put(preferences / 'katu-channels', f'Package: *\nPin: release n={blocked}\nPin-Priority: -1\n'.encode())
 
 
 if __name__ == '__main__':

@@ -93,6 +93,14 @@ def make_plan(selected=None):
                             notes=record.get('X-Katu-Notes', candidate.summary),
                             critical=pkg.name.startswith(CRITICAL)))
     changes.sort(key=lambda item: item['name'])
+    if changes:
+        specs = [p['name'] + '=' + p['version'] for p in changes]
+        simulation = subprocess.run(['apt-get', '--simulate', '--no-remove', '--no-install-recommends',
+                                     '-o', 'APT::Get::AllowUnauthenticated=false',
+                                     '-o', 'Acquire::AllowInsecureRepositories=false', 'install'] + specs,
+                                    capture_output=True, text=True, env={**os.environ, 'LC_ALL': 'C'})
+        if simulation.returncode:
+            raise UpdateError('As dependências deste plano não podem ser instaladas com segurança.')
     identity = [{k: p[k] for k in ('name', 'installed', 'version', 'size', 'sha256')} for p in changes]
     digest = hashlib.sha256(json.dumps(identity, sort_keys=True).encode()).hexdigest()
     return dict(packages=changes, digest=digest, selected=sorted(selected),

@@ -15,17 +15,32 @@ jobs:
     container: debian:trixie
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Install test and packaging tools
         run: |
           apt-get update
           apt-get install -y python3 python3-apt python3-pyqt5 python3-requests pkexec systemd libnotify-bin lsb-release dpkg-dev apt-utils gnupg lintian git
       - name: Unit tests
         run: python3 -m unittest discover -s scripts/tests -p test_continuous_update.py -v
-      - name: Build each component independently
+      - name: Select changed packages
+        id: changed
         run: |
-          for package in packages/*; do
-            bash scripts/release/build-package.sh "$(basename "$package")"
-          done
+          base='${{ github.event.before }}'
+          if [[ -z "$base" || "$base" =~ ^0+$ ]]; then base='HEAD^'; fi
+          packages=$(python3 scripts/release/changed-packages.py --base "$base")
+          printf '%s\n' "$packages" > "$RUNNER_TEMP/katu-packages"
+          cat "$RUNNER_TEMP/katu-packages"
+      - name: Build changed components independently
+        run: |
+          while IFS= read -r package; do
+            [[ -z "$package" ]] || bash scripts/release/build-package.sh "$package"
+          done < "$RUNNER_TEMP/katu-packages"
+      - name: Lint changed packages
+        run: |
+          while IFS= read -r package; do
+            [[ -z "$package" ]] || bash scripts/release/test-package.sh "output/packages/${package}_"*.deb
+          done < "$RUNNER_TEMP/katu-packages"
       - name: Real authenticated APT integration tests
         env:
           KATU_DISPOSABLE_TEST: '1'

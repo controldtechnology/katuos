@@ -163,19 +163,26 @@ class AptIntegration(unittest.TestCase):
         self.assertEqual(status['phase'], 'complete')
         self.assertTrue(Path('/var/lib/katu-update/history.jsonl').read_text())
 
-    def test_10_broken_dependency_rejected(self):
+    def test_10_build_release_index_fields(self):
+        deb = self.package('katu-example', '1.3.0')
+        metadata = command('dpkg-deb', '-f', str(deb)).stdout
+        fields = dict(line.split(': ', 1) for line in metadata.splitlines() if ': ' in line)
+        self.assertEqual(fields['Package'], 'katu-example')
+        self.assertEqual(fields['Version'], '1.3.0')
+
+    def test_11_broken_dependency_rejected(self):
         self.publish(self.package('katu-broken', '1.0.0', 'katu-missing (>= 9.0.0)'))
         with self.assertRaises(Exception):
             backend.make_plan(['katu-broken'])
 
-    def test_11_plan_change_rejected(self):
+    def test_12_plan_change_rejected(self):
         plan = backend.make_plan(['katu-example'])
         self.publish(self.package('katu-example', '1.2.0'))
         result = command('/usr/lib/katu-update/helper', 'apply', plan['digest'], 'katu-example', ok=False)
         self.assertNotEqual(result.returncode, 0)
         self.assertEqual(command('dpkg-query', '-W', '-f=${Version}', 'katu-example').stdout, '1.0.0')
 
-    def test_12_theme_and_hold(self):
+    def test_13_theme_and_hold(self):
         self.publish(self.package('katu-theme', '1.0.0'))
         self.install('katu-theme')
         self.publish(self.package('katu-theme', '1.1.0'))
@@ -187,7 +194,7 @@ class AptIntegration(unittest.TestCase):
         plan = backend.make_plan(['katu-theme'])
         self.assertEqual([p['name'] for p in plan['packages']], ['katu-theme'])
 
-    def test_13_unreviewed_beta_cannot_promote(self):
+    def test_14_unreviewed_beta_cannot_promote(self):
         deb = self.package('katu-unreviewed', '1.0.0')
         evidence = self.work / 'approval.json'
         evidence.write_text(json.dumps({repository.sha(deb): dict.fromkeys(repository.GATES, True)}))

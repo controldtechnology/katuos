@@ -62,8 +62,8 @@ def publish(channel, debs, root, evidence):
         pool.mkdir(parents=True, exist_ok=True)
         selected = records.setdefault(channel, {})
         for deb in debs:
-            metadata = run(['dpkg-deb', '-f', str(deb), 'Package', 'Version', 'Architecture'], text=True)
-            values = dict(line.split(': ', 1) for line in metadata.strip().splitlines())
+            metadata = run(['dpkg-deb', '-f', str(deb)], text=True)
+            values = dict(line.split(': ', 1) for line in metadata.splitlines() if ': ' in line and not line.startswith(' '))
             name, version, arch = (values[k] for k in ('Package', 'Version', 'Architecture'))
             if not re.fullmatch(r'katu-[a-z0-9+.-]+', name) or not re.fullmatch(r'\d+\.\d+\.\d+(?:-[1-9]\d*)?', version) or arch not in ('all', 'amd64'):
                 raise ValueError('Unsupported package metadata')
@@ -82,6 +82,10 @@ def publish(channel, debs, root, evidence):
             content = b''.join(paragraphs)
             (binary / 'Packages').write_bytes(content)
             (binary / 'Packages.gz').write_bytes(gzip.compress(content, mtime=0))
+            by_hash = binary / 'by-hash/SHA256'
+            by_hash.mkdir(parents=True, exist_ok=True)
+            for index in (binary / 'Packages', binary / 'Packages.gz'):
+                shutil.copy2(index, by_hash / sha(index))
             suite_dir = stage / 'dists' / suite
             for old in ('Release', 'InRelease', 'Release.gpg'):
                 (suite_dir / old).unlink(missing_ok=True)
@@ -93,7 +97,7 @@ def publish(channel, debs, root, evidence):
                            '-o', 'APT::FTPArchive::Release::Architectures=amd64 all',
                            '-o', 'APT::FTPArchive::Release::Components=main',
                            'release', '.'], cwd=suite_dir)
-            (suite_dir / 'Release').write_bytes(b'Valid-Until: ' + valid.encode() + b'\n' + release)
+            (suite_dir / 'Release').write_bytes(b'Acquire-By-Hash: yes\nValid-Until: ' + valid.encode() + b'\n' + release)
             for flags, filename in ((['--clearsign'], 'InRelease'), (['--armor', '--detach-sign'], 'Release.gpg')):
                 subprocess.run(['gpg', '--batch', '--yes', '--local-user', key, '--digest-algo', 'SHA256',
                                 '--output', str(suite_dir / filename)] + flags + [str(suite_dir / 'Release')], check=True)

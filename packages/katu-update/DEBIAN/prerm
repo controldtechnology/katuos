@@ -1,6 +1,6 @@
 #!/bin/sh
 set -e
-if [ "$1" = remove ] && [ -d /run/systemd/system ]; then
+if [ "$1" = remove ] && systemctl show-environment >/dev/null 2>&1; then
     systemctl disable --now katu-update-check.timer
     systemctl --global disable katu-update-check.timer
 fi
