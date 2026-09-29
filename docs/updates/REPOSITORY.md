@@ -25,10 +25,12 @@ Servidor observado em 29/09/2026: conta Plesk em CageFS, sem CLI administrativa,
 sem dpkg-deb/apt-ftparchive. O subdomínio `repo.katuos.com.br` foi criado pelo
 Plesk (ID 3731), raiz web `/var/www/vhosts/katuos.com.br/site1/public`; use
 `/var/www/vhosts/katuos.com.br/site1` como área privada de gerações. A zona pública usa
-Cloudflare e ainda não tem resolução para `repo`; adicionar um registro A
-`repo` → `186.209.113.132` com proxy desativado (DNS-only), depois emitir TLS.
-Build/signing precisam ocorrer em host Debian separado. Não publicar antes de
-DNS e HTTPS válidos e chave de produção protegida. Não apontar para o httpdocs do site atual.
+Cloudflare; o registro A `repo` → `186.209.113.132` já resolve com proxy
+desativado. HTTPS ainda serve um certificado com nome incorreto. A emissão Let's
+Encrypt pela API CLI foi recusada pela permissão desta conta; emitir pelo painel
+ou autorizar uma chave de API temporária, que será revogada após o uso. Build/signing
+precisam ocorrer em host Debian separado. Não publicar antes de HTTPS válido e chave
+de produção protegida. Não apontar para o httpdocs do site atual.
 
 Deploy: `scripts/release/deploy-repository.sh PUBLIC_GENERATION`. Configurar
 KATU_DEPLOY_HOST (alias SSH), KATU_DEPLOY_ROOT, KATU_SSH_PORT e KATU_VERIFY_KEYRING.
