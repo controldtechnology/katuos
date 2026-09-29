@@ -1,0 +1,8 @@
+Package: katu-repo-config
+Version: 1.0.0
+Architecture: all
+Maintainer: Katu OS Team <katuos@gmail.com>
+Section: admin
+Priority: important
+Description: Official authenticated APT source for Katu OS
+ Installs the public archive key and stable repository source for incremental updates.

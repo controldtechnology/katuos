@@ -1,3 +1,9 @@
+katu-desktop (1.1.1) stable; urgency=medium
+
+  * Depend on katu-repo-config so fresh installations receive the authenticated update source.
+
+ -- Katu OS Team <katuos@gmail.com>  Tue, 29 Sep 2026 18:00:00 -0300
+
 katu-desktop (1.1.0) beta; urgency=medium
 
   * Package existing desktop assets independently; preserve user preferences.

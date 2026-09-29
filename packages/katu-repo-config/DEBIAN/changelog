@@ -1,0 +1,6 @@
+katu-repo-config (1.0.0) stable; urgency=medium
+
+  * Configure the signed Katu stable APT repository on new installations.
+  * Install only the public archive key and use apt Signed-By.
+
+ -- Katu OS Team <katuos@gmail.com>  Tue, 29 Sep 2026 18:00:00 -0300

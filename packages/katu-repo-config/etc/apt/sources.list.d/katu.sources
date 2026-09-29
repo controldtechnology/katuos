@@ -1,0 +1,7 @@
+Types: deb
+URIs: https://repo.katuos.com.br
+Suites: stable
+Components: main
+Architectures: amd64
+Signed-By: /usr/share/keyrings/katu-archive-keyring.asc
+Check-Valid-Until: yes

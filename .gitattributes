@@ -13,6 +13,7 @@ config/includes.chroot/usr/lib/katu/qa-live-smoke text eol=lf
 *.qml text eol=lf
 *.script text eol=lf
 *.plymouth text eol=lf
+packages/katu-repo-config/usr/share/keyrings/*.asc text eol=lf
 *.colors text eol=lf
 
 # Windows docs can use CRLF
