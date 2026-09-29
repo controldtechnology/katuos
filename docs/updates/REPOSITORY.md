@@ -27,9 +27,9 @@ Plesk (ID 3731), raiz web `/var/www/vhosts/katuos.com.br/site1/public`; use
 `/var/www/vhosts/katuos.com.br/site1` como área privada de gerações. A zona pública usa
 Cloudflare; o registro A `repo` → `186.209.113.132` já resolve com proxy
 desativado. HTTPS ainda serve um certificado com nome incorreto. A emissão Let's
-Encrypt pela API CLI foi recusada pela permissão desta conta; emitir pelo painel
-ou autorizar uma chave de API temporária, que será revogada após o uso. Build/signing
-precisam ocorrer em host Debian separado. Não publicar antes de HTTPS válido e chave
+Encrypt via API CLI e a criação de chave temporária foram recusadas pela permissão
+desta conta; emitir pelo painel com usuário autorizado ou obter acesso Plesk admin.
+Build/signing precisam ocorrer em host Debian separado. Não publicar antes de HTTPS válido e chave
 de produção protegida. Não apontar para o httpdocs do site atual.
 
 Deploy: `scripts/release/deploy-repository.sh PUBLIC_GENERATION`. Configurar

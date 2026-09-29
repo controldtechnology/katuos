@@ -40,9 +40,10 @@ Limitações bloqueantes de produção:
 1. O subdomínio `repo.katuos.com.br` foi criado no Plesk (ID 3731), com raiz web
    `/var/www/vhosts/katuos.com.br/site1/public` e armazenamento privado em `site1`.
    O A `repo` → `186.209.113.132` já resolve pelo Cloudflare (DNS-only). HTTPS
-   ainda apresenta certificado de nome incorreto. A conta Plesk recusou a chamada
-   de emissão LE via CLI; falta autorização para chave API temporária ou emissão
-   manual pelo painel. Sem TLS válido e chave de assinatura de produção, nada foi publicado.
+   ainda apresenta certificado de nome incorreto. A conta Plesk recusou tanto a
+   emissão LE via CLI quanto a criação de uma chave API temporária (permissão negada).
+   A emissão precisa ser feita no painel por uma conta com essa permissão ou por
+   administrador Plesk. Sem TLS válido e chave de assinatura de produção, nada foi publicado.
 2. Não havia VM Katu OS registrada no usuário local, e WSL não está instalado.
    Executar homologação com Katu OS instalado conforme updates/TESTING.md.
 3. Nenhuma chave de assinatura de produção foi provisionada. Criar/recuperar a
@@ -54,7 +55,7 @@ Limitações bloqueantes de produção:
    APT autenticadas (incluindo autoatualização) e smoke test Qt. CI Debian não
    atesta reboot, KDE/Polkit/systemd PID 1 nem hardware.
 
-Próximos passos: emitir e validar TLS; obter chave de assinatura por processo protegido;
+Próximos passos: emitir e validar TLS com conta Plesk autorizada; obter chave de assinatura por processo protegido;
 homologar bootstrap de confiança
 em instalação existente; obter chave por processo protegido; executar a matriz beta
 no Katu OS instalado; anexar evidências por SHA-256; só então publicar beta, promover
