@@ -1,7 +1,7 @@
 # KATU OS — CONTINUOUS UPDATE
 
 Data da auditoria: 29/09/2026. Branch de trabalho: feat/continuous-update-20260928.
-Commits: 30f385d, 54382e4, 6a8346d, b7bad46, 1a45350.
+Branch publicada: `feat/continuous-update-20260928` (HEAD `24381f4`).
 
 **Estado: infraestrutura de código e testes preparada; produção e aceitação em
 máquina instalada ainda não concluídas.** Não anunciar atualização contínua em
@@ -23,7 +23,7 @@ Localização e baseline: [auditoria](KATU-UPDATE-AUDIT.md).
 | Dependências | Exercitadas com upgrade katu-core; APT inclui as dependências necessárias |
 | Novo aplicativo | Exercitado via metapacote em ambiente descartável |
 | Assinatura inválida/corrupção/offline | Rejeitados em testes APT descartáveis |
-| Autoatualização | Helper real exercitado; investigar último resultado CI |
+| Autoatualização | OK no CI Debian descartável: upgrade real do pacote `katu-update` verificado por dpkg e helper |
 | Preferências pessoais | Conffiles preservados; migração não percorre /home |
 | Histórico/migrações | Estado e histórico APT preparados; idempotência testada |
 | Timer/notificações | Unidades e notify-send incluídos; validação de sessão KDE pendente |
@@ -47,8 +47,9 @@ Limitações bloqueantes de produção:
    independente.
 4. A transferência de arquivos antes pertencentes a katu-branding e hooks de
    branding precisa de upgrade e remoção testados no Katu OS.
-5. O CI deve concluir lintian, autoatualização e smoke test Qt após o último commit.
-   CI Debian não atesta reboot, KDE/Polkit/systemd PID 1 nem hardware.
+5. A execução CI 36563783648 passou: lintian, testes unitários, 14 integrações
+   APT autenticadas (incluindo autoatualização) e smoke test Qt. CI Debian não
+   atesta reboot, KDE/Polkit/systemd PID 1 nem hardware.
 
 Próximos passos: resolver DNS/TLS do subdomínio; homologar bootstrap de confiança
 em instalação existente; obter chave por processo protegido; executar a matriz beta
