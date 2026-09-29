@@ -17,6 +17,10 @@ if args.event:
         for commit in event['commits']:
             for kind in ('added', 'modified', 'removed'):
                 paths.extend(commit.get(kind, []))
+    elif event.get('head_commit'):
+        commit = event['head_commit']
+        for kind in ('added', 'modified', 'removed'):
+            paths.extend(commit.get(kind, []))
     else:
         all_packages = True
 else:
