@@ -42,8 +42,12 @@ def publish(channel, debs, root, evidence):
         fcntl.flock(lock, fcntl.LOCK_EX)
         current = root / 'public'
         records = {}
-        if (current / 'ledger.json').exists():
-            records = json.loads((current / 'ledger.json').read_text())
+        state = root / '.release-state'
+        state.mkdir(mode=0o700, exist_ok=True)
+        state.chmod(0o700)
+        ledger = state / 'ledger.json'
+        if ledger.exists():
+            records = json.loads(ledger.read_text())
         gate = json.loads(evidence.read_text()) if evidence else {}
         for deb in debs:
             digest = sha(deb)
@@ -107,11 +111,15 @@ def publish(channel, debs, root, evidence):
             keyring.write_bytes(run(['gpg', '--export', key]))
             for suite in ('stable', 'beta'):
                 subprocess.run(['gpgv', '--keyring', str(keyring), str(stage / 'dists' / suite / 'InRelease')], check=True)
-        (stage / 'ledger.json').write_text(json.dumps(records, indent=2))
+        (stage / 'ledger.json').unlink(missing_ok=True)
         link = root / '.public-next'
         link.unlink(missing_ok=True)
         link.symlink_to(stage.relative_to(root), target_is_directory=True)
         link.replace(current)
+        ledger_tmp = ledger.with_suffix('.tmp')
+        ledger_tmp.write_text(json.dumps(records, indent=2))
+        ledger_tmp.chmod(0o600)
+        ledger_tmp.replace(ledger)
         print(current)
 
 

@@ -27,19 +27,19 @@ jobs:
         id: changed
         run: |
           base='${{ github.event.before }}'
-          if [[ -z "$base" || "$base" =~ ^0+$ ]]; then base='HEAD^'; fi
+          case "$base" in ''|000*) base='HEAD^' ;; esac
           packages=$(python3 scripts/release/changed-packages.py --base "$base")
           printf '%s\n' "$packages" > "$RUNNER_TEMP/katu-packages"
           cat "$RUNNER_TEMP/katu-packages"
       - name: Build changed components independently
         run: |
           while IFS= read -r package; do
-            [[ -z "$package" ]] || bash scripts/release/build-package.sh "$package"
+            [ -z "$package" ] || bash scripts/release/build-package.sh "$package"
           done < "$RUNNER_TEMP/katu-packages"
       - name: Lint changed packages
         run: |
           while IFS= read -r package; do
-            [[ -z "$package" ]] || bash scripts/release/test-package.sh "output/packages/${package}_"*.deb
+            [ -z "$package" ] || bash scripts/release/test-package.sh "output/packages/${package}_"*.deb
           done < "$RUNNER_TEMP/katu-packages"
       - name: Real authenticated APT integration tests
         env:

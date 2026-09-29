@@ -46,6 +46,7 @@ def apt_phase(args, record, cancellation=None):
     """Only numeric progress and validated package names reach persistent status."""
     diagnostic = STATE / 'apt-error.tmp'
     with diagnostic.open('w') as errors:
+      os.chmod(diagnostic, 0o600)
       process = subprocess.Popen(args + ['-o', 'APT::Status-Fd=1'], stdout=subprocess.PIPE,
                                  stderr=errors, env={**os.environ, 'LC_ALL': 'C', 'DEBIAN_FRONTEND': 'noninteractive'})
     os.set_blocking(process.stdout.fileno(), False)
