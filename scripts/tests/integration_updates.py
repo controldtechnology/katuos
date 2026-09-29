@@ -32,10 +32,10 @@ class AptIntegration(unittest.TestCase):
         cls.temp = tempfile.TemporaryDirectory(prefix='katu-apt-')
         cls.work = Path(cls.temp.name)
         cls.work.chmod(0o755)
-        updater_deb = ROOT / 'output/packages/katu-update_1.1.0_all.deb'
-        if not updater_deb.exists():
+        updater_candidates = sorted((ROOT / 'output/packages').glob('katu-update_*_all.deb'))
+        if not updater_candidates:
             command(sys.executable, str(ROOT / 'scripts/release/build-package.py'),
-                    'katu-update', '--output', str(updater_deb.parent))
+                    'katu-update', '--output', str(ROOT / 'output/packages'))
         cls.gpg = cls.work / 'signing'
         cls.gpg.mkdir(mode=0o700)
         os.environ['GNUPGHOME'] = str(cls.gpg)
@@ -148,14 +148,20 @@ class AptIntegration(unittest.TestCase):
 
 
     def test_09_actual_updater_self_upgrade(self):
-        original = ROOT / 'output/packages/katu-update_1.1.0_all.deb'
+        original = max((ROOT / 'output/packages').glob('katu-update_*_all.deb'),
+                       key=lambda path: tuple(int(part) for part in
+                           command('dpkg-deb', '-f', str(path), 'Version').stdout.strip().split('.')))
+        current = command('dpkg-deb', '-f', str(original), 'Version').stdout.strip()
+        parts = current.split('.')
+        parts[-1] = str(int(parts[-1]) + 1)
+        upgraded = '.'.join(parts)
         self.publish(original)
-        self.install('katu-update=1.1.0')
+        self.install('katu-update=' + current)
         stage = self.work / 'updater-next'
         command('dpkg-deb', '-R', str(original), str(stage))
         control = stage / 'DEBIAN/control'
-        control.write_text(control.read_text().replace('Version: 1.1.0', 'Version: 1.1.1'))
-        newer = self.work / 'katu-update_1.1.1_all.deb'
+        control.write_text(control.read_text().replace('Version: ' + current, 'Version: ' + upgraded))
+        newer = self.work / ('katu-update_' + upgraded + '_all.deb')
         command('dpkg-deb', '--build', '--root-owner-group', str(stage), str(newer))
         self.publish(newer)
         plan = backend.make_plan(['katu-update'])
