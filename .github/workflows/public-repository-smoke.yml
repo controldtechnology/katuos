@@ -1,0 +1,26 @@
+name: Public Katu APT repository smoke
+on:
+  workflow_dispatch:
+    inputs:
+      channel:
+        description: APT channel to validate
+        type: choice
+        options:
+          - beta
+          - stable
+        default: beta
+        required: true
+permissions:
+  contents: read
+jobs:
+  apt-client:
+    runs-on: ubuntu-24.04
+    container: debian:trixie
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install APT client prerequisites
+        run: |
+          apt-get update
+          apt-get install -y ca-certificates
+      - name: Verify signed public repository with APT
+        run: bash scripts/tests/smoke_public_repository.sh "${{ inputs.channel }}"
