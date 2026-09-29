@@ -1,0 +1,57 @@
+# KATU OS — CONTINUOUS UPDATE
+
+Data da auditoria: 29/09/2026. Branch de trabalho: feat/continuous-update-20260928.
+Commits: 30f385d, 54382e4, 6a8346d, b7bad46, 1a45350.
+
+**Estado: infraestrutura de código e testes preparada; produção e aceitação em
+máquina instalada ainda não concluídas.** Não anunciar atualização contínua em
+produção antes de concluir os itens abaixo e revisar o CI final.
+
+Atualizador auditado: GUI Katu Update existente em Python/Qt, evoluída no pacote
+existente; backend APT python-apt, Flatpak nativo, Polkit e systemd timer.
+Localização e baseline: [auditoria](KATU-UPDATE-AUDIT.md).
+
+| Área | Resultado atual |
+|---|---|
+| Arquitetura | Implementada; [documentada](updates/ARCHITECTURE.md) |
+| Repositório | Gerador assinado preparado; DNS ainda não resolvia |
+| Assinatura | GPG/apt-secure exercitados com chave descartável; chave de produção ausente |
+| Stable/Beta | Geração e gate de promoção preparados; nenhum canal de produção publicado |
+| Componentes | Apps existentes já eram pacotes; assets separados em katu-icons, katu-theme, katu-wallpapers |
+| Metapacote | katu-desktop preparado, com Recommends opcionais |
+| Update incremental | Exercitado em APT de Debian descartável: somente katu-ai; central permaneceu na versão anterior |
+| Dependências | Exercitadas com upgrade katu-core; APT inclui as dependências necessárias |
+| Novo aplicativo | Exercitado via metapacote em ambiente descartável |
+| Assinatura inválida/corrupção/offline | Rejeitados em testes APT descartáveis |
+| Autoatualização | Helper real exercitado; investigar último resultado CI |
+| Preferências pessoais | Conffiles preservados; migração não percorre /home |
+| Histórico/migrações | Estado e histórico APT preparados; idempotência testada |
+| Timer/notificações | Unidades e notify-send incluídos; validação de sessão KDE pendente |
+| Falhas/espaço/energia | Erros APT, dpkg incompleto, espaço e baixa bateria têm testes |
+| ISO atual | Preservada; SHA-256 5078d379640ae4743fe03d78642fde34b040095c36353c7aa30ebd3ee9fb6cda |
+
+Falhas tratadas: dependência impossível é rejeitada pela simulação APT; ausência de
+rede, assinatura/payload inválidos, falta de espaço, bateria baixa, pacote retido,
+plano alterado e estado dpkg sem validação são reportados como falha. Operações de
+boot, base, kernel e instalador permanecem sob mecanismos da distribuição.
+
+Limitações bloqueantes de produção:
+
+1. repo.katuos.com.br não resolvia no teste DNS/HTTPS. O SSH fornecido alcança
+   hospedagem CageFS, sem CLI de administração do Plesk. Criar DNS, vhost separado
+   e certificado pelo painel ou habilitar acesso administrativo.
+2. Não havia VM Katu OS registrada no usuário local, e WSL não está instalado.
+   Executar homologação com Katu OS instalado conforme updates/TESTING.md.
+3. Nenhuma chave de assinatura de produção foi provisionada. Criar/recuperar a
+   chave fora do Git, ISO, CI e raiz pública; distribuir fingerprint por canal
+   independente.
+4. A transferência de arquivos antes pertencentes a katu-branding e hooks de
+   branding precisa de upgrade e remoção testados no Katu OS.
+5. O CI deve concluir lintian, autoatualização e smoke test Qt após o último commit.
+   CI Debian não atesta reboot, KDE/Polkit/systemd PID 1 nem hardware.
+
+Próximos passos: resolver DNS/TLS do subdomínio; homologar bootstrap de confiança
+em instalação existente; obter chave por processo protegido; executar a matriz beta
+no Katu OS instalado; anexar evidências por SHA-256; só então publicar beta, promover
+stable e testar a notificação/atualização real. Nenhum pacote foi publicado no site;
+nenhuma chave de produção foi criada.

@@ -6,7 +6,10 @@ import subprocess
 parser = argparse.ArgumentParser()
 parser.add_argument('--base', required=True)
 args = parser.parse_args()
-paths = subprocess.check_output(['git', 'diff', '--name-only', args.base, 'HEAD'], text=True).splitlines()
+base = args.base
+if subprocess.run(['git', 'cat-file', '-e', base + '^{commit}'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).returncode:
+    base = 'HEAD^'
+paths = subprocess.check_output(['git', 'diff', '--name-only', base, 'HEAD'], text=True).splitlines()
 packages = set()
 all_packages = False
 assets = {
