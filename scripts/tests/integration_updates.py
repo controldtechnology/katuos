@@ -32,6 +32,10 @@ class AptIntegration(unittest.TestCase):
         cls.temp = tempfile.TemporaryDirectory(prefix='katu-apt-')
         cls.work = Path(cls.temp.name)
         cls.work.chmod(0o755)
+        updater_deb = ROOT / 'output/packages/katu-update_1.1.0_all.deb'
+        if not updater_deb.exists():
+            command(sys.executable, str(ROOT / 'scripts/release/build-package.py'),
+                    'katu-update', '--output', str(updater_deb.parent))
         cls.gpg = cls.work / 'signing'
         cls.gpg.mkdir(mode=0o700)
         os.environ['GNUPGHOME'] = str(cls.gpg)
