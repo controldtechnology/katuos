@@ -22,11 +22,11 @@ apt-get -o Dir::Etc::sourcelist="$source_list" \
 if [ "$channel" = beta ]; then
     apt-get -o Dir::Etc::sourcelist="$source_list" \
         -o Dir::Etc::sourceparts=- -o Dir::State::lists="$lists" \
-        download katu-update=1.1.1
-    package=$(find . -maxdepth 1 -name 'katu-update_1.1.1_*.deb' -print -quit)
+        download katu-update=1.1.2
+    package=$(find . -maxdepth 1 -name 'katu-update_1.1.2_*.deb' -print -quit)
     [ -n "$package" ]
     [ "$(dpkg-deb -f "$package" Package)" = katu-update ]
-    [ "$(dpkg-deb -f "$package" Version)" = 1.1.1 ]
+    [ "$(dpkg-deb -f "$package" Version)" = 1.1.2 ]
 fi
 
 echo "Public Katu APT channel verified: $channel"
