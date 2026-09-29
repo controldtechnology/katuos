@@ -31,10 +31,11 @@ metadata/pacotes. O domínio raiz sem caminho retorna 403 porque não há listag
 diretório; os caminhos APT diretos respondem 200. A emissão Let's Encrypt pela API
 CLI e a criação de chave temporária foram recusadas pela permissão desta conta; o
 usuário instalou o certificado pelo painel. A chave de produção e o fingerprint
-estão documentados em [SIGNING.md](SIGNING.md). O beta público contém
-`katu-update 1.1.1`; stable está vazio. Assinaturas, hashes, downloads HTTPS e gzip
-foram verificados localmente. A validação por `apt-get update` e numa instalação
-Katu OS continua pendente. O Plesk não tem `apt-ftparchive`/`dpkg-deb`; o Windows
+estão documentados em [SIGNING.md](SIGNING.md). O beta público contém somente
+`katu-update 1.1.2` (SHA-256 `c7a455b9fbcdff644b6b6a40e834fd8f97ec572c09c26cd9259f3aeb3a849ba3`);
+stable está vazio. Assinaturas, hashes, downloads HTTPS e gzip foram verificados;
+`apt-get update` e download do pacote passaram na CI com o repositório público.
+A validação numa instalação Katu OS continua pendente. O Plesk não tem `apt-ftparchive`/`dpkg-deb`; o Windows
 desta estação não conseguiu habilitar WSL. Usar host Debian separado para próximos
 builds e releases. Não apontar para o httpdocs do site atual.
 

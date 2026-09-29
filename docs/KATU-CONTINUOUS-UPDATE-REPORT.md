@@ -15,11 +15,11 @@ Localização e baseline: [auditoria](KATU-UPDATE-AUDIT.md).
 | Arquitetura | Implementada; [documentada](updates/ARCHITECTURE.md) |
 | Repositório | `https://repo.katuos.com.br`; DNS/TLS ativos; geração publicada no Plesk por symlink atômico |
 | Assinatura | Chave GPG de produção criada; fingerprint `402A0557D31BF7402008FB27B658038D520736AC`; privada local cifrada, nunca enviada ao servidor |
-| Stable/Beta | stable assinado e vazio; beta assinado publica `katu-update 1.1.1` |
+| Stable/Beta | stable assinado e vazio; beta assinado publica somente `katu-update 1.1.2` |
 | Componentes | Apps existentes já eram pacotes; assets separados em katu-icons, katu-theme, katu-wallpapers |
 | Metapacote | katu-desktop preparado, com Recommends opcionais |
 | Update incremental | Exercitado em APT de Debian descartável: somente katu-ai; central permaneceu na versão anterior |
-| Repositório público | InRelease de ambos canais, hashes SHA256, gzip e download do `.deb` verificados por HTTPS; `apt-get update` real pendente |
+| Repositório público | `apt-get update` e download do `.deb` 1.1.2 aprovados via APT autenticado; InRelease, hashes SHA256 e gzip válidos |
 | Dependências | Exercitadas com upgrade katu-core; APT inclui as dependências necessárias |
 | Novo aplicativo | Exercitado via metapacote em ambiente descartável |
 | Assinatura inválida/corrupção/offline | Rejeitados em testes APT descartáveis |
@@ -52,14 +52,16 @@ Limitações bloqueantes de produção:
    fingerprint por canal independente e manter backup cifrado fora desta estação.
 4. A transferência de arquivos antes pertencentes a katu-branding e hooks de
    branding precisa de upgrade e remoção testados no Katu OS.
-5. A execução CI 36566750249 passou: lintian, testes unitários, 14 integrações
-   APT autenticadas (incluindo autoatualização) e smoke test Qt. CI Debian não
-   atesta reboot, KDE/Polkit/systemd PID 1 nem hardware.
+5. A execução CI [36629886191](https://github.com/katuos/katuos/actions/runs/36629886191)
+   passou: testes unitários, build/lint do pacote, integrações APT autenticadas,
+   smoke Qt e consumo do beta público com APT. CI Debian não atesta reboot,
+   KDE/Polkit/systemd PID 1 nem hardware.
 
-Próximos passos: validar o repositório com `apt-get update` num Debian/Katu OS;
-homologar o bootstrap beta e o upgrade de `katu-update` numa máquina instalada;
+Próximos passos: homologar o bootstrap beta e o upgrade de `katu-update` numa
+máquina Katu OS instalada;
 preservar um backup cifrado da chave fora desta estação; testar recuperação/remoção;
-executar a matriz de stable antes de promover qualquer pacote. O beta público contém
-somente o candidato `katu-update 1.1.1` (SHA-256
-`f23bd098d4206dd5aacccd14ee06e5d0d1cf960f05254e8d74dd02848e843141`); stable não
-contém pacotes.
+executar a matriz de stable antes de promover qualquer pacote. O índice beta público
+contém somente `katu-update 1.1.2` (SHA-256
+`c7a455b9fbcdff644b6b6a40e834fd8f97ec572c09c26cd9259f3aeb3a849ba3`); stable não
+contém pacotes. O pacote foi baixado pelo teste APT público em CI, mas ainda aguarda
+homologação numa instalação Katu OS real.
