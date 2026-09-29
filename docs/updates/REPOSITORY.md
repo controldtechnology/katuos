@@ -21,10 +21,13 @@ do pool e não reutiliza um nome/versão com bytes diferentes. Metadata expira a
 14 dias; renovar as assinaturas antes do vencimento mesmo sem novos pacotes.
 `ledger.json` serve à promoção no release host, nunca à decisão de instalar no cliente.
 
-Servidor observado em 28/09/2026: conta Plesk em CageFS, sem CLI administrativa,
-sem dpkg-deb/apt-ftparchive. DNS de repo.katuos.com.br ainda ausente na verificação.
-Build/signing precisam ocorrer em host Debian separado. Configurar DNS, vhost e
-certificado TLS no painel antes do deploy. Não apontar para o httpdocs do site atual.
+Servidor observado em 29/09/2026: conta Plesk em CageFS, sem CLI administrativa,
+sem dpkg-deb/apt-ftparchive. O subdomínio `repo.katuos.com.br` foi criado pelo
+Plesk (ID 3731), raiz `/var/www/vhosts/katuos.com.br/site1`. A zona pública usa
+Cloudflare e ainda não tem resolução para `repo`; adicionar um registro A
+`repo` → `186.209.113.132` com proxy desativado (DNS-only), depois emitir TLS.
+Build/signing precisam ocorrer em host Debian separado. Não publicar antes de
+DNS e HTTPS válidos e chave de produção protegida. Não apontar para o httpdocs do site atual.
 
 Deploy: `scripts/release/deploy-repository.sh PUBLIC_GENERATION`. Configurar
 KATU_DEPLOY_HOST (alias SSH), KATU_DEPLOY_ROOT, KATU_SSH_PORT e KATU_VERIFY_KEYRING.

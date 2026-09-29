@@ -14,7 +14,7 @@ Localização e baseline: [auditoria](KATU-UPDATE-AUDIT.md).
 | Área | Resultado atual |
 |---|---|
 | Arquitetura | Implementada; [documentada](updates/ARCHITECTURE.md) |
-| Repositório | Gerador assinado preparado; DNS ainda não resolvia |
+| Repositório | Gerador assinado preparado; vhost Plesk criado; DNS público ainda não resolve |
 | Assinatura | GPG/apt-secure exercitados com chave descartável; chave de produção ausente |
 | Stable/Beta | Geração e gate de promoção preparados; nenhum canal de produção publicado |
 | Componentes | Apps existentes já eram pacotes; assets separados em katu-icons, katu-theme, katu-wallpapers |
@@ -37,9 +37,10 @@ boot, base, kernel e instalador permanecem sob mecanismos da distribuição.
 
 Limitações bloqueantes de produção:
 
-1. repo.katuos.com.br não resolvia no teste DNS/HTTPS. O SSH fornecido alcança
-   hospedagem CageFS, sem CLI de administração do Plesk. Criar DNS, vhost separado
-   e certificado pelo painel ou habilitar acesso administrativo.
+1. O subdomínio `repo.katuos.com.br` foi criado no Plesk (ID 3731), com raiz
+   `/var/www/vhosts/katuos.com.br/site1`. A zona pública usa nameservers Cloudflare;
+   o registro A precisa ser criado lá (`repo` → `186.209.113.132`, proxy DNS-only).
+   Depois, emitir/validar TLS no Plesk. Sem DNS autoritativo e TLS, nada foi publicado.
 2. Não havia VM Katu OS registrada no usuário local, e WSL não está instalado.
    Executar homologação com Katu OS instalado conforme updates/TESTING.md.
 3. Nenhuma chave de assinatura de produção foi provisionada. Criar/recuperar a
@@ -51,7 +52,7 @@ Limitações bloqueantes de produção:
    APT autenticadas (incluindo autoatualização) e smoke test Qt. CI Debian não
    atesta reboot, KDE/Polkit/systemd PID 1 nem hardware.
 
-Próximos passos: resolver DNS/TLS do subdomínio; homologar bootstrap de confiança
+Próximos passos: adicionar A no Cloudflare e validar TLS; homologar bootstrap de confiança
 em instalação existente; obter chave por processo protegido; executar a matriz beta
 no Katu OS instalado; anexar evidências por SHA-256; só então publicar beta, promover
 stable e testar a notificação/atualização real. Nenhum pacote foi publicado no site;
