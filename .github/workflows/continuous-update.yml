@@ -4,7 +4,7 @@ on:
     paths:
       - 'packages/**'
       - 'scripts/release/**'
-      - 'scripts/tests/*update*'
+      - 'scripts/tests/**'
       - '.github/workflows/continuous-update.yml'
   workflow_dispatch:
     inputs:
