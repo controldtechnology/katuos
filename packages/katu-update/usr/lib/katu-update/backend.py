@@ -40,7 +40,35 @@ def channel():
     return suites[0] if len(suites) == 1 and suites[0] in ('stable', 'beta') else 'configuração inválida'
 
 
+def validate_sources(root=Path('/')):
+    """Fail closed if APT has any explicit authentication bypass enabled."""
+    apt = root / 'etc/apt'
+    paths = [apt / 'sources.list']
+    for directory in ('sources.list.d', 'apt.conf.d'):
+        if (apt / directory).exists():
+            paths.extend((apt / directory).glob('*'))
+    if (apt / 'apt.conf').exists():
+        paths.append(apt / 'apt.conf')
+    source_bypass = re.compile(
+        r'(?i)(?:\btrusted\s*=\s*yes\b|\ballow-(?:insecure|weak|downgrade-to-insecure)\s*=\s*yes\b|'
+        r'^\s*(?:Trusted|Allow-Insecure|Allow-Weak|Allow-Downgrade-To-Insecure):\s*yes\s*$)'
+    )
+    config_bypass = re.compile(
+        r'(?i)\b(?:AllowUnauthenticated|AllowInsecureRepositories|'
+        r'AllowDowngradeToInsecureRepositories|AllowWeakRepositories)\s+"?(?:true|yes|1)\b'
+    )
+    for path in paths:
+        if path.is_file():
+            for line in path.read_text(errors='replace').splitlines():
+                if line.lstrip().startswith('#'):
+                    continue
+                if source_bypass.search(line) or config_bypass.search(line):
+                    raise UpdateError('Atualizações bloqueadas: existe uma fonte ou configuração APT sem autenticação obrigatória.')
+    return True
+
+
 def make_plan(selected=None):
+    validate_sources()
     import apt
     import apt_pkg
     apt_pkg.init_config()

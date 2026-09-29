@@ -270,9 +270,14 @@ class KatuUpdate(QMainWindow):
             self._update_btn.setEnabled(True)
 
     def _update_all(self):
+        package_lines = []
+        for package in self._apt_pkgs:
+            package_lines.append(f"{package['name']}  {package['installed'] or 'Novo'} → {package['version']}  ({package['origin']})")
+        package_lines.extend(f"{package['ref']}  {package['version']}  (Flatpak / {package['scope']})" for package in self._flat_pkgs)
+        download = self._plan.get('download', 0) / 1048576
         reply = QMessageBox.question(
             self, "Atualizar sistema",
-            f"Instalar {len(self._apt_pkgs) + len(self._flat_pkgs)} atualizações?\n\nO sistema não será reiniciado automaticamente.",
+            f"Instalar {len(package_lines)} atualizações?\nDownload APT: {download:.1f} MB\n\n" + "\n".join(package_lines) + "\n\nO sistema não será reiniciado automaticamente.",
             QMessageBox.Yes | QMessageBox.No
         )
         if reply != QMessageBox.Yes:

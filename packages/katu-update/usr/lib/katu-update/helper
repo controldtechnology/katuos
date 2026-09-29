@@ -11,7 +11,7 @@ import subprocess
 import sys
 import time
 sys.path.insert(0, '/usr/lib/katu-update')
-from backend import STATE, HELPER, UNIT, SAFE_NAME, UpdateError, make_plan, preflight, run, verify_versions
+from backend import STATE, HELPER, UNIT, SAFE_NAME, UpdateError, make_plan, preflight, run, validate_sources, verify_versions
 
 
 def write_json(name, value):
@@ -26,6 +26,7 @@ def write_json(name, value):
 
 
 def refresh():
+    validate_sources()
     STATE.mkdir(mode=0o755, parents=True, exist_ok=True)
     refresh_lock = (STATE / 'refresh.lock').open('w')
     try:

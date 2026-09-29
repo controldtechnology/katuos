@@ -38,6 +38,24 @@ class FailureTests(unittest.TestCase):
         message = backend.user_error(RuntimeError('https://user:secret@example.invalid'))
         self.assertNotIn('secret', message)
 
+    def test_apt_signature_bypass_is_rejected(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            sources = root / 'etc/apt/sources.list.d'
+            sources.mkdir(parents=True)
+            (sources / 'insecure.list').write_text('deb [trusted=yes] https://repo.invalid stable main\n')
+            with self.assertRaisesRegex(backend.UpdateError, 'sem autenticação'):
+                backend.validate_sources(root)
+
+    def test_deb822_signature_bypass_is_rejected(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            sources = root / 'etc/apt/sources.list.d'
+            sources.mkdir(parents=True)
+            (sources / 'insecure.sources').write_text('Types: deb\nURIs: https://repo.invalid\nSuites: stable\nTrusted: yes\n')
+            with self.assertRaises(backend.UpdateError):
+                backend.validate_sources(root)
+
     def test_version_must_be_verified(self):
         with patch.object(backend, 'run', return_value='installed\t1.0.0'):
             with self.assertRaisesRegex(backend.UpdateError, 'Validação'):

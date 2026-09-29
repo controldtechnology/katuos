@@ -16,7 +16,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 2
       - name: Install test and packaging tools
         run: |
           apt-get update
@@ -26,9 +26,7 @@ jobs:
       - name: Select changed packages
         id: changed
         run: |
-          base='${{ github.event.before }}'
-          case "$base" in ''|000*) base='HEAD^' ;; esac
-          packages=$(python3 scripts/release/changed-packages.py --base "$base")
+          packages=$(python3 scripts/release/changed-packages.py --event "$GITHUB_EVENT_PATH")
           printf '%s\n' "$packages" > "$RUNNER_TEMP/katu-packages"
           cat "$RUNNER_TEMP/katu-packages"
       - name: Build changed components independently
