@@ -27,7 +27,8 @@ def build(name, output):
         raise ValueError('Immutable artifact already exists; increment version or use a clean output directory')
     with tempfile.TemporaryDirectory(prefix='katu-package-') as temp:
         stage = Path(temp) / name
-        shutil.copytree(source, stage)
+        # Unit tests may create bytecode inside source package trees before packaging.
+        shutil.copytree(source, stage, ignore=shutil.ignore_patterns('__pycache__', '*.pyc', '*.pyo'))
         # Adopt the current image assets without changing the installed appearance.
         assets = {
             'katu-icons': ['usr/share/icons/katu', 'usr/share/icons/hicolor'],
