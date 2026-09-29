@@ -1,7 +1,7 @@
 # KATU OS — CONTINUOUS UPDATE
 
 Data da auditoria: 29/09/2026. Branch de trabalho: feat/continuous-update-20260928.
-Branch publicada: `feat/continuous-update-20260928` (HEAD `24381f4`).
+Branch publicada: `feat/continuous-update-20260928` (HEAD `2224709`).
 
 **Estado: infraestrutura de código e testes preparada; produção e aceitação em
 máquina instalada ainda não concluídas.** Não anunciar atualização contínua em
