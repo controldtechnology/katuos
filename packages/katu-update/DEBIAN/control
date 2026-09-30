@@ -1,5 +1,5 @@
 Package: katu-update
-Version: 1.1.2
+Version: 1.1.3
 Architecture: all
 Maintainer: Katu OS Team <katuos@gmail.com>
 Depends: python3 (>= 3.10), python3-pyqt5 | python3-pyside6, katu-core, python3-apt, apt, pkexec, systemd, libnotify-bin

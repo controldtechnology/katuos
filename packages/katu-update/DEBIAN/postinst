@@ -4,7 +4,9 @@ if [ "$1" = configure ]; then
     /usr/bin/python3 -I /usr/lib/katu-update/migrate.py
     if systemctl show-environment >/dev/null 2>&1; then
         systemctl daemon-reload
-        systemctl enable --now katu-update-check.timer
+        # Package configuration also runs inside live-build's chroot, where
+        # systemd is not running. Enable the timer for the next boot only.
+        systemctl enable katu-update-check.timer
         systemctl --global enable katu-update-check.timer
     fi
 fi
